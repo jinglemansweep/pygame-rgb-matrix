@@ -34,6 +34,10 @@ If the LED matrix doesn't show any content, inspect the journal logs for informa
 
     sudo journalctl -n 200 -u rgbmatrix.service
 
+If the service starts and you want to enable it to start automatically on every boot:
+
+    sudo systemctl enable rgbmatrix
+
 ## Development (Locally)
 
 The project can be started with a local PyGame GUI window for easier development and testing, providing the required desktop environment is installed and configured. The local GUI window can be enabled by setting the `GUI_ENABLED` environment variable to `true` (by default, the GUI is disabled).
