@@ -20,6 +20,7 @@ from utils import build_random_color, render_pygame
 COLOR = (255, 255, 255)
 COLOR_YELLOW = (255, 255, 0)
 COLOR_GREY = (127, 127, 127)
+COLOR_GREY_DARK = (15, 15, 15)
 COLOR_WHITE = (255, 255, 255)
 COLOR_BACKGROUND = (0, 0, 0)
 
@@ -36,7 +37,7 @@ screen = pygame.display.set_mode((LED_COLS, LED_ROWS))
 clock = pygame.time.Clock()
 font_small = pygame.font.SysFont(None, 14)
 font_medium = pygame.font.SysFont(None, 24)
-font_large = pygame.font.SysFont(None, 40)
+font_large = pygame.font.SysFont(None, 80)
 
 root = pygame.sprite.Group()
 
@@ -69,13 +70,13 @@ while True:
     actors.update()
     screen.fill(COLOR_BACKGROUND)
     t_frame = font_small.render(f"{frame}", True, COLOR_YELLOW)
-    screen.blit(t_frame, (0, 0))
+    screen.blit(t_frame, (LED_COLS - 24, 0))
     t_hhmm = font_medium.render(
-        "{}:{}".format(now.tm_hour, now.tm_min), True, COLOR_GREY
+        "{:0>2d}:{:0>2d}".format(now.tm_hour, now.tm_min), True, COLOR_GREY
     )
     screen.blit(t_hhmm, (0, 10))
-    t_ss = font_large.render("{}".format(now.tm_sec), True, COLOR_GREY)
-    screen.blit(t_ss, (30, 20))
+    t_ss = font_large.render("{:0>2d}".format(now.tm_sec), True, COLOR_GREY_DARK)
+    screen.blit(t_ss, (10, 20))
     root.draw(screen)
     render_pygame(screen, matrix)
 
