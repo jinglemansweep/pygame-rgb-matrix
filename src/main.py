@@ -73,12 +73,14 @@ while True:
     root.draw(screen)
     t_frame = font_small.render(f"{frame}", True, COLOR_YELLOW_DARK)
     screen.blit(t_frame, (LED_COLS - 24, 0))
+    t_ss = font_large.render("{:0>2d}".format(now.tm_sec), True, COLOR_GREY_DARK)
+    screen.blit(
+        pygame.transform.rotozoom(t_ss, frame % 360, 1 * (frame % 100) / 100), (0, 0)
+    )
     t_hhmm = font_medium.render(
         "{:0>2d}:{:0>2d}".format(now.tm_hour, now.tm_min), True, COLOR_GREY
     )
-    screen.blit(t_hhmm, (0, 10))
-    t_ss = font_large.render("{:0>2d}".format(now.tm_sec), True, COLOR_GREY_DARK)
-    screen.blit(t_ss, (10, 20))
+    screen.blit(t_hhmm, (10, 10))
 
     render_pygame(screen, matrix)
 
