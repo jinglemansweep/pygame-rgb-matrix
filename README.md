@@ -54,11 +54,9 @@ To test locally with a PyGame GUI window and without initialising the RGB Matrix
 It may be beneficial to develop locally using the local PyGame GUI and then deploy any changes to the Raspberry Pi when finished. This can be achieved using `rsync` over `ssh`. The following command will syncronise any changes (excluding cache and virtualenv resources) to the Raspberry Pi over the network. The following assumes the Raspberry Pi is accessible as `rpi.local` and the project is deployed to `/opt/pygame-rgb-matrix` already:
 
     rsync -avx \
-      --exclude venv \
       --exclude __pycache__ \
-      --exclude .git \
-      . \
-      rpi.local:/opt/pygame-rgb-matrix/
+      ./src/ \
+      rpi.local:/opt/pygame-rgb-matrix/src/
 
 If using the provided systemd unit file, the project can be remotely restarted from the Raspberry Pi:
 
