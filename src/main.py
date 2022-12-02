@@ -19,6 +19,7 @@ from utils import build_random_color, render_pygame
 
 COLOR = (255, 255, 255)
 COLOR_YELLOW = (255, 255, 0)
+COLOR_YELLOW_DARK = (31, 31, 31)
 COLOR_GREY = (127, 127, 127)
 COLOR_GREY_DARK = (15, 15, 15)
 COLOR_WHITE = (255, 255, 255)
@@ -43,7 +44,7 @@ root = pygame.sprite.Group()
 
 actors = pygame.sprite.Group()
 for i in range(3, random.randint(3, 100)):
-    s = BaseSprite(random.randint(1, 3), random.randint(1, 3), build_random_color())
+    s = BaseSprite(random.randint(1, 3), random.randint(1, 3), build_random_color(63))
     s.rect.x = random.randint(0, LED_COLS)
     s.rect.y = random.randint(0, LED_ROWS)
     actors.add(s)
@@ -69,7 +70,8 @@ while True:
             actor.rect.y = 0
     actors.update()
     screen.fill(COLOR_BACKGROUND)
-    t_frame = font_small.render(f"{frame}", True, COLOR_YELLOW)
+    root.draw(screen)
+    t_frame = font_small.render(f"{frame}", True, COLOR_YELLOW_DARK)
     screen.blit(t_frame, (LED_COLS - 24, 0))
     t_hhmm = font_medium.render(
         "{:0>2d}:{:0>2d}".format(now.tm_hour, now.tm_min), True, COLOR_GREY
@@ -77,8 +79,8 @@ while True:
     screen.blit(t_hhmm, (0, 10))
     t_ss = font_large.render("{:0>2d}".format(now.tm_sec), True, COLOR_GREY_DARK)
     screen.blit(t_ss, (10, 20))
-    root.draw(screen)
+
     render_pygame(screen, matrix)
 
-    clock.tick(200)
+    clock.tick(60)
     frame += 1

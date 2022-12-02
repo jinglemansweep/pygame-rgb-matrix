@@ -3,8 +3,12 @@ import random
 from PIL import Image
 
 
-def build_random_color():
-    return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+def build_random_color(range=255):
+    return (
+        random.randint(0, range),
+        random.randint(0, range),
+        random.randint(0, range),
+    )
 
 
 def render_pygame(screen, matrix=None):
