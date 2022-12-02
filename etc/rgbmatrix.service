@@ -1,0 +1,11 @@
+[Unit]
+Description=RGB Matrix
+
+[Service]
+ExecStart=/opt/pygame-rgb-matrix/venv/bin/python /opt/pygame-rgb-matrix/src/main.py
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+Type=notify
+
+[Install]
+WantedBy=default.target
