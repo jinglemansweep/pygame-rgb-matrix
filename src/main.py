@@ -11,7 +11,7 @@ sys.path.append(
 
 import pygame
 import random
-from pygame.locals import QUIT, RESIZABLE
+from pygame.locals import QUIT, RESIZABLE, SCALED
 
 from config import matrix_options, LED_ENABLED, LED_ROWS, LED_COLS
 from sprites import BaseSprite
@@ -58,14 +58,10 @@ for i in range(3, random.randint(3, 100)):
 root.add(actors)
 
 x = 0
-y = 0   
+y = 0
 frame = 0
 
-async def mqtt_poll():
-    while True:
-        mqtt.loop()
-        await asyncio.sleep(1)
-        
+
 def run():
     print("start asyncio event loop")
 
@@ -81,7 +77,7 @@ def run():
 
 
 async def main():
-    asyncio.create_task(mqtt_poll())
+    mqtt.loop_start()
     while True:
         await asyncio.create_task(tick())
         await asyncio.sleep(0.001)
@@ -117,5 +113,6 @@ async def tick():
     render_pygame(screen, matrix)
     clock.tick(60)
     frame += 1
+
 
 run()

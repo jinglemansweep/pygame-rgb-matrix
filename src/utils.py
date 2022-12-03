@@ -2,15 +2,28 @@ import pygame
 import random
 import paho.mqtt.client as mqtt
 from PIL import Image
+from pygame.locals import QUIT, RESIZABLE, SCALED
 
-from config import LED_ENABLED, GUI_ENABLED, LED_COLS, LED_ROWS, MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD
+from config import (
+    LED_ENABLED,
+    GUI_ENABLED,
+    LED_COLS,
+    LED_ROWS,
+    MQTT_HOST,
+    MQTT_PORT,
+    MQTT_USER,
+    MQTT_PASSWORD,
+)
+
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print("Connected with result code " + str(rc))
     client.subscribe("test/poop")
 
+
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    print(msg.topic + " " + str(msg.payload))
+
 
 def setup_mqtt_client():
     print(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
@@ -22,12 +35,12 @@ def setup_mqtt_client():
     client.connect(MQTT_HOST, MQTT_PORT, 60)
     return client
 
+
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
 # client.loop_forever()M
-
 
 
 def build_random_color(range=255):
@@ -37,9 +50,11 @@ def build_random_color(range=255):
         random.randint(0, range),
     )
 
+
 def build_pygame_screen():
     pygame.display.set_caption("RGB MATRIX")
-    return pygame.display.set_mode((LED_COLS, LED_ROWS))
+    return pygame.display.set_mode((LED_COLS, LED_ROWS), SCALED | RESIZABLE)
+
 
 def render_pygame(screen, matrix=None):
     if matrix is not None:
