@@ -7,7 +7,7 @@ from config import LED_ENABLED, GUI_ENABLED, LED_COLS, LED_ROWS, MQTT_HOST, MQTT
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.subscribe("$SYS/#")
+    client.subscribe("test/poop")
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
