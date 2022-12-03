@@ -26,6 +26,8 @@ from utils import (
 COLOR = (255, 255, 255)
 COLOR_YELLOW = (255, 255, 0)
 COLOR_YELLOW_DARK = (31, 31, 31)
+COLOR_MAGENTA = (255, 0, 255)
+COLOR_MAGENTA_DARK = (63, 0, 63)
 COLOR_GREY = (127, 127, 127)
 COLOR_GREY_DARK = (15, 15, 15)
 COLOR_WHITE = (255, 255, 255)
@@ -102,6 +104,11 @@ async def tick():
     root.draw(screen)
     t_frame = font_small.render(f"{frame}", True, COLOR_YELLOW_DARK)
     screen.blit(t_frame, (LED_COLS - 24, 0))
+    t_hiss = font_large.render("PARTY!", True, COLOR_MAGENTA_DARK)
+    screen.blit(
+        pygame.transform.rotozoom(t_hiss, frame % 360, 1 * (frame % 1000) / 1000),
+        (0, 0),
+    )
     t_ss = font_large.render("{:0>2d}".format(now.tm_sec), True, COLOR_GREY_DARK)
     screen.blit(
         pygame.transform.rotozoom(t_ss, frame % 360, 1 * (frame % 100) / 100), (0, 0)
@@ -109,7 +116,10 @@ async def tick():
     t_hhmm = font_medium.render(
         "{:0>2d}:{:0>2d}".format(now.tm_hour, now.tm_min), True, COLOR_GREY
     )
-    screen.blit(t_hhmm, (10, 10))
+    screen.blit(
+        t_hhmm,
+        (10, 10),
+    )
     render_pygame(screen, matrix)
     clock.tick(60)
     frame += 1
