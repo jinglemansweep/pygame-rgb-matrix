@@ -10,19 +10,26 @@ Create a `virtualenv` and install the project requirements:
     source ./venv/bin/activate
     pip install -r ./requirements.txt
 
-Clone and build [hzeller](https://github.com/hzeller)'s [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) Python bindings into the `lib` directory within the clone of this repository:
+The [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) library by [hzeller](https://github.com/hzeller)'s should be installed as a Git submodule in `lib/rpi-rgb-led-matrix`. Build the required Python bindings:
 
-    mkdir ./lib
-    cd ./lib
-    git clone git@github.com:hzeller/rpi-rgb-led-matrix.git
+    git submodule update --init --recursive
+    cd ./lib/rpi-rgb-led-matrix
     make build-python
 
+## Configuration
+
+Modify any LED matrix and other settings by copying and modifying the provided [config.env](./config.env.example) example file:
+
+    cp ./config.env.example ./config.env
+    vim ./config.env
+
+## Starting / Testing
+
+Use the provided helper [start.sh](./scripts/start.sh) script to start the application. It will automatically include your configuration in `config.env`:
+
+    sudo ./scripts/start.sh
+
 ## Deployment / Configuration
-
-Modify any LED matrix settings and other configuration by modifying the provided [rgbmatrix.env](./etc/rgbmatrix.env) environment file, and then copy it to `/etc/default`:
-
-    vim ./etc/rgbmatrix.env
-    sudo cp ./etc/rgbmatrix.env /etc/default/rgbmatrix
 
 Copy the provided [rgbmatrix.service](./etc/rgbmatrix.service) systemd unit definition file to `/etc/systemd/system`, reload the systemd daemon and then attempt to start the service:
 

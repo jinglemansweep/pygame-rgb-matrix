@@ -10,6 +10,7 @@ sys.path.append(
 )
 
 import pygame
+import pygame.pkgdata
 import random
 from pygame.locals import QUIT, RESIZABLE, SCALED
 
@@ -45,9 +46,9 @@ mqtt = setup_mqtt_client()
 pygame.init()
 screen = build_pygame_screen()
 clock = pygame.time.Clock()
-font_small = pygame.font.SysFont(None, 14)
-font_medium = pygame.font.SysFont(None, 24)
-font_large = pygame.font.SysFont(None, 80)
+font_small = pygame.font.SysFont("freesansbold", 14)
+font_medium = pygame.font.SysFont("freesansbold", 24)
+font_large = pygame.font.SysFont("freesansbold", 80)
 
 root = pygame.sprite.Group()
 

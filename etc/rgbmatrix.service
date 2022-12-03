@@ -2,9 +2,9 @@
 Description=RGB Matrix
 
 [Service]
-ExecStart=/opt/pygame-rgb-matrix/venv/bin/python /opt/pygame-rgb-matrix/src/main.py
+WorkingDirectory=/home/louis/data/dev/pygame-rgb-matrix
+ExecStart=/bin/bash ./scripts/start.sh
 Environment=PYTHONUNBUFFERED=1
-EnvironmentFile=-/etc/default/%p
 Restart=always
 Type=simple
 
