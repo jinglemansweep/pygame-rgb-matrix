@@ -1,5 +1,4 @@
 import os
-from rgbmatrix import RGBMatrixOptions
 
 # Read environment variable configuration and set any default values
 GUI_ENABLED = os.environ.get("GUI_ENABLED", "false").lower() == "true"
@@ -21,11 +20,17 @@ LED_PIXEL_MAPPER = os.environ.get("LED_PIXEL_MAPPER", "")
 LED_ROW_ADDR_TYPE = int(os.environ.get("LED_ROW_ADDR_TYPE", 0))
 LED_MULTIPLEXING = int(os.environ.get("LED_MULTIPLEXING", 0))
 LED_PANEL_TYPE = os.environ.get("LED_PANEL_TYPE", "")
+MQTT_HOST = os.environ.get("MQTT_HOST", "localhost")
+MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
+MQTT_USER = os.environ.get("MQTT_USER", None)
+MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD", "")
 
 # Construct RGB Matrix options object
 matrix_options = None
 
 if LED_ENABLED:
+    from rgbmatrix import RGBMatrixOptions
+
     matrix_options = RGBMatrixOptions()
     if LED_GPIO_MAPPING is not None:
         matrix_options.hardware_mapping = LED_GPIO_MAPPING

@@ -14,7 +14,12 @@ from pygame.locals import QUIT, RESIZABLE
 
 from config import matrix_options, LED_ENABLED, LED_ROWS, LED_COLS
 from sprites import BaseSprite
-from utils import build_random_color, render_pygame
+from utils import (
+    build_random_color,
+    render_pygame,
+    build_pygame_screen,
+    setup_mqtt_client,
+)
 
 
 COLOR = (255, 255, 255)
@@ -32,9 +37,10 @@ if LED_ENABLED:
     matrix = RGBMatrix(options=matrix_options)
 
 
+mqtt = setup_mqtt_client()
+
 pygame.init()
-pygame.display.set_caption("RGB MATRIX")
-screen = pygame.display.set_mode((LED_COLS, LED_ROWS))
+screen = build_pygame_screen()
 clock = pygame.time.Clock()
 font_small = pygame.font.SysFont(None, 14)
 font_medium = pygame.font.SysFont(None, 24)
@@ -49,7 +55,6 @@ for i in range(3, random.randint(3, 100)):
     s.rect.y = random.randint(0, LED_ROWS)
     actors.add(s)
 root.add(actors)
-
 
 x = 0
 y = 0
@@ -85,4 +90,5 @@ while True:
     render_pygame(screen, matrix)
 
     clock.tick(60)
+    mqtt.loop()
     frame += 1
