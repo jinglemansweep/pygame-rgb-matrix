@@ -92,6 +92,15 @@ class Camera:
         self.position = list(position)
         self.direction = list(direction)
         self.speed = list(speed)
+        print("MAP SIZE", self.map_size)
+        print(
+            self.map_size,
+            self.viewport_size,
+            self.tile_size,
+            self.position,
+            self.direction,
+            self.speed,
+        )
 
     def get_position(self):
         return (self.position[0], self.position[1])
@@ -101,7 +110,8 @@ class Camera:
             self.position[axis] += self.direction[axis] * self.speed[axis]
             if (
                 self.position[axis]
-                > (self.map_size[axis] - self.viewport_size[axis]) * self.tile_size
+                > (self.map_size[axis] - self.viewport_size[axis])
+                * self.tile_size[axis]
             ):
                 self.direction[axis] = -1
             if self.position[axis] < 0:

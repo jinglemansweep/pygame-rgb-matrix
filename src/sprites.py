@@ -18,7 +18,7 @@ class BaseSprite(pygame.sprite.Sprite):
         return (self.rect[0] - camera.position[0], self.rect[1] - camera.position[1])
 
 
-class Tileset:
+class BaseTileset:
     def __init__(self, file, size=(8, 8), margin=0, spacing=0, brightness=1.0):
         self.file = file
         self.size = size
@@ -51,8 +51,8 @@ class Tileset:
         return f"{self.__class__.__name__} file:{self.file} tile:{self.size}"
 
 
-class Tilemap:
-    def __init__(self, tileset, size=(4, 4), rect=None):
+class BaseTilemap:
+    def __init__(self, tileset, size=None, rect=None):
         self.size = size
         self.tileset = tileset
         self.map = np.zeros(size, dtype=int)
@@ -76,16 +76,8 @@ class Tilemap:
         self.map = np.zeros(self.size, dtype=int)
         self.render()
 
-    # Direction: Top to Bottom, Left to Right
-    # 0 = Top Row, 41 = Bottom Row
-
     def set_map(self, map):
         self.map = np.array(map)
-
-    def set_random(self):
-        n = len(self.tileset.tiles)
-        self.map = np.random.randint(n, size=self.size)
-        self.render()
 
     def __str__(self):
         return f"{self.__class__.__name__} {self.size}"
