@@ -120,7 +120,7 @@ async def main():
 
 
 async def tick():
-    global frame, screen
+    global frame
     now = time.localtime()
     for event in pygame.event.get():
         if event.type == QUIT:
