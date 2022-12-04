@@ -32,9 +32,6 @@ class Camera:
         self.speed = list(speed)
         self.target_position = [None, None]
 
-    def get_position(self):
-        return (self.position[0], self.position[1])
-
     def set_target_position(self, position):
         for axis in [0, 1]:
             if position[axis] is not None:
@@ -141,6 +138,9 @@ class BaseTilemap:
             for j in range(n):
                 tile = self.tileset.tiles[self.map[i, j]]
                 self.image.blit(tile, (j * tw, i * th))
+
+    def update(self):
+        pass
 
     def set_zero(self):
         self.map = np.zeros(self.size, dtype=int)
