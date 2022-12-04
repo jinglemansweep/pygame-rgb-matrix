@@ -36,13 +36,6 @@ def setup_mqtt_client():
     return client
 
 
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-# client.loop_forever()M
-
-
 def build_random_color(range=255):
     return (
         random.randint(0, range),
@@ -68,51 +61,3 @@ def render_pygame(screen, matrix=None):
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
     pygame.display.flip()
-
-
-class Camera:
-    def __init__(
-        self,
-        map_size,
-        viewport_size,
-        tile_size,
-        position=None,
-        direction=None,
-        speed=None,
-    ):
-        if position is None:
-            position = [0, 0]
-        if direction is None:
-            direction = [0, 0]
-        if speed is None:
-            speed = [0, 0]
-        self.map_size = map_size
-        self.viewport_size = viewport_size
-        self.tile_size = tile_size
-        self.position = list(position)
-        self.direction = list(direction)
-        self.speed = list(speed)
-        print("MAP SIZE", self.map_size)
-        print(
-            self.map_size,
-            self.viewport_size,
-            self.tile_size,
-            self.position,
-            self.direction,
-            self.speed,
-        )
-
-    def get_position(self):
-        return (self.position[0], self.position[1])
-
-    def update(self):
-        for axis in [0, 1]:
-            self.position[axis] += self.direction[axis] * self.speed[axis]
-            if (
-                self.position[axis]
-                > (self.map_size[axis] - self.viewport_size[axis])
-                * self.tile_size[axis]
-            ):
-                self.direction[axis] = -1
-            if self.position[axis] < 0:
-                self.direction[axis] = 1

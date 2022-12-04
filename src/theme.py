@@ -63,9 +63,6 @@ ANIMAL_CHOICES = [
     TILE_ANIMAL_FOX,
 ]
 
-tileset_bg = BaseTileset(SPRITE_TILES_FILE, TILE_SIZE, 0, 0, 0.6)
-tilemap_bg = BaseTilemap(tileset_bg, MAP_SIZE)
-
 
 class Theme:
     def __init__(self):

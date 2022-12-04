@@ -7,6 +7,45 @@ COLOR_SURFACE = (0, 0, 0)
 _dummy_display = pygame.display.set_mode((1, 1))
 
 
+class Camera:
+    def __init__(
+        self,
+        map_size,
+        viewport_size,
+        tile_size,
+        position=None,
+        direction=None,
+        speed=None,
+    ):
+        if position is None:
+            position = [0, 0]
+        if direction is None:
+            direction = [0, 0]
+        if speed is None:
+            speed = [0, 0]
+        self.map_size = map_size
+        self.viewport_size = viewport_size
+        self.tile_size = tile_size
+        self.position = list(position)
+        self.direction = list(direction)
+        self.speed = list(speed)
+
+    def get_position(self):
+        return (self.position[0], self.position[1])
+
+    def update(self):
+        for axis in [0, 1]:
+            self.position[axis] += self.direction[axis] * self.speed[axis]
+            if (
+                self.position[axis]
+                > (self.map_size[axis] - self.viewport_size[axis])
+                * self.tile_size[axis]
+            ):
+                self.direction[axis] = -1
+            if self.position[axis] < 0:
+                self.direction[axis] = 1
+
+
 class BaseSprite(pygame.sprite.Sprite):
     def __init__(self, tileset, tile_index):
         super().__init__()
@@ -19,7 +58,7 @@ class BaseSprite(pygame.sprite.Sprite):
 
 
 class BaseTileset:
-    def __init__(self, file, size=(8, 8), margin=0, spacing=0, brightness=1.0):
+    def __init__(self, file, size, margin=0, spacing=0, brightness=1.0):
         self.file = file
         self.size = size
         self.margin = margin
@@ -78,6 +117,7 @@ class BaseTilemap:
 
     def set_map(self, map):
         self.map = np.array(map)
+        self.render()
 
     def __str__(self):
         return f"{self.__class__.__name__} {self.size}"
