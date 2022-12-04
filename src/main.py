@@ -74,7 +74,7 @@ for i in range(0, 16):
     sprite.rect.x = x
     sprite.rect.y = y
     actors.add(sprite)
-    # x += 16
+    x += 16
     if x > LED_COLS:
         y += 16
         x = 0

@@ -62,11 +62,8 @@ def render_pygame(screen, matrix=None):
         new_screen = pygame.Surface(
             (flipped.get_rect().width, flipped.get_rect().height)
         )
-
         new_screen.blit(flipped, (0, 0), special_flags=BLEND_RGBA_ADD)
         imgdata = pygame.surfarray.array3d(new_screen)
-        print(imgdata)
-
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
     pygame.display.flip()
