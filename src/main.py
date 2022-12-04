@@ -128,7 +128,7 @@ for row in range(MAP_HEIGHT):
         game_map.append(generate_row_waves(MAP_WIDTH, random.randint(0, 2)))
     if row > row_beach + 1:
         game_map.append(
-            generate_row_water(MAP_WIDTH, random.randint(0, 2), random.randint(0, 2))
+            generate_row_water(MAP_WIDTH, random.randint(0, 8), random.randint(0, 8))
         )
 
 tilemap_bg.set_map(game_map)
