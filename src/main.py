@@ -136,7 +136,7 @@ async def tick():
         if actor.rect.y > LED_ROWS:
             actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
-    screen = render_pygame(screen, matrix)
+    render_pygame(screen, matrix)
     clock.tick(60)
     frame += 1
 

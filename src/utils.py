@@ -56,10 +56,10 @@ def build_pygame_screen():
     return pygame.display.set_mode((LED_COLS, LED_ROWS), SCALED | RESIZABLE, 32)
 
 
-def render_pygame(_screen, matrix=None):
+def render_pygame(screen, matrix=None):
     if matrix is not None:
-        flipped = pygame.transform.flip(_screen, True, False)
-        screen = pygame.Surface((flipped.get_rect().width, flipped.get_rect().height))
+        flipped = pygame.transform.flip(screen, True, False)
+        # screen = pygame.Surface((flipped.get_rect().width, flipped.get_rect().height))
         screen.blit(
             flipped,
             (0, 0),
@@ -67,4 +67,4 @@ def render_pygame(_screen, matrix=None):
         imgdata = pygame.surfarray.array3d(screen)
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
-    return screen
+    pygame.display.flip()
