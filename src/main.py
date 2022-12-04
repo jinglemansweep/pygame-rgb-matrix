@@ -58,6 +58,8 @@ TILE_WATER_LILY = 50
 TILE_WATER_REEDS = 56
 
 MAP_TILE_SIZE = 8
+VIEWPORT_WIDTH = 8  # number of tiles per row
+VIEWPORT_HEIGHT = 8  # number of rows
 MAP_WIDTH = 32  # multiplied by tile size to get pixels
 MAP_HEIGHT = 32  # multiplied by tile size to get pixels
 
@@ -65,7 +67,7 @@ SPRITE_TILES_FILE = f"{os.path.dirname(__file__)}/sprites/tiles.png"
 SPRITE_ANIMALS_FILE = f"{os.path.dirname(__file__)}/sprites/animals.png"
 
 tileset_bg = Tileset(SPRITE_TILES_FILE, (8, 8), 0, 0, 0.6)
-tilemap_bg = Tilemap(tileset_bg, (8, 8))
+tilemap_bg = Tilemap(tileset_bg, (MAP_WIDTH, MAP_HEIGHT))
 
 
 def generate_row_land(width, alt_tiles=0, rock_tiles=0, weed_tiles=0, desert=False):
@@ -108,7 +110,7 @@ def generate_row_water(width, lily_tiles=0, reed_tiles=0):
     return row
 
 
-row_beach = random.randint(3, 6)
+row_beach = random.randint(3, MAP_HEIGHT // 2)
 
 game_map = []
 
@@ -117,9 +119,9 @@ for row in range(MAP_HEIGHT):
         game_map.append(
             generate_row_land(
                 MAP_WIDTH,
-                random.randint(0, 2),
-                random.randint(0, 2),
-                random.randint(0, 2),
+                random.randint(0, 8),
+                random.randint(0, 8),
+                random.randint(0, 8),
             )
         )
     if row == row_beach:
@@ -128,7 +130,7 @@ for row in range(MAP_HEIGHT):
         game_map.append(generate_row_waves(MAP_WIDTH, random.randint(0, 2)))
     if row > row_beach + 1:
         game_map.append(
-            generate_row_water(MAP_WIDTH, random.randint(0, 8), random.randint(0, 8))
+            generate_row_water(MAP_WIDTH, random.randint(0, 4), random.randint(0, 4))
         )
 
 tilemap_bg.set_map(game_map)
@@ -189,6 +191,11 @@ async def main():
         await asyncio.sleep(0.001)
 
 
+camera = [0, 0]
+camera_dir = [1, 1]
+camera_speed = [0.5, 1]
+
+
 async def tick():
     global frame, screen
     now = time.localtime()
@@ -197,7 +204,8 @@ async def tick():
             pygame.quit()
             sys.exit()
     screen.fill((0, 0, 0))
-    screen.blit(tilemap_bg.image, (0, 0))
+    cam_x, cam_y = camera
+    screen.blit(tilemap_bg.image, (0 - cam_x, 0 - cam_y))
     for idx, actor in enumerate(actors):
         actor.rect.x += 1
         if actor.rect.x > LED_COLS:
@@ -206,6 +214,18 @@ async def tick():
         if actor.rect.y >= 16:
             actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
+    if frame % 1 == 0:
+        camera[0] += camera_dir[0] * camera_speed[0]
+        if camera[0] > (MAP_WIDTH - VIEWPORT_WIDTH) * MAP_TILE_SIZE:
+            camera_dir[0] = -1
+        if camera[0] < 0:
+            camera_dir[0] = 1
+        camera[1] += camera_dir[1] * camera_speed[1]
+        if camera[1] > (MAP_HEIGHT - VIEWPORT_HEIGHT) * MAP_TILE_SIZE:
+            camera_dir[1] = -1
+        if camera[1] < 0:
+            camera_dir[1] = 1
+    print(camera_dir, camera)
     render_pygame(screen, matrix)
     clock.tick(30)
     frame += 1
