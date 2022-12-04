@@ -67,7 +67,7 @@ class Camera:
     def _set_motion_props(self):
         for axis in [0, 1]:
             if self.target_position[axis] is not None:
-                if self.target_position[axis] != self.position[axis]:
+                if int(self.target_position[axis]) != int(self.position[axis]):
                     self.direction[axis] = (
                         1 if self.target_position[axis] > self.position[axis] else -1
                     )
