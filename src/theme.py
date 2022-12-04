@@ -65,7 +65,7 @@ TILE_SIZE = (8, 8)  # width, height
 class Theme:
     def __init__(self, viewport_size):
         self.viewport_size = viewport_size
-        self.camera = Camera(MAP_SIZE, self.viewport_size, TILE_SIZE, speed=(0.2, 0.2))
+        self.camera = Camera(MAP_SIZE, self.viewport_size, TILE_SIZE, speed=(0.5, 0.5))
         self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, TILE_SIZE, 0, 0, 0.6)
         self.tileset_animals = BaseTileset(SPRITE_ANIMALS_FILE, TILE_SIZE, 0, 0, 0.9)
         self.row_beach = random.randint(MAP_SIZE[1] // 2, MAP_SIZE[1] - 4)
