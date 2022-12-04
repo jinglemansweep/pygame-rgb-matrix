@@ -53,12 +53,12 @@ def build_random_color(range=255):
 
 def build_pygame_screen():
     pygame.display.set_caption("RGB MATRIX")
-    return pygame.display.set_mode((LED_COLS, LED_ROWS), SCALED | RESIZABLE)
+    return pygame.display.set_mode((LED_COLS, LED_ROWS), SCALED | RESIZABLE, 32)
 
 
 def render_pygame(screen, matrix=None):
     if matrix is not None:
-        screen.blit(pygame.transform.flip(screen, False, True), dest=(0, 0))
+        # screen.blit(pygame.transform.flip(screen, False, True), dest=(0, 0))
         imgdata = pygame.surfarray.array3d(screen)
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)

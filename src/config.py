@@ -54,4 +54,5 @@ if LED_ENABLED:
     matrix_options.drop_privileges = True
 
 if not GUI_ENABLED:
+    pass
     os.putenv("SDL_VIDEODRIVER", "dummy")
