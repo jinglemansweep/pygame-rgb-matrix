@@ -1,8 +1,22 @@
-# pygame-rgb-matrix
+# PyGame IoT Framework for RGB LED Matrices
 
-PyGame RGB Matrix Framework for HUB75 LED Panels
+An attempt at an experimental but slightly opinionated IoT display framework utilising PyGame as a sprite and graphics engine running on a Raspberry Pi outputting to a standard HUB75 RGB LED matrix. PyGame is able to dump its display as an array of RGB values, which are perfect for driving an RGB Matrix using the [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) library by [hzeller](https://github.com/hzeller).
+
+By utilising PyGame, we can leverage the awesome graphics, spriting and animation systems available as well as develop locally (without the need for a Raspberry Pi and RGB Matrix connected).
 
 ![Demo](./docs/images/demo.gif)
+
+## Requirements
+
+* Any Raspberry Pi with 40 pin headers
+* RGB Matrix Hat (e.g. [AdaFruit RGB Matrix Bonnet](https://www.adafruit.com/product/3211) or [Electrodragon RGB LED Matrix Panel Drive Board](https://www.electrodragon.com/product/rgb-matrix-panel-drive-board-raspberry-pi/)) 
+* HUB75(E) compatible LED matrix
+
+## Components
+
+* [PyGame](https://www.pygame.org/)
+* [hzeller/rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix)
+* [Tiny Ranch 8x8px Asset Pack](https://gvituri.itch.io/tiny-ranch)
 
 ## Installation
 
@@ -60,12 +74,12 @@ To test locally with a PyGame GUI window and without initialising the RGB Matrix
 
 ### Redeploying Changes
 
-It may be beneficial to develop locally using the local PyGame GUI and then deploy any changes to the Raspberry Pi when finished. This can be achieved using `rsync` over `ssh`. The following command will syncronise any changes (excluding cache and virtualenv resources) to the Raspberry Pi over the network. The following assumes the Raspberry Pi is accessible as `rpi.local` and the project is deployed to `/opt/pygame-rgb-matrix` already:
+It may be beneficial to develop locally using the local PyGame GUI and then deploy any changes to the Raspberry Pi when finished. This can be achieved using `rsync` over `ssh`. The following command will syncronise any changes (excluding cache and virtualenv resources) to the Raspberry Pi over the network. The following assumes the Raspberry Pi is accessible as `rpi.local` and the project is deployed to `/home/user/pygame-rgb-matrix` already:
 
     rsync -avx \
       --exclude __pycache__ \
       ./src/ \
-      rpi.local:/opt/pygame-rgb-matrix/src/
+      rpi.local:/home/user/pygame-rgb-matrix/src/
 
 If using the provided systemd unit file, the project can be remotely restarted from the Raspberry Pi:
 

@@ -15,7 +15,6 @@ sys.path.append(
 )
 
 from config import matrix_options, LED_ENABLED
-from sprites import BaseSprite, BaseTilemap, BaseTileset, Camera
 from utils import (
     render_pygame,
     build_pygame_screen,
@@ -23,9 +22,7 @@ from utils import (
 )
 from theme import Theme
 
-VIEWPORT_WIDTH = 8  # number of tiles per row
-VIEWPORT_HEIGHT = 8  # number of rows
-VIEWPORT_SIZE = (VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
+VIEWPORT_SIZE = (8, 8)
 
 matrix = None
 if LED_ENABLED:
@@ -39,10 +36,8 @@ pygame.init()
 screen = build_pygame_screen()
 clock = pygame.time.Clock()
 
-frame = 0
-
-
 theme = Theme(VIEWPORT_SIZE)
+frame = 0
 
 
 def run():
@@ -75,6 +70,7 @@ async def tick():
     # frame start
     now = time.localtime()
     screen.fill((0, 0, 0))
+    # updates
     theme.update(frame)
     # blitting
     theme.blit(screen)

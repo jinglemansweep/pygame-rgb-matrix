@@ -5,8 +5,6 @@ from PIL import Image
 from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
 from config import (
-    LED_ENABLED,
-    GUI_ENABLED,
     LED_COLS,
     LED_ROWS,
     MQTT_HOST,
@@ -18,7 +16,7 @@ from config import (
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
-    client.subscribe("test/poop")
+    client.subscribe("test/rgbmatrix")
 
 
 def on_message(client, userdata, msg):
@@ -36,14 +34,6 @@ def setup_mqtt_client():
     return client
 
 
-def build_random_color(range=255):
-    return (
-        random.randint(0, range),
-        random.randint(0, range),
-        random.randint(0, range),
-    )
-
-
 def build_pygame_screen():
     pygame.display.set_caption("RGB MATRIX")
     return pygame.display.set_mode((LED_COLS, LED_ROWS), SCALED | RESIZABLE, 32)
@@ -52,7 +42,6 @@ def build_pygame_screen():
 def render_pygame(screen, matrix=None):
     if matrix is not None:
         flipped = pygame.transform.flip(screen, True, False)
-        # screen = pygame.Surface((flipped.get_rect().width, flipped.get_rect().height))
         screen.blit(
             flipped,
             (0, 0),
