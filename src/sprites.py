@@ -8,10 +8,14 @@ _dummy_display = pygame.display.set_mode((1, 1))
 
 
 class BaseSprite(pygame.sprite.Sprite):
-    def __init__(self, surface):
+    def __init__(self, tileset, tile_index):
         super().__init__()
-        self.image = surface
+        self.tileset = tileset
+        self.image = self.tileset.tiles[tile_index]
         self.rect = self.image.get_rect()
+
+    def get_viewport_position(self, camera):
+        return (self.rect[0] - camera.position[0], self.rect[1] - camera.position[1])
 
 
 class Tileset:

@@ -22,6 +22,7 @@ from utils import (
     render_pygame,
     build_pygame_screen,
     setup_mqtt_client,
+    Camera,
 )
 
 COLOR = (255, 255, 255)
@@ -56,6 +57,24 @@ TILE_WAVES_ALT = 54
 TILE_WATER_EMPTY = 49
 TILE_WATER_LILY = 50
 TILE_WATER_REEDS = 56
+
+TILE_ANIMAL_COW = 0
+TILE_ANIMAL_XXX = 6
+TILE_ANIMAL_PIG = 12
+TILE_ANIMAL_SHEEP = 18
+TILE_ANIMAL_GOOSE = 24
+TILE_ANIMAL_DUCK = 30
+TILE_ANIMAL_CHICKEN = 36
+TILE_ANIMAL_CHICK = 42
+TILE_ANIMAL_FOX = 48
+TILE_ANIMAL_CAT_BLACK = 54
+TILE_ANIMAL_DOG_ALSATION = 60
+TILE_ANIMAL_DOG_HUSKY = 66
+TILE_ANIMAL_DOG_COLLIE = 72
+TILE_ANIMAL_CAT_BROWN = 80
+TILE_ANIMAL_CAT_GINGER = 88
+TILE_ANIMAL_CAT_BLACK = 94
+
 
 MAP_TILE_SIZE = 8
 VIEWPORT_WIDTH = 8  # number of tiles per row
@@ -137,20 +156,41 @@ tilemap_bg.render()
 
 tileset_animals = Tileset(SPRITE_ANIMALS_FILE, (8, 8), 0, 0, 0.9)
 
-actors = pygame.sprite.Group()
-x = 0
-y = 0
-for i in range(0, 16):
-    sprite = BaseSprite(tileset_animals.tiles[i])
-    sprite.rect.x = x
-    sprite.rect.y = y
-    actors.add(sprite)
-    x += 8
-    if x > LED_COLS:
-        y += 8
-        x = 0
-    if y > LED_ROWS:
-        y = 0
+animal_choices = [
+    TILE_ANIMAL_COW,
+    TILE_ANIMAL_PIG,
+    TILE_ANIMAL_SHEEP,
+    TILE_ANIMAL_GOOSE,
+    TILE_ANIMAL_DUCK,
+    TILE_ANIMAL_CHICKEN,
+    TILE_ANIMAL_CHICK,
+    TILE_ANIMAL_FOX,
+]
+
+
+class AnimalSprite(BaseSprite):
+    def __init__(self, tileset, tile_start_index=0, position=None):
+        super().__init__(tileset_animals, tile_start_index)
+        if position is None:
+            position = (0, 0)
+        self.rect = position
+
+    def update(self):
+        print(self, "update")
+
+
+actors_animals = pygame.sprite.Group()
+for i in range(0, 24):
+    sprite = AnimalSprite(
+        tileset_animals,
+        random.choice(animal_choices),
+        (
+            random.randint(0, MAP_WIDTH * MAP_TILE_SIZE),
+            random.randint(0, (row_beach -1) * MAP_TILE_SIZE),
+        ),
+    )
+    actors_animals.add(sprite)
+
 matrix = None
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
@@ -190,43 +230,36 @@ async def main():
         await asyncio.sleep(0.001)
 
 
-camera = [0, 0]
-camera_dir = [1, 1]
-camera_speed = [0.4, 0.1]
+camera = Camera(
+    (MAP_WIDTH, MAP_HEIGHT),
+    (VIEWPORT_WIDTH, VIEWPORT_HEIGHT),
+    MAP_TILE_SIZE,
+    (0, 0),
+    (1, 1),
+    (0.4, 0.1),
+)
 
 
 async def tick():
-    global frame, screen
-    now = time.localtime()
+    global camera, frame, screen
+    # events
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+    # frame start
     screen.fill((0, 0, 0))
-    cam_x, cam_y = camera
-    screen.blit(tilemap_bg.image, (0 - cam_x, 0 - cam_y))
-    for idx, actor in enumerate(actors):
-        actor.rect.x += 1
-        if actor.rect.x > LED_COLS:
-            actor.rect.y += 8
-            actor.rect.x = -8
-        if actor.rect.y >= 16:
-            actor.rect.y = 0
-        screen.blit(actor.image, actor.rect)
-
-    camera[0] += camera_dir[0] * camera_speed[0]
-    if camera[0] > (MAP_WIDTH - VIEWPORT_WIDTH) * MAP_TILE_SIZE:
-        camera_dir[0] = -1
-    if camera[0] < 0:
-        camera_dir[0] = 1
-    camera[1] += camera_dir[1] * camera_speed[1]
-    if camera[1] > (MAP_HEIGHT - VIEWPORT_HEIGHT) * MAP_TILE_SIZE:
-        camera_dir[1] = -1
-    if camera[1] < 0:
-        camera_dir[1] = 1
-    print(camera_dir, camera)
-
+    camera.update()
+    cx, cy = camera.get_position()
+    now = time.localtime()
+    # blitting
+    screen.blit(tilemap_bg.image, (0 - cx, 0 - cy))
+    actors_animals.update()
+    for idx, actor in enumerate(actors_animals):
+        screen.blit(actor.image, actor.get_viewport_position(camera))
+    # rendering
     render_pygame(screen, matrix)
+    # frame end
     clock.tick(120)
     frame += 1
 

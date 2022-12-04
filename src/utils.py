@@ -68,3 +68,41 @@ def render_pygame(screen, matrix=None):
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
     pygame.display.flip()
+
+
+class Camera:
+    def __init__(
+        self,
+        map_size,
+        viewport_size,
+        tile_size,
+        position=None,
+        direction=None,
+        speed=None,
+    ):
+        if position is None:
+            position = [0, 0]
+        if direction is None:
+            direction = [0, 0]
+        if speed is None:
+            speed = [0, 0]
+        self.map_size = map_size
+        self.viewport_size = viewport_size
+        self.tile_size = tile_size
+        self.position = list(position)
+        self.direction = list(direction)
+        self.speed = list(speed)
+
+    def get_position(self):
+        return (self.position[0], self.position[1])
+
+    def update(self):
+        for axis in [0, 1]:
+            self.position[axis] += self.direction[axis] * self.speed[axis]
+            if (
+                self.position[axis]
+                > (self.map_size[axis] - self.viewport_size[axis]) * self.tile_size
+            ):
+                self.direction[axis] = -1
+            if self.position[axis] < 0:
+                self.direction[axis] = 1
