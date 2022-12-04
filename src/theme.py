@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 from pygame.locals import *
-from sprites import BaseSprite, BaseTilemap, BaseTileset
+from sprites import BaseSprite, BaseTilemap, BaseTileset, Camera
 
 # THEME STUFF
 
@@ -65,9 +65,13 @@ ANIMAL_CHOICES = [
 
 
 class Theme:
-    def __init__(self):
+    def __init__(self, viewport_size):
+        self.viewport_size = viewport_size
         self.map_size = MAP_SIZE
         self.tile_size = TILE_SIZE
+        self.camera = Camera(
+            self.map_size, self.viewport_size, self.tile_size, speed=(0.2, 0.2)
+        )
         self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, self.tile_size, 0, 0, 0.6)
         self.tileset_animals = BaseTileset(
             SPRITE_ANIMALS_FILE, self.tile_size, 0, 0, 0.9
@@ -88,14 +92,21 @@ class Theme:
             )
             self.actors_animals.add(sprite)
 
-    def blit(self, screen, camera):
+    def update(self, frame):
+        self.camera.update()
+        self.actors_animals.update()
+        if frame % 2500 == 0:
+            self.camera.set_random_position((None, self.row_beach * self.tile_size[1]))
+
+    def blit(self, screen):
+        # print(f"theme->blit camera={self.camera.position}")
         screen.blit(
             self.tilemap_bg.image,
-            (0 - camera.get_position()[0], 0 - camera.get_position()[1]),
+            (0 - self.camera.get_position()[0], 0 - self.camera.get_position()[1]),
         )
-        self.actors_animals.update()
+
         for idx, actor in enumerate(self.actors_animals):
-            screen.blit(actor.image, actor.get_viewport_position(camera))
+            screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
 
 class AnimalSprite(BaseSprite):
@@ -106,7 +117,7 @@ class AnimalSprite(BaseSprite):
         self.rect = position
 
     def update(self):
-        print(self, "update")
+        pass
 
 
 class BackgroundTilemap(BaseTilemap):
@@ -147,7 +158,6 @@ class BackgroundTilemap(BaseTilemap):
             row[random.randint(0, width - 1)] = start_tile + 6
         for i in range(weed_tiles):
             row[random.randint(0, width - 1)] = start_tile + 7
-        print(row)
         return row
 
     def _generate_row_beach(self, width, alt_tiles=0, desert=False):
@@ -155,14 +165,12 @@ class BackgroundTilemap(BaseTilemap):
         row = [start_tile + 2 for i in range(width)]
         for i in range(alt_tiles):
             row[random.randint(0, width - 1)] = start_tile + 8
-        print(row)
         return row
 
     def _generate_row_waves(self, width, alt_tiles=0):
         row = [TILE_WAVES for i in range(width)]
         for i in range(alt_tiles):
             row[random.randint(0, width - 1)] = TILE_WAVES_ALT
-        print(row)
         return row
 
     def _generate_row_water(self, width, lily_tiles=0, reed_tiles=0):
@@ -171,5 +179,4 @@ class BackgroundTilemap(BaseTilemap):
             row[random.randint(0, width - 1)] = TILE_WATER_LILY
         for i in range(reed_tiles):
             row[random.randint(0, width - 1)] = TILE_WATER_REEDS
-        print(row)
         return row

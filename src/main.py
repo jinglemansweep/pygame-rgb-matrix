@@ -41,15 +41,8 @@ clock = pygame.time.Clock()
 
 frame = 0
 
-theme = Theme()
-camera = Camera(
-    theme.map_size,
-    VIEWPORT_SIZE,
-    theme.tile_size,
-    (0, 0),
-    (1, 1),
-    (0.4, 0.1),
-)
+
+theme = Theme(VIEWPORT_SIZE)
 
 
 def run():
@@ -82,14 +75,13 @@ async def tick():
     # frame start
     now = time.localtime()
     screen.fill((0, 0, 0))
-    camera.update()
-
+    theme.update(frame)
     # blitting
-    theme.blit(screen, camera)
+    theme.blit(screen)
     # rendering
     render_pygame(screen, matrix)
     # frame end
-    clock.tick(120)
+    clock.tick()
     frame += 1
 
 

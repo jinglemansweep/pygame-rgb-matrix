@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+import random
 from pygame.locals import SRCALPHA
 
 COLOR_SURFACE = (0, 0, 0)
@@ -22,28 +23,58 @@ class Camera:
         if direction is None:
             direction = [0, 0]
         if speed is None:
-            speed = [0, 0]
+            speed = [1, 1]
         self.map_size = map_size
         self.viewport_size = viewport_size
         self.tile_size = tile_size
         self.position = list(position)
         self.direction = list(direction)
         self.speed = list(speed)
+        self.target_position = [None, None]
 
     def get_position(self):
         return (self.position[0], self.position[1])
 
+    def set_target_position(self, position):
+        for axis in [0, 1]:
+            if position[axis] is not None:
+                self.target_position[axis] = position[axis]
+
+    def set_random_position(self, bounds=None):
+        if bounds is None:
+            bounds = [None, None]
+        bound_x = (
+            bounds[0]
+            if bounds[0] is not None
+            else (self.map_size[0] - self.viewport_size[0]) * self.tile_size[0]
+        )
+        bound_y = (
+            bounds[1]
+            if bounds[1] is not None
+            else (self.map_size[1] - self.viewport_size[1]) * self.tile_size[1]
+        )
+        position = (
+            random.randint(0, bound_x),
+            random.randint(0, bound_y),
+        )
+        self.set_target_position(position)
+
     def update(self):
+        self._set_motion_props()
         for axis in [0, 1]:
             self.position[axis] += self.direction[axis] * self.speed[axis]
-            if (
-                self.position[axis]
-                > (self.map_size[axis] - self.viewport_size[axis])
-                * self.tile_size[axis]
-            ):
-                self.direction[axis] = -1
-            if self.position[axis] < 0:
-                self.direction[axis] = 1
+
+    def _set_motion_props(self):
+        for axis in [0, 1]:
+            if self.target_position[axis] is not None:
+                if self.target_position[axis] != self.position[axis]:
+                    self.direction[axis] = (
+                        1 if self.target_position[axis] > self.position[axis] else -1
+                    )
+                else:
+                    self.direction[axis] = 0
+                    self.target_position[axis] = None
+                    self.position[axis] = float(round(self.position[axis]))
 
 
 class BaseSprite(pygame.sprite.Sprite):
