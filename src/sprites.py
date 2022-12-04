@@ -1,9 +1,11 @@
 import numpy as np
 import pygame
 from pygame.locals import SRCALPHA
+
 COLOR_SURFACE = (0, 0, 0)
 
-_dummy_display = pygame.display.set_mode((1,1))
+_dummy_display = pygame.display.set_mode((1, 1))
+
 
 class BaseSprite(pygame.sprite.Sprite):
     def __init__(self, w, h, color):
@@ -24,7 +26,7 @@ class Tileset:
         self._image = pygame.image.load(file).convert_alpha()
         self.image = self._image.copy()
         self.image.fill((255, 255, 255, 255), None, pygame.BLEND_RGBA_MULT)
-        #self.image.set_colorkey((0,0,0))        
+        # self.image.set_colorkey((0,0,0))
         self.rect = self.image.get_rect()
         self.tiles = []
         self.load()
@@ -76,7 +78,16 @@ class Tilemap:
     # 0 = Top Row, 41 = Bottom Row
 
     def set_test(self):
-        self.map = np.array([(0, 1, 2, 3)])
+        self.map = np.array(
+            [(0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0),
+            (0, 1, 0, 1, 6, 0, 1, 0)],
+        )
 
     def set_random(self):
         n = len(self.tileset.tiles)

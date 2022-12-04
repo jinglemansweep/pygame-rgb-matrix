@@ -96,7 +96,7 @@ async def tick():
     #     (0, 0),
     # )
     screen.blit(tilemap_bg.image, (0, 0))
-    screen.blit(tileset_animals.tiles[0], (2, 2))
+    screen.blit(tileset_animals.tiles[0], (0, 0))
     render_pygame(screen, matrix)
     clock.tick(60)
     frame += 1
