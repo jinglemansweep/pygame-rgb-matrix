@@ -120,7 +120,7 @@ async def main():
 
 
 async def tick():
-    global frame
+    global frame, screen
     now = time.localtime()
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -136,7 +136,7 @@ async def tick():
         if actor.rect.y > LED_ROWS:
             actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
-    render_pygame(screen, matrix)
+    screen = render_pygame(screen, matrix)
     clock.tick(60)
     frame += 1
 
