@@ -137,7 +137,7 @@ async def tick():
             actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
     render_pygame(screen, matrix)
-    clock.tick(60)
+    clock.tick(120)
     frame += 1
 
 
