@@ -58,7 +58,7 @@ def build_pygame_screen():
 
 def render_pygame(screen, matrix=None):
     if matrix is not None:
-        # screen.blit(pygame.transform.flip(screen, False, True), dest=(0, 0))
+        screen.blit(pygame.transform.flip(screen, False, True), dest=(0, 0))
         imgdata = pygame.surfarray.array3d(screen)
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
