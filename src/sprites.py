@@ -15,12 +15,15 @@ class BaseSprite(pygame.sprite.Sprite):
 
 
 class Tileset:
-    def __init__(self, file, size=(8, 8), margin=0, spacing=0):
+    def __init__(self, file, size=(8, 8), margin=0, spacing=0, brightness=1.0):
         self.file = file
         self.size = size
         self.margin = margin
         self.spacing = spacing
         self._image = pygame.image.load(file).convert_alpha()
+        if brightness < 1.0:
+            value = int((1.0 - brightness) * 255)
+            self._image.fill((value, value, value), special_flags=pygame.BLEND_RGB_SUB)
         self.image = self._image.copy()
         self.image.fill((255, 255, 255, 255), None, pygame.BLEND_RGBA_MULT)
         self.image.set_colorkey((0, 0, 0))

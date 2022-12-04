@@ -37,7 +37,7 @@ COLOR_BACKGROUND = (0, 0, 0)
 SPRITE_TILES_FILE = f"{os.path.dirname(__file__)}/sprites/tiles.png"
 SPRITE_ANIMALS_FILE = f"{os.path.dirname(__file__)}/sprites/animals.png"
 
-tileset_bg = Tileset(SPRITE_TILES_FILE, (8, 8), 0, 0)
+tileset_bg = Tileset(SPRITE_TILES_FILE, (8, 8), 0, 0, 0.6)
 tilemap_bg = Tilemap(tileset_bg, (8, 8))
 
 
@@ -52,19 +52,19 @@ def generate_bg_row():
 
 tilemap_bg.set_map(
     [
-        generate_bg_row(),
-        generate_bg_row(),
-        generate_bg_row(),
-        generate_bg_row(),
-        generate_bg_row(),
-        generate_bg_row(),
-        generate_bg_row(),
-        generate_bg_row(),
+        [1, 1, 1, 1, 1, 1, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 1],
+        [2, 8, 2, 8, 2, 2, 2, 2],
+        [48, 54, 48, 54, 48, 54, 48, 54],
+        [49, 49, 49, 49, 49, 49, 49, 49],
+        [49, 50, 49, 49, 49, 49, 49, 49],
+        [49, 49, 49, 49, 56, 49, 49, 49],
+        [49, 49, 49, 49, 49, 49, 49, 49],
     ]
 )
 tilemap_bg.render()
 
-tileset_animals = Tileset(SPRITE_ANIMALS_FILE, (8, 8), 0, 0)
+tileset_animals = Tileset(SPRITE_ANIMALS_FILE, (8, 8), 0, 0, 0.9)
 
 actors = pygame.sprite.Group()
 x = 0
@@ -74,9 +74,9 @@ for i in range(0, 16):
     sprite.rect.x = x
     sprite.rect.y = y
     actors.add(sprite)
-    x += 16
+    x += 8
     if x > LED_COLS:
-        y += 16
+        y += 8
         x = 0
     if y > LED_ROWS:
         y = 0
@@ -127,17 +127,17 @@ async def tick():
             pygame.quit()
             sys.exit()
     screen.fill((0, 0, 0))
-    # screen.blit(tilemap_bg.image, (0, 0))
+    screen.blit(tilemap_bg.image, (0, 0))
     for idx, actor in enumerate(actors):
         actor.rect.x += 1
         if actor.rect.x > LED_COLS:
-            actor.rect.y += 16
-            actor.rect.x = 0
-        if actor.rect.y > LED_ROWS:
+            actor.rect.y += 8
+            actor.rect.x = -8
+        if actor.rect.y >= 16:
             actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
     render_pygame(screen, matrix)
-    clock.tick(120)
+    clock.tick(30)
     frame += 1
 
 
