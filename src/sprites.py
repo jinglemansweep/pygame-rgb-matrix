@@ -23,7 +23,7 @@ class Tileset:
         self._image = pygame.image.load(file).convert_alpha()
         self.image = self._image.copy()
         self.image.fill((255, 255, 255, 255), None, pygame.BLEND_RGBA_MULT)
-        # self.image.set_colorkey((0,0,0))
+        self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.tiles = []
         self.load()

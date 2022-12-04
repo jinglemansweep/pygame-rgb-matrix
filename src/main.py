@@ -67,12 +67,19 @@ tilemap_bg.render()
 tileset_animals = Tileset(SPRITE_ANIMALS_FILE, (8, 8), 0, 0)
 
 actors = pygame.sprite.Group()
+x = 0
+y = 0
 for i in range(0, 16):
     sprite = BaseSprite(tileset_animals.tiles[i])
-    sprite.rect.x = random.randint(0, 64)
-    sprite.rect.y = random.randint(0, 64)
+    sprite.rect.x = x
+    sprite.rect.y = y
     actors.add(sprite)
-
+    # x += 16
+    if x > LED_COLS:
+        y += 16
+        x = 0
+    if y > LED_ROWS:
+        y = 0
 matrix = None
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
@@ -119,12 +126,7 @@ async def tick():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-    # screen.blit(
-    #     pygame.transform.rotozoom(tilemap_bg.image, frame % 360, 1),
-    #     (0, 0),
-    # )
-    screen.blit(tilemap_bg.image, (0, 0))
-
+    # screen.blit(tilemap_bg.image, (0, 0))
     for idx, actor in enumerate(actors):
         screen.blit(actor.image, actor.rect)
     render_pygame(screen, matrix)

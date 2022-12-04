@@ -2,7 +2,7 @@ import pygame
 import random
 import paho.mqtt.client as mqtt
 from PIL import Image
-from pygame.locals import QUIT, RESIZABLE, SCALED
+from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
 from config import (
     LED_ENABLED,
@@ -58,8 +58,15 @@ def build_pygame_screen():
 
 def render_pygame(screen, matrix=None):
     if matrix is not None:
-        screen.blit(pygame.transform.flip(screen, False, True), dest=(0, 0))
-        imgdata = pygame.surfarray.array3d(screen)
+        flipped = pygame.transform.flip(screen, True, False)
+        new_screen = pygame.Surface(
+            (flipped.get_rect().width, flipped.get_rect().height)
+        )
+
+        new_screen.blit(flipped, (0, 0), special_flags=BLEND_RGBA_ADD)
+        imgdata = pygame.surfarray.array3d(new_screen)
+        print(imgdata)
+
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
     pygame.display.flip()
