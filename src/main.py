@@ -120,14 +120,21 @@ async def main():
 
 
 async def tick():
-    global frame
+    global frame, screen
     now = time.localtime()
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+    screen.fill((0, 0, 0))
     # screen.blit(tilemap_bg.image, (0, 0))
     for idx, actor in enumerate(actors):
+        actor.rect.x += 1
+        if actor.rect.x > LED_COLS:
+            actor.rect.y += 16
+            actor.rect.x = 0
+        if actor.rect.y > LED_ROWS:
+            actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
     render_pygame(screen, matrix)
     clock.tick(60)
