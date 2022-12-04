@@ -57,7 +57,6 @@ async def main():
     mqtt.loop_start()
     while True:
         await asyncio.create_task(tick())
-        await asyncio.sleep(0.001)
 
 
 async def tick():

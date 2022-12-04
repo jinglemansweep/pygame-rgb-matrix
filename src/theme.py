@@ -79,6 +79,8 @@ class Theme:
                     random.randint(0, MAP_SIZE[0] * TILE_SIZE[0]),
                     random.randint(0, (self.row_beach - 1) * TILE_SIZE[1]),
                 ),
+                speed=[0.1, 0.1],
+                bounds=[MAP_SIZE[0] * TILE_SIZE[0], self.row_beach * TILE_SIZE[1]],
             )
             self.actors_animals.add(sprite)
 
@@ -106,19 +108,40 @@ class AnimalSprite(BaseSprite):
         tileset,
         tile_start_index=0,
         position=None,
+        direction=None,
+        speed=None,
+        bounds=None,
         sprite_frames=4,
         animate_every_x_frame=30,
+        move_every_x_frame=2000,
     ):
         super().__init__(tileset, tile_start_index)
         if position is None:
             position = [0, 0]
-        self.rect = position
+        if direction is None:
+            direction = [0, 0]
+        if speed is None:
+            speed = [0, 0]
+        if bounds is None:
+            bounds = [None, None]
+        self.rect = list(position)
+        self.direction = list(direction)
+        self.direction_last = [1, 1]
+        self.speed = list(speed)
+        self.bounds = list(bounds)
+        self.target_position = [None, None]
         self.tile_start_index = tile_start_index
         self.sprite_frames = sprite_frames
         self.sprite_frame_index = 0
         self.animate_every_x_frame = animate_every_x_frame
+        self.move_every_x_frame = move_every_x_frame
+        self.image_orig = self.image.copy()
+        self._seed()
 
     def update(self, frame):
+        # random reseed
+        self._seed()
+        # sprite animation
         if frame % self.animate_every_x_frame == 0:
             self.image = self.tileset.tiles[
                 self.tile_start_index + self.sprite_frame_index
@@ -126,6 +149,46 @@ class AnimalSprite(BaseSprite):
             self.sprite_frame_index += 1
             if self.sprite_frame_index > self.sprite_frames - 1:
                 self.sprite_frame_index = 0
+
+        self.image = pygame.transform.flip(
+            self.image_orig, self.direction_last[0] < 0, False
+        )
+        # perform motion operations
+        if frame % self.move_every_x_frame == 0 and 0 < self.random_seed < 10:
+            self.set_random_position()
+        self._set_motion_props()
+        for axis in [0, 1]:
+            self.rect[axis] += self.direction[axis] * self.speed[axis]
+
+    def set_target_position(self, position):
+        # print(f"BaseSprite->set_target_position: position={position}")
+        for axis in [0, 1]:
+            if position[axis] is not None:
+                self.target_position[axis] = position[axis]
+
+    def set_random_position(self):
+        if not self.bounds[0] or not self.bounds[1]:
+            return
+        self.set_target_position(
+            (random.randint(0, self.bounds[0]), random.randint(0, self.bounds[1]))
+        )
+
+    def _seed(self):
+        self.random_seed = random.randint(0, 99)
+
+    def _set_motion_props(self):
+        # iterate through x and y axis
+        for axis in [0, 1]:
+            # apply directions based on target
+            if self.target_position[axis] is not None:
+                if int(self.target_position[axis]) != int(self.rect[axis]):
+                    dir = 1 if self.target_position[axis] > self.rect[axis] else -1
+                    self.direction[axis] = dir
+                    self.direction_last[axis] = dir
+                else:
+                    self.direction[axis] = 0
+                    self.target_position[axis] = None
+                    self.rect[axis] = float(round(self.rect[axis]))
 
 
 class BackgroundTilemap(BaseTilemap):
