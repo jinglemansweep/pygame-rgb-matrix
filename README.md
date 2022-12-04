@@ -2,6 +2,8 @@
 
 PyGame RGB Matrix Framework for HUB75 LED Panels
 
+![Demo](./docs/images/demo.gif)
+
 ## Installation
 
 Create a `virtualenv` and install the project requirements:
