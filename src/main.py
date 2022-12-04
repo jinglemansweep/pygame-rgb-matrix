@@ -129,9 +129,8 @@ for row in range(MAP_HEIGHT):
     if row == row_beach + 1:
         game_map.append(generate_row_waves(MAP_WIDTH, random.randint(0, 2)))
     if row > row_beach + 1:
-        game_map.append(
-            generate_row_water(MAP_WIDTH, random.randint(0, 4), random.randint(0, 4))
-        )
+        alt_tiles = random.randint(0, 3) if row % 2 == 0 else 0
+        game_map.append(generate_row_water(MAP_WIDTH, alt_tiles, alt_tiles))
 
 tilemap_bg.set_map(game_map)
 tilemap_bg.render()
@@ -193,7 +192,7 @@ async def main():
 
 camera = [0, 0]
 camera_dir = [1, 1]
-camera_speed = [0.5, 1]
+camera_speed = [0.4, 0.1]
 
 
 async def tick():
@@ -214,20 +213,21 @@ async def tick():
         if actor.rect.y >= 16:
             actor.rect.y = 0
         screen.blit(actor.image, actor.rect)
-    if frame % 1 == 0:
-        camera[0] += camera_dir[0] * camera_speed[0]
-        if camera[0] > (MAP_WIDTH - VIEWPORT_WIDTH) * MAP_TILE_SIZE:
-            camera_dir[0] = -1
-        if camera[0] < 0:
-            camera_dir[0] = 1
-        camera[1] += camera_dir[1] * camera_speed[1]
-        if camera[1] > (MAP_HEIGHT - VIEWPORT_HEIGHT) * MAP_TILE_SIZE:
-            camera_dir[1] = -1
-        if camera[1] < 0:
-            camera_dir[1] = 1
+
+    camera[0] += camera_dir[0] * camera_speed[0]
+    if camera[0] > (MAP_WIDTH - VIEWPORT_WIDTH) * MAP_TILE_SIZE:
+        camera_dir[0] = -1
+    if camera[0] < 0:
+        camera_dir[0] = 1
+    camera[1] += camera_dir[1] * camera_speed[1]
+    if camera[1] > (MAP_HEIGHT - VIEWPORT_HEIGHT) * MAP_TILE_SIZE:
+        camera_dir[1] = -1
+    if camera[1] < 0:
+        camera_dir[1] = 1
     print(camera_dir, camera)
+
     render_pygame(screen, matrix)
-    clock.tick(30)
+    clock.tick(120)
     frame += 1
 
 
