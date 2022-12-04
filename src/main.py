@@ -39,11 +39,39 @@ SPRITE_ANIMALS_FILE = f"{os.path.dirname(__file__)}/sprites/animals.png"
 
 tileset_bg = Tileset(SPRITE_TILES_FILE, (8, 8), 0, 0)
 tilemap_bg = Tilemap(tileset_bg, (8, 8))
-tilemap_bg.set_test()
+
+
+def generate_bg_row():
+    row = [0, 0, 0, 0, 0, 0, 0, 0]
+    for i in range(0, 2):
+        row[random.randint(0, 7)] = 1
+    if random.randint(0, 3) == 0:
+        row[random.randint(0, 7)] = 6
+    return row
+
+
+tilemap_bg.set_map(
+    [
+        generate_bg_row(),
+        generate_bg_row(),
+        generate_bg_row(),
+        generate_bg_row(),
+        generate_bg_row(),
+        generate_bg_row(),
+        generate_bg_row(),
+        generate_bg_row(),
+    ]
+)
 tilemap_bg.render()
 
 tileset_animals = Tileset(SPRITE_ANIMALS_FILE, (8, 8), 0, 0)
 
+actors = pygame.sprite.Group()
+for i in range(0, 16):
+    sprite = BaseSprite(tileset_animals.tiles[i])
+    sprite.rect.x = random.randint(0, 64)
+    sprite.rect.y = random.randint(0, 64)
+    actors.add(sprite)
 
 matrix = None
 if LED_ENABLED:
@@ -96,7 +124,9 @@ async def tick():
     #     (0, 0),
     # )
     screen.blit(tilemap_bg.image, (0, 0))
-    screen.blit(tileset_animals.tiles[0], (0, 0))
+
+    for idx, actor in enumerate(actors):
+        screen.blit(actor.image, actor.rect)
     render_pygame(screen, matrix)
     clock.tick(60)
     frame += 1

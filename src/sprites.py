@@ -8,12 +8,9 @@ _dummy_display = pygame.display.set_mode((1, 1))
 
 
 class BaseSprite(pygame.sprite.Sprite):
-    def __init__(self, w, h, color):
+    def __init__(self, surface):
         super().__init__()
-        self.image = pygame.Surface([w, h])
-        self.image.fill(COLOR_SURFACE)
-        self.image.set_colorkey(COLOR_SURFACE)
-        pygame.draw.rect(self.image, color, pygame.Rect(0, 0, w, h))
+        self.image = surface
         self.rect = self.image.get_rect()
 
 
@@ -70,29 +67,17 @@ class Tilemap:
 
     def set_zero(self):
         self.map = np.zeros(self.size, dtype=int)
-        print(self.map)
-        print(self.map.shape)
         self.render()
 
     # Direction: Top to Bottom, Left to Right
     # 0 = Top Row, 41 = Bottom Row
 
-    def set_test(self):
-        self.map = np.array(
-            [(0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0),
-            (0, 1, 0, 1, 6, 0, 1, 0)],
-        )
+    def set_map(self, map):
+        self.map = np.array(map)
 
     def set_random(self):
         n = len(self.tileset.tiles)
         self.map = np.random.randint(n, size=self.size)
-        print(self.map)
         self.render()
 
     def __str__(self):
