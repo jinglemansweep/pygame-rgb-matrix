@@ -2,6 +2,7 @@ import numpy as np
 import os
 import pygame
 import random
+import time
 from pygame.locals import *
 from sprites import BaseSprite, BaseTilemap, BaseTileset, Camera
 
@@ -40,7 +41,18 @@ TILE_ANIMAL_DOG_ALSATION = 60
 TILE_ANIMAL_DOG_HUSKY = 66
 TILE_ANIMAL_DOG_COLLIE = 72
 TILE_ANIMAL_CAT_BROWN = 80
-TILE_ANIMAL_CAT_GINGER = 88
+TILE_ANIMAL_CAT_GINGER = 86
+
+TILE_STRUCTURE_HOUSE_RED = 0
+TILE_STRUCTURE_HOUSE_GREY = 8
+TILE_STRUCTURE_HOUSE_BROWN = 16
+TILE_STRUCTURE_BARN_A = 17
+TILE_STRUCTURE_HOUSE_BRICK = 24
+TILE_STRUCTURE_BARN_B = 25
+
+ACTION_STILL = 0
+ACTION_WALKING = 1
+
 
 ANIMAL_CHOICES = [
     TILE_ANIMAL_COW,
@@ -59,41 +71,75 @@ ANIMAL_CHOICES = [
     TILE_ANIMAL_CAT_GINGER,
 ]
 
+STRUCTURE_BUILDING_CHOICES = [
+    TILE_STRUCTURE_HOUSE_RED,
+    TILE_STRUCTURE_HOUSE_GREY,
+    TILE_STRUCTURE_HOUSE_BROWN,
+    TILE_STRUCTURE_HOUSE_BRICK,
+    TILE_STRUCTURE_BARN_A,
+    TILE_STRUCTURE_BARN_B,
+]
+
 SPRITE_TILES_FILE = f"{os.path.dirname(__file__)}/sprites/tiles.png"
 SPRITE_ANIMALS_FILE = f"{os.path.dirname(__file__)}/sprites/animals.png"
+SPRITE_STRUCTURES_FILE = f"{os.path.dirname(__file__)}/sprites/structures.png"
 
 MAP_SIZE = (32, 32)  # width, height (multiplied by TILE_SIZE to get pixels)
-TILE_SIZE = (8, 8)  # width, height
+MAP_TILE_SIZE = (8, 8)  # width, height
+STRUCTURE_TILE_SIZE = (16, 16)
 
 
 class Theme:
     def __init__(self, viewport_size):
         self.viewport_size = viewport_size
-        self.camera = Camera(MAP_SIZE, self.viewport_size, TILE_SIZE, speed=(0.5, 0.5))
-        self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, TILE_SIZE, 0, 0, 0.6)
-        self.tileset_animals = BaseTileset(SPRITE_ANIMALS_FILE, TILE_SIZE, 0, 0, 0.9)
+        self.camera = Camera(
+            MAP_SIZE, self.viewport_size, MAP_TILE_SIZE, speed=(0.5, 0.5)
+        )
+        self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, MAP_TILE_SIZE, 0, 0, 0.6)
+        self.tileset_animals = BaseTileset(
+            SPRITE_ANIMALS_FILE, MAP_TILE_SIZE, 0, 0, 0.9
+        )
+        self.tileset_structures = BaseTileset(
+            SPRITE_STRUCTURES_FILE, STRUCTURE_TILE_SIZE, 0, 0, 0.9
+        )
         self.row_beach = random.randint(MAP_SIZE[1] // 2, MAP_SIZE[1] - 4)
         self.tilemap_bg = BackgroundTilemap(self.tileset_bg, MAP_SIZE, self.row_beach)
+        self.group_collidables = pygame.sprite.Group()
+
+        for _ in range(0, 12):
+            structure = StructureSprite(
+                self.tileset_structures,
+                random.choice(STRUCTURE_BUILDING_CHOICES),
+                (
+                    random.randint(0, MAP_SIZE[0] * MAP_TILE_SIZE[0]),
+                    random.randint(0, (self.row_beach - 2) * MAP_TILE_SIZE[1]),
+                ),
+            )
+            self.group_collidables.add(structure)
         self.actors_animals = pygame.sprite.Group()
         for _ in range(0, 100):
-            sprite = AnimalSprite(
+            animal = AnimalSprite(
                 self.tileset_animals,
                 random.choice(ANIMAL_CHOICES),
                 (
-                    random.randint(0, MAP_SIZE[0] * TILE_SIZE[0]),
-                    random.randint(0, (self.row_beach - 1) * TILE_SIZE[1]),
+                    random.randint(0, MAP_SIZE[0] * MAP_TILE_SIZE[0]),
+                    random.randint(0, (self.row_beach - 1) * MAP_TILE_SIZE[1]),
                 ),
-                speed=[0.1, 0.1],
-                bounds=[MAP_SIZE[0] * TILE_SIZE[0], self.row_beach * TILE_SIZE[1]],
+                speed=[1, 1],
+                bounds=[
+                    MAP_SIZE[0] * MAP_TILE_SIZE[0],
+                    self.row_beach * MAP_TILE_SIZE[1],
+                ],
+                collidables=self.group_collidables,
             )
-            self.actors_animals.add(sprite)
+            self.actors_animals.add(animal)
 
     def update(self, frame):
         self.camera.update()
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
         if frame % 1000 == 0:
-            self.camera.set_random_position((None, self.row_beach * TILE_SIZE[1]))
+            self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
 
     def blit(self, screen):
         # print(f"theme->blit camera={self.camera.position}")
@@ -102,12 +148,24 @@ class Theme:
             (0 - self.camera.position[0], 0 - self.camera.position[1]),
         )
 
+        for idx, structure in enumerate(self.group_collidables):
+            screen.blit(structure.image, structure.get_viewport_position(self.camera))
+
         for idx, actor in enumerate(self.actors_animals):
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
 
-ACTION_STILL = 0
-ACTION_WALKING = 1
+class StructureSprite(BaseSprite):
+    def __init__(
+        self,
+        tileset,
+        tile_start_index=0,
+        position=None,
+    ):
+        super().__init__(tileset, tile_start_index)
+        if position is None:
+            position = [0, 0]
+        self.rect[0], self.rect[1] = position
 
 
 class AnimalSprite(BaseSprite):
@@ -120,19 +178,22 @@ class AnimalSprite(BaseSprite):
         speed=None,
         bounds=None,
         sprite_frames=3,
-        animate_every_x_frame=30,
-        move_every_x_frame=2000,
+        animate_every_x_frame=5,
+        move_every_x_frame=5,
+        collidables=None,
     ):
         super().__init__(tileset, tile_start_index)
         if position is None:
-            position = [0, 0]
+            position = (0, 0)
         if direction is None:
             direction = [0, 0]
         if speed is None:
             speed = [0, 0]
         if bounds is None:
             bounds = [None, None]
-        self.rect = list(position)
+        if collidables is None:
+            collidables = []
+        self.rect[0], self.rect[1] = position
         self.direction = list(direction)
         self.direction_last = [1, 1]
         self.speed = list(speed)
@@ -143,8 +204,10 @@ class AnimalSprite(BaseSprite):
         self.sprite_frame_index = 0
         self.animate_every_x_frame = animate_every_x_frame
         self.move_every_x_frame = move_every_x_frame
+        self.collidables = collidables
         self.image_orig = self.image.copy()
         self.action = ACTION_STILL
+        self.timers = dict(collision=0)
         self._seed()
 
     def update(self, frame):
@@ -166,17 +229,47 @@ class AnimalSprite(BaseSprite):
             self.image_orig, self.direction_last[0] < 0, False
         )
         # perform motion operations
-        if frame % self.move_every_x_frame == 0 and 0 < self.random_seed < 10:
-            self.set_random_position()
-        self._set_motion_props()
-        for axis in [0, 1]:
-            self.rect[axis] += self.direction[axis] * self.speed[axis]
+        # if we collide with a building, move to somewhere else
+        if self._detect_collision():
+            self.set_nearby_position()
+        if frame % self.move_every_x_frame == 0:
+            # move to a nearby location every once in a while
+            if 0 < self.random_seed < 30:
+                self.set_nearby_position()
+            # calculate sprite movement and apply
+            self._set_motion_props()
+            for axis in [0, 1]:
+                self.rect[axis] += self.direction[axis] * self.speed[axis]
+        self._update_timers()
+        # print(f"sprite->update: timers={self.timers}")
 
     def set_target_position(self, position):
         # print(f"BaseSprite->set_target_position: position={position}")
         for axis in [0, 1]:
             if position[axis] is not None:
                 self.target_position[axis] = position[axis]
+
+    def set_nearby_position(self, range=(MAP_TILE_SIZE[0] * 4, MAP_TILE_SIZE[1] * 4)):
+        x = self.rect[0] + (
+            random.choice([-1, 1])
+            * random.randrange(MAP_TILE_SIZE[0], MAP_TILE_SIZE[0] * 2)
+        )
+        y = self.rect[1] + (
+            random.choice([-1, 1])
+            * random.randrange(MAP_TILE_SIZE[1], MAP_TILE_SIZE[1] * 2)
+        )
+        x_max = (MAP_TILE_SIZE[0] * MAP_SIZE[0]) - MAP_TILE_SIZE[0]
+        y_max = (MAP_TILE_SIZE[1] * MAP_SIZE[1]) - MAP_TILE_SIZE[1]
+        if x < 0:
+            x = 0
+        if y < 0:
+            y = 0
+        if x > x_max:
+            x = x_max
+        if y > y_max:
+            y = y_max
+        # print(f"set_nearby_position: from=({self.rect[0]},{self.rect[1]}) to=({x},{y})")
+        self.set_target_position((x, y))
 
     def set_random_position(self):
         if not self.bounds[0] or not self.bounds[1]:
@@ -185,8 +278,24 @@ class AnimalSprite(BaseSprite):
             (random.randint(0, self.bounds[0]), random.randint(0, self.bounds[1]))
         )
 
+    def stop(self):
+        for axis in [0, 1]:
+            self.direction[axis] = 0
+            self.target_position[axis] = None
+            self.rect[axis] = float(round(self.rect[axis]))
+            self.action = ACTION_STILL
+
     def _seed(self):
-        self.random_seed = random.randint(0, 99)
+        self.random_seed = random.randint(0, 9999)
+
+    def _detect_collision(self):
+        if self.timers["collision"] > 0:
+            return False
+        collisions = [self.rect.colliderect(c) for c in self.collidables]
+        has_collided = any(collisions)
+        if has_collided:
+            self.timers["collision"] = 100
+        return any(collisions)
 
     def _set_motion_props(self):
         # iterate through x and y axis
@@ -199,10 +308,12 @@ class AnimalSprite(BaseSprite):
                     self.direction_last[axis] = dir
                     self.action = ACTION_WALKING
                 else:
-                    self.direction[axis] = 0
-                    self.target_position[axis] = None
-                    self.rect[axis] = float(round(self.rect[axis]))
-                    self.action = ACTION_STILL
+                    self.stop()
+
+    def _update_timers(self):
+        for k, v in self.timers.items():
+            if self.timers[k] > 0:
+                self.timers[k] = self.timers[k] - 1
 
 
 class BackgroundTilemap(BaseTilemap):
