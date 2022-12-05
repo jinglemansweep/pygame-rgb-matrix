@@ -41,8 +41,6 @@ TILE_ANIMAL_DOG_HUSKY = 66
 TILE_ANIMAL_DOG_COLLIE = 72
 TILE_ANIMAL_CAT_BROWN = 80
 TILE_ANIMAL_CAT_GINGER = 88
-TILE_ANIMAL_CAT_BLACK = 94
-
 
 ANIMAL_CHOICES = [
     TILE_ANIMAL_COW,
@@ -53,6 +51,12 @@ ANIMAL_CHOICES = [
     TILE_ANIMAL_CHICKEN,
     TILE_ANIMAL_CHICK,
     TILE_ANIMAL_FOX,
+    TILE_ANIMAL_CAT_BLACK,
+    TILE_ANIMAL_DOG_ALSATION,
+    TILE_ANIMAL_DOG_HUSKY,
+    TILE_ANIMAL_DOG_COLLIE,
+    TILE_ANIMAL_CAT_BROWN,
+    TILE_ANIMAL_CAT_GINGER,
 ]
 
 SPRITE_TILES_FILE = f"{os.path.dirname(__file__)}/sprites/tiles.png"
@@ -102,6 +106,10 @@ class Theme:
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
 
+ACTION_STILL = 0
+ACTION_WALKING = 1
+
+
 class AnimalSprite(BaseSprite):
     def __init__(
         self,
@@ -111,7 +119,7 @@ class AnimalSprite(BaseSprite):
         direction=None,
         speed=None,
         bounds=None,
-        sprite_frames=4,
+        sprite_frames=3,
         animate_every_x_frame=30,
         move_every_x_frame=2000,
     ):
@@ -136,20 +144,24 @@ class AnimalSprite(BaseSprite):
         self.animate_every_x_frame = animate_every_x_frame
         self.move_every_x_frame = move_every_x_frame
         self.image_orig = self.image.copy()
+        self.action = ACTION_STILL
         self._seed()
 
     def update(self, frame):
         # random reseed
         self._seed()
         # sprite animation
-        if frame % self.animate_every_x_frame == 0:
-            self.image = self.tileset.tiles[
-                self.tile_start_index + self.sprite_frame_index
-            ]
-            self.sprite_frame_index += 1
-            if self.sprite_frame_index > self.sprite_frames - 1:
-                self.sprite_frame_index = 0
-
+        if self.action == ACTION_STILL:
+            self.image = self.tileset.tiles[self.tile_start_index]
+        elif self.action == ACTION_WALKING:
+            if frame % self.animate_every_x_frame == 0:
+                self.image = self.tileset.tiles[
+                    self.tile_start_index + 1 + self.sprite_frame_index
+                ]
+                self.image_orig = self.image.copy()
+                self.sprite_frame_index += 1
+                if self.sprite_frame_index > self.sprite_frames - 1:
+                    self.sprite_frame_index = 0
         self.image = pygame.transform.flip(
             self.image_orig, self.direction_last[0] < 0, False
         )
@@ -185,10 +197,12 @@ class AnimalSprite(BaseSprite):
                     dir = 1 if self.target_position[axis] > self.rect[axis] else -1
                     self.direction[axis] = dir
                     self.direction_last[axis] = dir
+                    self.action = ACTION_WALKING
                 else:
                     self.direction[axis] = 0
                     self.target_position[axis] = None
                     self.rect[axis] = float(round(self.rect[axis]))
+                    self.action = ACTION_STILL
 
 
 class BackgroundTilemap(BaseTilemap):
