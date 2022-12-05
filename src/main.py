@@ -2,7 +2,6 @@ import asyncio
 import os
 import pygame
 import pygame.pkgdata
-import random
 import sys
 import traceback
 import time
@@ -15,14 +14,12 @@ sys.path.append(
 )
 
 from config import matrix_options, LED_ENABLED
-from utils import (
+from utils.helpers import (
     render_pygame,
     build_pygame_screen,
     setup_mqtt_client,
 )
 from theme import Theme
-
-VIEWPORT_SIZE = (8, 8)
 
 matrix = None
 if LED_ENABLED:
@@ -36,7 +33,7 @@ pygame.init()
 screen = build_pygame_screen()
 clock = pygame.time.Clock()
 
-theme = Theme(VIEWPORT_SIZE)
+theme = Theme()
 frame = 0
 
 

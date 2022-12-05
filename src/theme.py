@@ -2,9 +2,13 @@ import numpy as np
 import os
 import pygame
 import random
-import time
 from pygame.locals import *
-from sprites import BaseSprite, BaseTilemap, BaseTileset, Camera
+
+from utils.camera import Camera
+from utils.sprites import TilesetSprite
+from utils.themes import BaseTheme
+from utils.tiles.tilemap import BaseTilemap
+from utils.tiles.tileset import BaseTileset
 
 TILE_GRASS_EMPTY_ALT = 0
 TILE_GRASS_EMPTY = 1
@@ -85,16 +89,14 @@ SPRITE_ANIMALS_FILE = f"{os.path.dirname(__file__)}/sprites/animals.png"
 SPRITE_STRUCTURES_FILE = f"{os.path.dirname(__file__)}/sprites/structures.png"
 
 MAP_SIZE = (32, 32)  # width, height (multiplied by TILE_SIZE to get pixels)
+VIEWPORT_SIZE = (8, 8)  # side of viewport in tiles (not pixels)
 MAP_TILE_SIZE = (8, 8)  # width, height
 STRUCTURE_TILE_SIZE = (16, 16)
 
 
-class Theme:
-    def __init__(self, viewport_size):
-        self.viewport_size = viewport_size
-        self.camera = Camera(
-            MAP_SIZE, self.viewport_size, MAP_TILE_SIZE, speed=(0.5, 0.5)
-        )
+class Theme(BaseTheme):
+    def __init__(self):
+        self.camera = Camera(MAP_SIZE, VIEWPORT_SIZE, MAP_TILE_SIZE, speed=(0.5, 0.5))
         self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, MAP_TILE_SIZE, 0, 0, 0.6)
         self.tileset_animals = BaseTileset(
             SPRITE_ANIMALS_FILE, MAP_TILE_SIZE, 0, 0, 0.9
@@ -107,10 +109,10 @@ class Theme:
         self.group_collidables = pygame.sprite.Group()
 
         for _ in range(0, 12):
-            structure = StructureSprite(
-                self.tileset_structures,
-                random.choice(STRUCTURE_BUILDING_CHOICES),
-                (
+            structure = TilesetSprite(
+                tileset=self.tileset_structures,
+                tile_index=random.choice(STRUCTURE_BUILDING_CHOICES),
+                position=(
                     random.randint(0, MAP_SIZE[0] * MAP_TILE_SIZE[0]),
                     random.randint(0, (self.row_beach - 2) * MAP_TILE_SIZE[1]),
                 ),
@@ -119,9 +121,9 @@ class Theme:
         self.actors_animals = pygame.sprite.Group()
         for _ in range(0, 100):
             animal = AnimalSprite(
-                self.tileset_animals,
-                random.choice(ANIMAL_CHOICES),
-                (
+                tileset=self.tileset_animals,
+                tile_index=random.choice(ANIMAL_CHOICES),
+                position=(
                     random.randint(0, MAP_SIZE[0] * MAP_TILE_SIZE[0]),
                     random.randint(0, (self.row_beach - 1) * MAP_TILE_SIZE[1]),
                 ),
@@ -135,7 +137,7 @@ class Theme:
             self.actors_animals.add(animal)
 
     def update(self, frame):
-        self.camera.update()
+        super().update(frame)
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
         if frame % 1000 == 0:
@@ -143,6 +145,7 @@ class Theme:
 
     def blit(self, screen):
         # print(f"theme->blit camera={self.camera.position}")
+        super().blit(screen)
         screen.blit(
             self.tilemap_bg.image,
             (0 - self.camera.position[0], 0 - self.camera.position[1]),
@@ -155,24 +158,11 @@ class Theme:
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
 
-class StructureSprite(BaseSprite):
+class AnimalSprite(TilesetSprite):
     def __init__(
         self,
         tileset,
-        tile_start_index=0,
-        position=None,
-    ):
-        super().__init__(tileset, tile_start_index)
-        if position is None:
-            position = [0, 0]
-        self.rect[0], self.rect[1] = position
-
-
-class AnimalSprite(BaseSprite):
-    def __init__(
-        self,
-        tileset,
-        tile_start_index=0,
+        tile_index=0,
         position=None,
         direction=None,
         speed=None,
@@ -182,9 +172,7 @@ class AnimalSprite(BaseSprite):
         move_every_x_frame=5,
         collidables=None,
     ):
-        super().__init__(tileset, tile_start_index)
-        if position is None:
-            position = (0, 0)
+        super().__init__(tileset, tile_index, position)
         if direction is None:
             direction = [0, 0]
         if speed is None:
@@ -199,7 +187,7 @@ class AnimalSprite(BaseSprite):
         self.speed = list(speed)
         self.bounds = list(bounds)
         self.target_position = [None, None]
-        self.tile_start_index = tile_start_index
+        self.tile_index = tile_index
         self.sprite_frames = sprite_frames
         self.sprite_frame_index = 0
         self.animate_every_x_frame = animate_every_x_frame
@@ -215,11 +203,11 @@ class AnimalSprite(BaseSprite):
         self._seed()
         # sprite animation
         if self.action == ACTION_STILL:
-            self.image = self.tileset.tiles[self.tile_start_index]
+            self.image = self.tileset.tiles[self.tile_index]
         elif self.action == ACTION_WALKING:
             if frame % self.animate_every_x_frame == 0:
                 self.image = self.tileset.tiles[
-                    self.tile_start_index + 1 + self.sprite_frame_index
+                    self.tile_index + 1 + self.sprite_frame_index
                 ]
                 self.image_orig = self.image.copy()
                 self.sprite_frame_index += 1
