@@ -134,8 +134,8 @@ class Theme(BaseTheme):
                     self.row_beach * MAP_TILE_SIZE[1],
                 ],
                 collidables=self.group_collidables,
-                move_every_x_frame=100,
-                animate_every_x_frame=100,
+                move_every_x_frame=10,
+                animate_every_x_frame=10,
             )
             self.actors_animals.add(animal)
 

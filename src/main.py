@@ -73,7 +73,7 @@ async def tick():
     # rendering
     render_pygame(screen, matrix)
     # frame end
-    clock.tick()
+    clock.tick(120)
     frame += 1
 
 
