@@ -5,7 +5,7 @@ import random
 from pygame.locals import *
 
 from utils.camera import Camera
-from utils.sprites import TilesetSprite
+from utils.sprites import TilesetSprite, AnimationMixin, CollisionMixin, RandomMixin
 from utils.themes import BaseTheme
 from utils.tiles.tilemap import BaseTilemap
 from utils.tiles.tileset import BaseTileset
@@ -123,6 +123,7 @@ class Theme(BaseTheme):
             animal = AnimalSprite(
                 tileset=self.tileset_animals,
                 tile_index=random.choice(ANIMAL_CHOICES),
+                sprite_frames=3,
                 position=(
                     random.randint(0, MAP_SIZE[0] * MAP_TILE_SIZE[0]),
                     random.randint(0, (self.row_beach - 1) * MAP_TILE_SIZE[1]),
@@ -133,6 +134,7 @@ class Theme(BaseTheme):
                     self.row_beach * MAP_TILE_SIZE[1],
                 ],
                 collidables=self.group_collidables,
+                move_every_x_frame=1000,
             )
             self.actors_animals.add(animal)
 
@@ -158,49 +160,19 @@ class Theme(BaseTheme):
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
 
-class AnimalSprite(TilesetSprite):
+class AnimalSprite(AnimationMixin, CollisionMixin, RandomMixin, TilesetSprite):
     def __init__(
         self,
-        tileset,
-        tile_index=0,
-        position=None,
-        direction=None,
-        speed=None,
-        bounds=None,
-        sprite_frames=3,
-        animate_every_x_frame=5,
-        move_every_x_frame=5,
-        collidables=None,
+        sprite_frames,
+        **kwargs,
     ):
-        super().__init__(tileset, tile_index, position)
-        if direction is None:
-            direction = [0, 0]
-        if speed is None:
-            speed = [0, 0]
-        if bounds is None:
-            bounds = [None, None]
-        if collidables is None:
-            collidables = []
-        self.rect[0], self.rect[1] = position
-        self.direction = list(direction)
-        self.direction_last = [1, 1]
-        self.speed = list(speed)
-        self.bounds = list(bounds)
-        self.target_position = [None, None]
-        self.tile_index = tile_index
+        super().__init__(**kwargs)
         self.sprite_frames = sprite_frames
         self.sprite_frame_index = 0
-        self.animate_every_x_frame = animate_every_x_frame
-        self.move_every_x_frame = move_every_x_frame
-        self.collidables = collidables
-        self.image_orig = self.image.copy()
         self.action = ACTION_STILL
-        self.timers = dict(collision=0)
-        self._seed()
 
     def update(self, frame):
-        # random reseed
-        self._seed()
+        super().update(frame)
         # sprite animation
         if self.action == ACTION_STILL:
             self.image = self.tileset.tiles[self.tile_index]
@@ -216,26 +188,14 @@ class AnimalSprite(TilesetSprite):
         self.image = pygame.transform.flip(
             self.image_orig, self.direction_last[0] < 0, False
         )
-        # perform motion operations
         # if we collide with a building, move to somewhere else
-        if self._detect_collision():
+        # if self._collision_detect():
+        #    self.set_nearby_position()
+        # move to a nearby location every once in a while
+        if 0 < self._random_seed < 30:
             self.set_nearby_position()
-        if frame % self.move_every_x_frame == 0:
-            # move to a nearby location every once in a while
-            if 0 < self.random_seed < 30:
-                self.set_nearby_position()
-            # calculate sprite movement and apply
-            self._set_motion_props()
-            for axis in [0, 1]:
-                self.rect[axis] += self.direction[axis] * self.speed[axis]
-        self._update_timers()
-        # print(f"sprite->update: timers={self.timers}")
 
-    def set_target_position(self, position):
-        # print(f"BaseSprite->set_target_position: position={position}")
-        for axis in [0, 1]:
-            if position[axis] is not None:
-                self.target_position[axis] = position[axis]
+        # print(f"sprite->update: timers={self.timers}")
 
     def set_nearby_position(self, range=(MAP_TILE_SIZE[0] * 4, MAP_TILE_SIZE[1] * 4)):
         x = self.rect[0] + (
@@ -258,50 +218,6 @@ class AnimalSprite(TilesetSprite):
             y = y_max
         # print(f"set_nearby_position: from=({self.rect[0]},{self.rect[1]}) to=({x},{y})")
         self.set_target_position((x, y))
-
-    def set_random_position(self):
-        if not self.bounds[0] or not self.bounds[1]:
-            return
-        self.set_target_position(
-            (random.randint(0, self.bounds[0]), random.randint(0, self.bounds[1]))
-        )
-
-    def stop(self):
-        for axis in [0, 1]:
-            self.direction[axis] = 0
-            self.target_position[axis] = None
-            self.rect[axis] = float(round(self.rect[axis]))
-            self.action = ACTION_STILL
-
-    def _seed(self):
-        self.random_seed = random.randint(0, 9999)
-
-    def _detect_collision(self):
-        if self.timers["collision"] > 0:
-            return False
-        collisions = [self.rect.colliderect(c) for c in self.collidables]
-        has_collided = any(collisions)
-        if has_collided:
-            self.timers["collision"] = 100
-        return any(collisions)
-
-    def _set_motion_props(self):
-        # iterate through x and y axis
-        for axis in [0, 1]:
-            # apply directions based on target
-            if self.target_position[axis] is not None:
-                if int(self.target_position[axis]) != int(self.rect[axis]):
-                    dir = 1 if self.target_position[axis] > self.rect[axis] else -1
-                    self.direction[axis] = dir
-                    self.direction_last[axis] = dir
-                    self.action = ACTION_WALKING
-                else:
-                    self.stop()
-
-    def _update_timers(self):
-        for k, v in self.timers.items():
-            if self.timers[k] > 0:
-                self.timers[k] = self.timers[k] - 1
 
 
 class BackgroundTilemap(BaseTilemap):
