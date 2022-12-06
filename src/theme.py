@@ -5,7 +5,7 @@ import random
 from pygame.locals import *
 
 from utils.camera import Camera
-from utils.sprites import TilesetSprite, AnimationMixin, CollisionMixin, RandomMixin
+from utils.sprites import TilesetSprite, AnimationMixin, CollisionMixin
 from utils.themes import BaseTheme
 from utils.tiles.tilemap import BaseTilemap
 from utils.tiles.tileset import BaseTileset
@@ -134,7 +134,8 @@ class Theme(BaseTheme):
                     self.row_beach * MAP_TILE_SIZE[1],
                 ],
                 collidables=self.group_collidables,
-                move_every_x_frame=1000,
+                move_every_x_frame=100,
+                animate_every_x_frame=100,
             )
             self.actors_animals.add(animal)
 
@@ -143,7 +144,8 @@ class Theme(BaseTheme):
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
         if frame % 1000 == 0:
-            self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
+            pass
+            # self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
 
     def blit(self, screen):
         # print(f"theme->blit camera={self.camera.position}")
@@ -160,7 +162,7 @@ class Theme(BaseTheme):
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
 
-class AnimalSprite(AnimationMixin, CollisionMixin, RandomMixin, TilesetSprite):
+class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):
     def __init__(
         self,
         sprite_frames,
@@ -172,7 +174,6 @@ class AnimalSprite(AnimationMixin, CollisionMixin, RandomMixin, TilesetSprite):
         self.action = ACTION_STILL
 
     def update(self, frame):
-        super().update(frame)
         # sprite animation
         if self.action == ACTION_STILL:
             self.image = self.tileset.tiles[self.tile_index]
@@ -192,9 +193,9 @@ class AnimalSprite(AnimationMixin, CollisionMixin, RandomMixin, TilesetSprite):
         # if self._collision_detect():
         #    self.set_nearby_position()
         # move to a nearby location every once in a while
-        if 0 < self._random_seed < 30:
+        if 0 < self._random_seed < 10:
             self.set_nearby_position()
-
+        super().update(frame)
         # print(f"sprite->update: timers={self.timers}")
 
     def set_nearby_position(self, range=(MAP_TILE_SIZE[0] * 4, MAP_TILE_SIZE[1] * 4)):

@@ -33,15 +33,6 @@ class TilesetSprite(BaseSprite):
         return (self.rect[0] - camera.position[0], self.rect[1] - camera.position[1])
 
 
-class RandomMixin:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._random_generate_seed()
-
-    def _random_generate_seed(self):
-        self._random_seed = random.randint(0, 9999)
-
-
 class AnimationMixin:
     def __init__(
         self,
@@ -49,8 +40,8 @@ class AnimationMixin:
         speed=[0, 0],
         bounds=[None, None],
         sprite_frames=0,
-        animate_every_x_frame=1,
-        move_every_x_frame=1,
+        animate_every_x_frame=2,
+        move_every_x_frame=2,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -73,6 +64,7 @@ class AnimationMixin:
         self.image_orig = self.image.copy()
         self.action = ACTION_STILL
         self.timers = dict(collision=0)
+        self._random_generate_seed()
 
     def update(self, frame, **kwargs):
         if frame % self.move_every_x_frame == 0:
@@ -80,9 +72,11 @@ class AnimationMixin:
             self._set_motion_props()
             for axis in [0, 1]:
                 self.rect[axis] += self.direction[axis] * self.speed[axis]
+        # random reseed
+        self._random_generate_seed()
 
     def set_target_position(self, position):
-        print(f"BaseSprite->set_target_position: position={position}")
+        # print(f"BaseSprite->set_target_position: position={position}")
         for axis in [0, 1]:
             if position[axis] is not None:
                 self.target_position[axis] = position[axis]
@@ -106,6 +100,9 @@ class AnimationMixin:
                     self.action = ACTION_WALKING
                 else:
                     self.stop()
+
+    def _random_generate_seed(self):
+        self._random_seed = random.randint(0, 9999)
 
 
 class CollisionMixin:
