@@ -19,7 +19,7 @@ class Camera:
         self.tile_size = tile_size
         self.positions = list(positions)
         self.position_idx = 0
-        self.position = self.positions[self.position_idx]
+        self.position = [0, 0]
         self.direction = list(direction)
         self.speed = list(speed)
         self.acceleration = list(accelleration)
@@ -27,15 +27,21 @@ class Camera:
         self.target_position = [None, None]
 
     def set_target_position(self, position):
+        # print(f"camera->set_target_position: position={position}")
         for axis in [0, 1]:
             if position[axis] is not None:
                 self.target_position[axis] = position[axis]
 
     def move_next_position(self):
+
         self.position_idx += 1
-        if self.position_idx > len(self.positions) - 1:
+        if self.position_idx + 1 > len(self.positions):
             self.position_idx = 0
-        self.set_target_position(self.positions[self.position_idx])
+        position = self.positions[self.position_idx]
+        self.set_target_position(position)
+        # print(
+        #    f"camera->move_next_position: positions={self.positions} position_idx={self.position_idx} position={position}"
+        # )
         self.acceleration = [0.5, 0.5]
 
     def set_random_position(self, bounds=None):

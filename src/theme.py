@@ -93,19 +93,16 @@ VIEWPORT_SIZE = (8, 8)  # side of viewport in tiles (not pixels)
 MAP_TILE_SIZE = (8, 8)  # width, height
 STRUCTURE_TILE_SIZE = (16, 16)
 
-CAMERA_POSITIONS = [
-    [0, 0],
-    [(MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0], 0],
-    [
-        (MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0],
-        (MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1],
-    ],
-    [0, (MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1]],
-    [
-        ((MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0]) // 2,
-        ((MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1]) // 2,
-    ],
-]
+CAMERA_X_MAX = (MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0]
+CAMERA_Y_MAX = (MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1]
+
+TL = [0, 0]
+TR = [CAMERA_X_MAX, 0]
+BR = [CAMERA_X_MAX, CAMERA_Y_MAX]
+BL = [0, CAMERA_Y_MAX]
+C = [CAMERA_X_MAX // 2, CAMERA_Y_MAX // 2]
+
+CAMERA_POSITIONS = [TL, TR, BR, BL, C]
 
 
 class Theme(BaseTheme):
