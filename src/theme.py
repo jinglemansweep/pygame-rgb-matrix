@@ -144,8 +144,7 @@ class Theme(BaseTheme):
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
         if frame % 1000 == 0:
-            pass
-            # self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
+            self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
 
     def blit(self, screen):
         # print(f"theme->blit camera={self.camera.position}")
@@ -190,8 +189,9 @@ class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):
             self.image_orig, self.direction_last[0] < 0, False
         )
         # if we collide with a building, move to somewhere else
-        # if self._collision_detect():
-        #    self.set_nearby_position()
+        if self._collision_detect():
+            self.stop()
+            self.set_nearby_position()
         # move to a nearby location every once in a while
         if 0 < self._random_seed < 10:
             self.set_nearby_position()

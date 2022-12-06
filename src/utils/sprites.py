@@ -119,5 +119,6 @@ class CollisionMixin:
         collisions = [self.rect.colliderect(c) for c in self._collision_collidables]
         has_collided = any(collisions)
         if has_collided:
-            self._timers["collision"] = 100
-        return any(collisions)
+            self._timers["collision"] = 1000
+            # print("collision")
+        return has_collided
