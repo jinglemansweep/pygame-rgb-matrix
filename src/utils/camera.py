@@ -7,24 +7,19 @@ class Camera:
         map_size,
         viewport_size,
         tile_size,
-        position=None,
-        direction=None,
-        speed=None,
-        accelleration=None,
-        friction=0.98,
+        positions=[[0, 0]],
+        direction=[0, 0],
+        speed=[0, 0],
+        accelleration=[0, 0],
+        friction=0.999,
     ):
-        if position is None:
-            position = [0, 0]
-        if direction is None:
-            direction = [0, 0]
-        if speed is None:
-            speed = [0, 0]
-        if accelleration is None:
-            accelleration = [0, 0]
+
         self.map_size = map_size
         self.viewport_size = viewport_size
         self.tile_size = tile_size
-        self.position = list(position)
+        self.positions = list(positions)
+        self.position_idx = 0
+        self.position = self.positions[self.position_idx]
         self.direction = list(direction)
         self.speed = list(speed)
         self.acceleration = list(accelleration)
@@ -35,6 +30,13 @@ class Camera:
         for axis in [0, 1]:
             if position[axis] is not None:
                 self.target_position[axis] = position[axis]
+
+    def move_next_position(self):
+        self.position_idx += 1
+        if self.position_idx > len(self.positions) - 1:
+            self.position_idx = 0
+        self.set_target_position(self.positions[self.position_idx])
+        self.acceleration = [0.5, 0.5]
 
     def set_random_position(self, bounds=None):
         if bounds is None:

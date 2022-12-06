@@ -93,10 +93,31 @@ VIEWPORT_SIZE = (8, 8)  # side of viewport in tiles (not pixels)
 MAP_TILE_SIZE = (8, 8)  # width, height
 STRUCTURE_TILE_SIZE = (16, 16)
 
+CAMERA_POSITIONS = [
+    [0, 0],
+    [(MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0], 0],
+    [
+        (MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0],
+        (MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1],
+    ],
+    [0, (MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1]],
+    [
+        ((MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0]) // 2,
+        ((MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1]) // 2,
+    ],
+]
+
 
 class Theme(BaseTheme):
     def __init__(self):
-        self.camera = Camera(MAP_SIZE, VIEWPORT_SIZE, MAP_TILE_SIZE, speed=(0.5, 0.5))
+        self.camera = Camera(
+            MAP_SIZE,
+            VIEWPORT_SIZE,
+            MAP_TILE_SIZE,
+            positions=CAMERA_POSITIONS,
+            accelleration=[0.1, 0.1],
+            friction=0.99,
+        )
         self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, MAP_TILE_SIZE, 0, 0, 0.6)
         self.tileset_animals = BaseTileset(
             SPRITE_ANIMALS_FILE, MAP_TILE_SIZE, 0, 0, 0.9
@@ -104,7 +125,7 @@ class Theme(BaseTheme):
         self.tileset_structures = BaseTileset(
             SPRITE_STRUCTURES_FILE, STRUCTURE_TILE_SIZE, 0, 0, 0.9
         )
-        self.row_beach = random.randint(MAP_SIZE[1] // 2, MAP_SIZE[1] - 4)
+        self.row_beach = random.randint(MAP_SIZE[1] - 4, MAP_SIZE[1] - 2)
         self.tilemap_bg = BackgroundTilemap(self.tileset_bg, MAP_SIZE, self.row_beach)
         self.group_collidables = pygame.sprite.Group()
 
@@ -144,7 +165,8 @@ class Theme(BaseTheme):
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
         if frame % 1000 == 0:
-            self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
+            self.camera.move_next_position()
+            # self.camera.set_random_position((None, self.row_beach * MAP_TILE_SIZE[1]))
 
     def blit(self, screen):
         # print(f"theme->blit camera={self.camera.position}")
@@ -191,7 +213,7 @@ class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):
         # if we collide with a building, move to somewhere else
         if self._collision_detect():
             self.stop()
-            self.set_nearby_position()
+            # self.set_nearby_position()
         # move to a nearby location every once in a while
         if 0 < self._random_seed < 10:
             self.set_nearby_position()
