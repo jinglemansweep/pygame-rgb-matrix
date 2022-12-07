@@ -49,6 +49,8 @@ if LED_ENABLED:
     matrix_options.show_refresh_rate = 1 if LED_SHOW_REFRESH else 0
     if LED_SLOWDOWN_GPIO is not None:
         matrix_options.gpio_slowdown = LED_SLOWDOWN_GPIO
+    if LED_GPIO_MAPPING is not None:
+        matrix_options.hardware_mapping = LED_GPIO_MAPPPING
     if LED_NO_HARDWARE_PULSE:
         matrix_options.disable_hardware_pulsing = True
     matrix_options.drop_privileges = True
