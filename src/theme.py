@@ -1,4 +1,5 @@
 import datetime
+import logging
 import numpy as np
 import os
 import pygame
@@ -10,6 +11,8 @@ from utils.sprites import TilesetSprite, AnimationMixin, CollisionMixin
 from utils.themes import BaseTheme
 from utils.tiles.tilemap import BaseTilemap
 from utils.tiles.tileset import BaseTileset
+
+logger = logging.getLogger("theme")
 
 TILE_GRASS_EMPTY_ALT = 0
 TILE_GRASS_EMPTY = 1
@@ -90,10 +93,9 @@ SPRITE_ANIMALS_FILE = f"{os.path.dirname(__file__)}/sprites/animals.png"
 SPRITE_STRUCTURES_FILE = f"{os.path.dirname(__file__)}/sprites/structures.png"
 
 pygame.font.init()
-# FONT_PATH = "/usr/share/fonts/truetype/anonymous-pro/Anonymous Pro B.ttf"
 # FONT_PATH = "/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf"
-FONT_PATH = f"{os.path.dirname(__file__)}/../farmer.otf"
-FONT_LARGE = pygame.font.Font(FONT_PATH, 20)
+FONT_PATH = f"{os.path.dirname(__file__)}/../boldmarker.otf"
+FONT_LARGE = pygame.font.Font(FONT_PATH, 24)
 FONT_SMALL = pygame.font.Font(FONT_PATH, 14)
 
 MAP_SIZE = (32, 32)  # width, height (multiplied by TILE_SIZE to get pixels)
@@ -103,6 +105,9 @@ STRUCTURE_TILE_SIZE = (16, 16)
 
 CAMERA_X_MAX = (MAP_SIZE[0] - VIEWPORT_SIZE[0]) * MAP_TILE_SIZE[0]
 CAMERA_Y_MAX = (MAP_SIZE[1] - VIEWPORT_SIZE[1]) * MAP_TILE_SIZE[1]
+
+DATE_POSITION = (0, (VIEWPORT_SIZE[1] * MAP_TILE_SIZE[1]) - 16)
+TIME_POSITION = (0, -8)
 
 TL = [0, 0]
 TR = [CAMERA_X_MAX, 0]
@@ -165,7 +170,8 @@ class Theme(BaseTheme):
             )
             self.actors_animals.add(animal)
 
-    def update(self, frame):
+    def update(self, ctx):
+        frame, screen, hass = ctx
         super().update(frame)
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
@@ -188,14 +194,12 @@ class Theme(BaseTheme):
     def render_date(self):
         shadow_offset = 1
         shadow = FONT_SMALL.render(self._get_date_string(), True, (0, 0, 0))
-        date = FONT_SMALL.render(
-            self._get_date_string(), True, (200, 200, 0)
-        )
+        date = FONT_SMALL.render(self._get_date_string(), True, (200, 200, 0))
         x, y, w, h = date.get_rect()
         img = pygame.Surface((w + shadow_offset, h + shadow_offset), SRCALPHA)
         img.blit(shadow, (shadow_offset, shadow_offset))
         img.blit(date, (0, 0))
-        return img        
+        return img
 
     def _get_time_string(self, show_seconds):
         now = datetime.datetime.now()
@@ -213,9 +217,15 @@ class Theme(BaseTheme):
         values = (now.day, now.month)
         return fmt.format(*values)
 
-    def blit(self, screen):
+    def blit(self, ctx):
+        frame, screen, hass = ctx
+        visible = hass.store["power"].state["state"] == "ON"
+        show_date = hass.store["show_date"].state["state"] == "ON"
+        show_seconds = hass.store["show_seconds"].state["state"] == "ON"
         # print(f"theme->blit camera={self.camera.position}")
         super().blit(screen)
+        if not visible:
+            return
         screen.blit(
             self.tilemap_bg.image,
             (0 - self.camera.position[0], 0 - self.camera.position[1]),
@@ -228,14 +238,15 @@ class Theme(BaseTheme):
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
         screen.blit(
-            self.render_clock(show_seconds=False),
-            (28, -6),
+            self.render_clock(show_seconds=show_seconds),
+            TIME_POSITION,
         )
 
-        screen.blit(
-            self.render_date(),
-            (2, -4),
-        )        
+        if show_date:
+            screen.blit(
+                self.render_date(),
+                DATE_POSITION,
+            )
 
 
 class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):

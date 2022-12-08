@@ -1,37 +1,17 @@
+import logging
 import pygame
 import random
-import paho.mqtt.client as mqtt
 from PIL import Image
 from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
 from config import (
     LED_COLS,
     LED_ROWS,
-    MQTT_HOST,
-    MQTT_PORT,
-    MQTT_USER,
-    MQTT_PASSWORD,
 )
 
 
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
-    client.subscribe("test/rgbmatrix")
-
-
-def on_message(client, userdata, msg):
-    print(msg.topic + " " + str(msg.payload))
-
-
-def setup_mqtt_client():
-    print(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    if MQTT_USER is not None:
-        client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
-    client.connect(MQTT_HOST, MQTT_PORT, 60)
-    return client
+def setup_logger(debug=False):
+    logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
 
 def build_pygame_screen():
@@ -50,3 +30,7 @@ def render_pygame(screen, matrix=None):
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
     pygame.display.flip()
+
+
+def build_context(frame, screen, hass):
+    return (frame, screen, hass)

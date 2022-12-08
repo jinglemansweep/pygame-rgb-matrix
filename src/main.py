@@ -1,10 +1,13 @@
 import asyncio
+import logging
 import os
 import pygame
 import pygame.pkgdata
 import sys
 import traceback
 import time
+import uuid
+from argparse import ArgumentParser
 from pygame.locals import QUIT
 
 sys.path.append(
@@ -14,12 +17,27 @@ sys.path.append(
 )
 
 from config import matrix_options, LED_ENABLED
+from integrations import setup_mqtt_client, HASSManager
 from utils.helpers import (
     render_pygame,
     build_pygame_screen,
-    setup_mqtt_client,
+    build_context,
+    setup_logger,
 )
 from theme import Theme
+
+_APP_NAME = "matrixclock"
+_APP_DESCRIPTION = "RGB Matrix Clock"
+_APP_VERSION = "0.0.1"
+
+parser = ArgumentParser(description=f"{_APP_DESCRIPTION} v{_APP_VERSION}")
+parser.add_argument("-v", "--verbose", action="store_true")
+
+args = parser.parse_args()
+setup_logger(debug=args.verbose)
+logger = logging.getLogger("main")
+
+device_id = uuid.getnode()
 
 matrix = None
 if LED_ENABLED:
@@ -27,7 +45,23 @@ if LED_ENABLED:
 
     matrix = RGBMatrix(options=matrix_options)
 
+store = dict()
+
+
 mqtt = setup_mqtt_client()
+
+
+hass = HASSManager(mqtt, device_id, _APP_NAME)
+hass.add_entity("power", "Power", "switch", {}, dict(state="ON"))
+hass.add_entity("show_date", "Show Date", "switch", {}, dict(state="ON"))
+
+
+def _on_message(client, userdata, msg):
+    hass.process_message(str(msg.topic), str(msg.payload))
+
+
+mqtt.on_message = _on_message
+
 
 pygame.init()
 screen = build_pygame_screen()
@@ -38,14 +72,14 @@ frame = 0
 
 
 def run():
-    print("start asyncio event loop")
+    logger.info("start asyncio event loop")
     while True:
         try:
             asyncio.run(main())
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
         finally:
-            print(f"asyncio restarting")
+            logger.warn(f"asyncio restarting")
             time.sleep(1)
             asyncio.new_event_loop()
 
@@ -57,7 +91,8 @@ async def main():
 
 
 async def tick():
-    global camera, frame, screen
+    global frame, screen
+    ctx = build_context(frame, screen, hass)
     # events
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -67,14 +102,16 @@ async def tick():
     now = time.localtime()
     screen.fill((0, 0, 0))
     # updates
-    theme.update(frame)
+    theme.update(ctx)
     # blitting
-    theme.blit(screen)
+    theme.blit(ctx)
     # rendering
     render_pygame(screen, matrix)
     # frame end
+    # logger.debug(store)
     clock.tick(120)
     frame += 1
 
 
-run()
+if __name__ == "__main__":
+    run()
