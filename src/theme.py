@@ -91,8 +91,10 @@ SPRITE_STRUCTURES_FILE = f"{os.path.dirname(__file__)}/sprites/structures.png"
 
 pygame.font.init()
 # FONT_PATH = "/usr/share/fonts/truetype/anonymous-pro/Anonymous Pro B.ttf"
-FONT_PATH = "/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf"
-FONT_LARGE = pygame.font.Font(FONT_PATH, 12)
+# FONT_PATH = "/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf"
+FONT_PATH = f"{os.path.dirname(__file__)}/../farmer.otf"
+FONT_LARGE = pygame.font.Font(FONT_PATH, 20)
+FONT_SMALL = pygame.font.Font(FONT_PATH, 14)
 
 MAP_SIZE = (32, 32)  # width, height (multiplied by TILE_SIZE to get pixels)
 VIEWPORT_SIZE = (8, 8)  # side of viewport in tiles (not pixels)
@@ -183,6 +185,18 @@ class Theme(BaseTheme):
         img.blit(clock, (0, 0))
         return img
 
+    def render_date(self):
+        shadow_offset = 1
+        shadow = FONT_SMALL.render(self._get_date_string(), True, (0, 0, 0))
+        date = FONT_SMALL.render(
+            self._get_date_string(), True, (200, 200, 0)
+        )
+        x, y, w, h = date.get_rect()
+        img = pygame.Surface((w + shadow_offset, h + shadow_offset), SRCALPHA)
+        img.blit(shadow, (shadow_offset, shadow_offset))
+        img.blit(date, (0, 0))
+        return img        
+
     def _get_time_string(self, show_seconds):
         now = datetime.datetime.now()
         if show_seconds:
@@ -191,6 +205,12 @@ class Theme(BaseTheme):
         else:
             fmt = "{:0>2d}:{:0>2d}"
             values = (now.hour, now.minute)
+        return fmt.format(*values)
+
+    def _get_date_string(self):
+        now = datetime.datetime.now()
+        fmt = "{:0>2d}/{:0>2d}"
+        values = (now.day, now.month)
         return fmt.format(*values)
 
     def blit(self, screen):
@@ -209,8 +229,13 @@ class Theme(BaseTheme):
 
         screen.blit(
             self.render_clock(show_seconds=False),
-            (26, 0),
+            (28, -6),
         )
+
+        screen.blit(
+            self.render_date(),
+            (2, -4),
+        )        
 
 
 class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):
