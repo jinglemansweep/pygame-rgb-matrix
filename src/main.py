@@ -5,8 +5,6 @@ import pygame.pkgdata
 import sys
 import traceback
 import time
-from contextlib import AsyncExitStack
-from mqtt_hass_base.daemon import MqttClientDaemon
 from pygame.locals import QUIT
 
 sys.path.append(
@@ -15,14 +13,7 @@ sys.path.append(
     )
 )
 
-from config import (
-    matrix_options,
-    LED_ENABLED,
-    MQTT_HOST,
-    MQTT_PORT,
-    MQTT_USER,
-    MQTT_PASSWORD,
-)
+from config import matrix_options, LED_ENABLED
 from utils.helpers import (
     render_pygame,
     build_pygame_screen,
@@ -46,34 +37,44 @@ theme = Theme()
 frame = 0
 
 
-class Daemon(MqttClientDaemon):
-    def read_config(self) -> None:
-        pass
-
-    async def _init_main_loop(self, stack: AsyncExitStack) -> None:
-        pass
-
-    async def _main_loop(self, stack: AsyncExitStack):
-        global camera, frame, screen
-        # events
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-        # frame start
-        now = time.localtime()
-        screen.fill((0, 0, 0))
-        # updates
-        theme.update(frame)
-        # blitting
-        theme.blit(screen)
-        # rendering
-        render_pygame(screen, matrix)
-        # frame end
-        clock.tick(120)
-        frame += 1
+def run():
+    print("start asyncio event loop")
+    while True:
+        try:
+            asyncio.run(main())
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+        finally:
+            print(f"asyncio restarting")
+            time.sleep(1)
+            asyncio.new_event_loop()
 
 
-daemon = Daemon("rgbmatrix", MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
+async def main():
+    mqtt.loop_start()
+    while True:
+        await asyncio.create_task(tick())
 
-asyncio.run(daemon.async_run())
+
+async def tick():
+    global camera, frame, screen
+    # events
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+    # frame start
+    now = time.localtime()
+    screen.fill((0, 0, 0))
+    # updates
+    theme.update(frame)
+    # blitting
+    theme.blit(screen)
+    # rendering
+    render_pygame(screen, matrix)
+    # frame end
+    clock.tick(120)
+    frame += 1
+
+
+run()
