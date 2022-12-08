@@ -221,7 +221,6 @@ class Theme(BaseTheme):
         frame, screen, hass = ctx
         visible = hass.store["power"].state["state"] == "ON"
         show_date = hass.store["show_date"].state["state"] == "ON"
-        show_seconds = hass.store["show_seconds"].state["state"] == "ON"
         # print(f"theme->blit camera={self.camera.position}")
         super().blit(screen)
         if not visible:
@@ -238,7 +237,7 @@ class Theme(BaseTheme):
             screen.blit(actor.image, actor.get_viewport_position(self.camera))
 
         screen.blit(
-            self.render_clock(show_seconds=show_seconds),
+            self.render_clock(show_seconds=False),
             TIME_POSITION,
         )
 
