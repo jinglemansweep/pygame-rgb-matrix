@@ -9,7 +9,7 @@ LED_CHAIN = int(os.environ.get("LED_CHAIN", 1))
 LED_PARALLEL = int(os.environ.get("LED_PARALLEL", 1))
 LED_PWM_BITS = int(os.environ.get("LED_PWM_BITS", 11))
 LED_BRIGHTNESS = int(os.environ.get("LED_BRIGHTNESS", 100))
-LED_GPIO_MAPPING = os.environ.get("LED_GPIO_MAPPING", None)
+LED_HARDWARE_MAPPING = os.environ.get("LED_HARDWARE_MAPPING", None)
 LED_SCAN_MODE = int(os.environ.get("LED_SCAN_MODE", 1))
 LED_PWM_LSB_NANOSECONDS = int(os.environ.get("LED_PWM_LSB_NANOSECONDS", 130))
 LED_SHOW_REFRESH = os.environ.get("LED_SHOW_REFRESH", False)
@@ -32,8 +32,6 @@ if LED_ENABLED:
     from rgbmatrix import RGBMatrixOptions
 
     matrix_options = RGBMatrixOptions()
-    if LED_GPIO_MAPPING is not None:
-        matrix_options.hardware_mapping = LED_GPIO_MAPPING
     matrix_options.rows = LED_ROWS
     matrix_options.cols = LED_COLS
     matrix_options.chain_length = LED_CHAIN
@@ -49,10 +47,10 @@ if LED_ENABLED:
     matrix_options.show_refresh_rate = 1 if LED_SHOW_REFRESH else 0
     if LED_SLOWDOWN_GPIO is not None:
         matrix_options.gpio_slowdown = LED_SLOWDOWN_GPIO
-    if LED_GPIO_MAPPING is not None:
-        matrix_options.hardware_mapping = LED_GPIO_MAPPPING
     if LED_NO_HARDWARE_PULSE:
         matrix_options.disable_hardware_pulsing = True
+    if LED_HARDWARE_MAPPING is not None:
+        matrix_options.hardware_mapping = LED_HARDWARE_MAPPING
     matrix_options.drop_privileges = True
 
 if not GUI_ENABLED:

@@ -2,9 +2,8 @@
 
 declare -r root_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../" &> /dev/null && pwd)"
 
+set -a
 source "${root_dir}/config.env"
-
-export LED_ROWS LED_COLS LED_SLOWDOWN_GPIO 
-export MQTT_HOST MQTT_PORT MQTT_USER MQTT_PASSWORD
+set +a
 
 "${root_dir}/venv/bin/python" "${root_dir}/src/main.py"
