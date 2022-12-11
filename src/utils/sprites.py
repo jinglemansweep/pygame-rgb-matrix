@@ -1,5 +1,8 @@
+import logging
 import pygame
 import random
+
+logger = logging.getLogger("utils.sprites")
 
 ACTION_STILL = 0
 ACTION_WALKING = 1
@@ -38,7 +41,7 @@ class AnimationMixin:
         self,
         direction=[0, 0],
         speed=[0, 0],
-        bounds=[None, None],
+        bounds=[None, None, None, None],
         sprite_frames=0,
         animate_every_x_frame=2,
         move_every_x_frame=2,
@@ -46,12 +49,6 @@ class AnimationMixin:
     ):
         super().__init__(**kwargs)
         self.image_orig = self.image.copy()
-        if direction is None:
-            direction = [0, 0]
-        if speed is None:
-            speed = [0, 0]
-        if bounds is None:
-            bounds = [None, None]
         self.direction = list(direction)
         self.direction_last = [1, 1]
         self.speed = list(speed)
@@ -76,9 +73,13 @@ class AnimationMixin:
         self._random_generate_seed()
 
     def set_target_position(self, position):
-        # print(f"BaseSprite->set_target_position: position={position}")
+        logger.debug(f"BaseSprite->set_target_position: position={position}")
         for axis in [0, 1]:
             if position[axis] is not None:
+                if position[axis] < self.bounds[axis]:
+                    position[axis] = self.bounds[axis]
+                if position[axis] > (self.bounds[axis] + self.bounds[axis + 2]):
+                    position[axis] = self.bounds[axis] + self.bounds[axis + 2]
                 self.target_position[axis] = position[axis]
 
     def stop(self):
@@ -111,14 +112,10 @@ class CollisionMixin:
         if collidables is None:
             collidables = []
         self._collision_collidables = collidables
-        self._timers["collision"] = 0
 
-    def _collision_detect(self):
-        if self._timers["collision"] > 0:
-            return False
-        collisions = [self.rect.colliderect(c) for c in self._collision_collidables]
-        has_collided = any(collisions)
-        if has_collided:
-            self._timers["collision"] = 1000
-            # print("collision")
-        return has_collided
+    def get_collisions(self):
+        collisions = []
+        for c in self._collision_collidables:
+            if self.rect.colliderect(c):
+                collisions.append(c)
+        return collisions
