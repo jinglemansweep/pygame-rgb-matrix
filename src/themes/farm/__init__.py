@@ -140,8 +140,6 @@ class Theme(BaseTheme):
         self.actors_animals.update(frame)
         if frame % 1000 == 0:
             self.camera.move_next_position()
-        if frame % 100 == 0:
-            self.actors_animals.add(self._build_random_animal())
 
     def blit(self, ctx):
         frame, screen, hass = ctx
