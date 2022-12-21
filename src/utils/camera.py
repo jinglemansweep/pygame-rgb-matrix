@@ -1,4 +1,6 @@
+import pygame
 import random
+from pygame.locals import *
 
 
 class Camera:
@@ -63,6 +65,17 @@ class Projection:
 
     def update(self):
         self.camera.update()
+
+    def blit(self, surface, position, screen):
+        temp_surface = pygame.Surface((self.rect[2], self.rect[3]), SRCALPHA)
+        temp_surface.blit(
+            surface,
+            (
+                position[0] - self.camera.position[0],
+                position[1] - self.camera.position[1],
+            ),
+        )
+        screen.blit(temp_surface, self.rect, (0, 0, self.rect[2], self.rect[3]))
 
     def __str__(self):
         return f"<Projection rect={self.rect} camera={self.camera}>"

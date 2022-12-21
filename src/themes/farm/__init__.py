@@ -138,11 +138,11 @@ class Theme(BaseTheme):
         self.actors_animals.update(frame)
         for idx, p in enumerate(self.projections):
             p.update()
-            p.camera.position[0] += idx
-            p.camera.position[1] += idx
-            if p.camera.position[0] > 32 * 8:
+            p.camera.position[0] += (idx + 1) * 0.01
+            p.camera.position[1] += 0.01
+            if p.camera.position[0] > CAMERA_X_MAX:
                 p.camera.position[0] = 0
-            if p.camera.position[1] > 32 * 8:
+            if p.camera.position[1] > CAMERA_Y_MAX:
                 p.camera.position[1] = 0
 
     def blit(self, ctx):
@@ -154,12 +154,17 @@ class Theme(BaseTheme):
         if not visible:
             return
         for p in self.projections:
-            x = 0 - p.camera.position[0]
-            y = 0 - p.camera.position[1]
-            surface = pygame.Surface((p.rect[2], p.rect[3]))
-            surface.blit(self.tilemap_bg.image, (x, y))
-            screen.blit(surface, p.rect)
-            # logger.info(p)
+            p.blit(
+                self.tilemap_bg.image,
+                (0, 0),
+                screen,
+            )
+            for structure in self.group_collidables:
+                p.blit(
+                    structure.image, structure.get_viewport_position(p.camera), screen
+                )
+            for actor in self.actors_animals:
+                p.blit(actor.image, actor.get_viewport_position(p.camera), screen)
 
         """
         screen.blit(
