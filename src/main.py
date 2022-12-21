@@ -24,7 +24,7 @@ from utils.helpers import (
     build_context,
     setup_logger,
 )
-from themes.farm import Theme
+from themes.gradius import Theme
 
 _APP_NAME = "matrixclock"
 _APP_DESCRIPTION = "RGB Matrix Clock"

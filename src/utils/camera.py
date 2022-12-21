@@ -12,7 +12,7 @@ class Camera:
         accelleration=[0, 0],
         friction=0.999,
     ):
-        self.position = [0, 0]
+        self.position = list(position)
         self.direction = list(direction)
         self.speed = list(speed)
         self.acceleration = list(accelleration)
