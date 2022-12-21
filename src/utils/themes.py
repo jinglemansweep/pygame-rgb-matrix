@@ -9,12 +9,9 @@ class BaseTheme:
         self.viewport_size = viewport_size
         self.map_size = map_size
         self.tile_size = tile_size
-        self.camera = Camera(
-            self.map_size, self.viewport_size, self.tile_size, speed=(0.5, 0.5)
-        )
 
     def update(self, frame):
-        self.camera.update()
+        pass
 
     def blit(self, screen):
         pass

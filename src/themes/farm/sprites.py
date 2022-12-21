@@ -118,13 +118,13 @@ class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):
         # if we collide with a building, move to somewhere else
         collisions = self.get_collisions()
         if len(collisions):
-            logger.info(f"{self.get_name()} collided")
+            # logger.info(f"{self.get_name()} collided")
             self.set_nearby_position(max_range=[16, 16])
         # move to a nearby location every once in a while
         if 0 < self._random_seed < 10:
             self.set_nearby_position(min_range=[4, 4], max_range=[16, 16])
         super().update(frame)
-        logger.debug(f"sprite->update: timers={self.timers}")
+        # logger.debug(f"sprite->update: timers={self.timers}")
 
     def set_nearby_position(self, max_range, min_range=[0, 0]):
         x = self.rect[0] + (
@@ -133,9 +133,9 @@ class AnimalSprite(AnimationMixin, CollisionMixin, TilesetSprite):
         y = self.rect[1] + (
             random.choice([-1, 1]) * random.randrange(min_range[1], max_range[1])
         )
-        logger.info(
-            f"{self.get_name()} moving nearby to={x},{y} (from={self.rect[0]},{self.rect[1]})"
-        )
+        # logger.info(
+        #     f"{self.get_name()} moving nearby to={x},{y} (from={self.rect[0]},{self.rect[1]})"
+        # )
         self.set_target_position([x, y])
 
     def get_name(self):

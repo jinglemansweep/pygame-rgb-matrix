@@ -4,10 +4,7 @@ import random
 from PIL import Image
 from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
-from config import (
-    LED_COLS,
-    LED_ROWS,
-)
+from config import VIRTUAL_SCREEN_SIZE
 
 
 def setup_logger(debug=False):
@@ -16,7 +13,7 @@ def setup_logger(debug=False):
 
 def build_pygame_screen():
     pygame.display.set_caption("RGB MATRIX")
-    return pygame.display.set_mode((LED_COLS, LED_ROWS), SCALED | RESIZABLE, 32)
+    return pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, SCALED | RESIZABLE, 32)
 
 
 def render_pygame(screen, matrix=None):

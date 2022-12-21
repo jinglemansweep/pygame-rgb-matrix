@@ -5,7 +5,7 @@ import pygame
 import random
 from pygame.locals import *
 
-from utils.camera import Camera
+from utils.camera import Camera, Projection
 from utils.sprites import TilesetSprite
 from utils.themes import BaseTheme
 from utils.tiles.tileset import BaseTileset
@@ -99,14 +99,12 @@ CAMERA_POSITIONS = [TL, TR, BR, BL, C]
 
 class Theme(BaseTheme):
     def __init__(self):
-        self.camera = Camera(
-            MAP_SIZE,
-            VIEWPORT_SIZE,
-            MAP_TILE_SIZE,
-            positions=CAMERA_POSITIONS,
-            accelleration=[0.1, 0.1],
-            friction=0.99,
-        )
+        self.projections = [
+            Projection((0, 0, 64, 64)),
+            Projection((64, 0, 64, 64), (64, 0)),
+            Projection((128, 0, 64, 64), (128, 0)),
+            Projection((192, 0, 64, 64), (192, 0)),
+        ]
         self.tileset_bg = BaseTileset(SPRITE_TILES_FILE, MAP_TILE_SIZE, 0, 0, 0.6)
         self.tileset_animals = BaseTileset(
             SPRITE_ANIMALS_FILE, MAP_TILE_SIZE, 0, 0, 0.9
@@ -138,27 +136,50 @@ class Theme(BaseTheme):
         super().update(frame)
         self.tilemap_bg.update(frame)
         self.actors_animals.update(frame)
-        if frame % 1000 == 0:
-            self.camera.move_next_position()
+        for idx, p in enumerate(self.projections):
+            p.update()
+            p.camera.position[0] += idx
+            p.camera.position[1] += idx
+            if p.camera.position[0] > 32 * 8:
+                p.camera.position[0] = 0
+            if p.camera.position[1] > 32 * 8:
+                p.camera.position[1] = 0
 
     def blit(self, ctx):
         frame, screen, hass = ctx
         visible = hass.store["power"].state["state"] == "ON"
         show_date = hass.store["show_date"].state["state"] == "ON"
-        logger.debug(f"theme->blit camera={self.camera.position}")
+        # logger.debug(f"theme->blit camera={self.camera.position}")
         super().blit(screen)
         if not visible:
             return
+        for p in self.projections:
+            x = 0 - p.camera.position[0]
+            y = 0 - p.camera.position[1]
+            surface = pygame.Surface((p.rect[2], p.rect[3]))
+            surface.blit(self.tilemap_bg.image, (x, y))
+            screen.blit(surface, p.rect)
+            # logger.info(p)
+
+        """
         screen.blit(
             self.tilemap_bg.image,
             (0 - self.camera.position[0], 0 - self.camera.position[1]),
+            (0, 0, 64, 64),
         )
 
+
         for idx, structure in enumerate(self.group_collidables):
-            screen.blit(structure.image, structure.get_viewport_position(self.camera))
+            screen.blit(
+                structure.image,
+                structure.get_viewport_position(self.camera),
+                (0, 0, 64, 64),
+            )
 
         for idx, actor in enumerate(self.actors_animals):
-            screen.blit(actor.image, actor.get_viewport_position(self.camera))
+            screen.blit(
+                actor.image, actor.get_viewport_position(self.camera), (0, 0, 64, 64)
+            )
 
         screen.blit(
             self._render_clock(show_seconds=False),
@@ -170,6 +191,7 @@ class Theme(BaseTheme):
                 self._render_date(),
                 DATE_POSITION,
             )
+        """
 
     def _build_random_animal(self):
         position = (

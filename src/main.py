@@ -42,6 +42,7 @@ device_id = uuid.getnode()
 matrix = None
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
+
     matrix = RGBMatrix(options=matrix_options)
 
 store = dict()

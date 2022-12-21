@@ -4,21 +4,12 @@ import random
 class Camera:
     def __init__(
         self,
-        map_size,
-        viewport_size,
-        tile_size,
-        positions=[[0, 0]],
+        position=[0, 0],
         direction=[0, 0],
         speed=[0, 0],
         accelleration=[0, 0],
         friction=0.999,
     ):
-
-        self.map_size = map_size
-        self.viewport_size = viewport_size
-        self.tile_size = tile_size
-        self.positions = list(positions)
-        self.position_idx = 0
         self.position = [0, 0]
         self.direction = list(direction)
         self.speed = list(speed)
@@ -26,43 +17,14 @@ class Camera:
         self.friction = friction
         self.target_position = [None, None]
 
+    def __str__(self):
+        return f"<Camera pos={self.position} dir={self.direction} speed={self.speed} accel={self.acceleration}>"
+
     def set_target_position(self, position):
-        # print(f"camera->set_target_position: position={position}")
+        print(f"camera->set_target_position: position={position}")
         for axis in [0, 1]:
             if position[axis] is not None:
                 self.target_position[axis] = position[axis]
-
-    def move_next_position(self):
-
-        self.position_idx += 1
-        if self.position_idx + 1 > len(self.positions):
-            self.position_idx = 0
-        position = self.positions[self.position_idx]
-        self.set_target_position(position)
-        # print(
-        #    f"camera->move_next_position: positions={self.positions} position_idx={self.position_idx} position={position}"
-        # )
-        self.acceleration = [0.5, 0.5]
-
-    def set_random_position(self, bounds=None):
-        if bounds is None:
-            bounds = [None, None]
-        bound_x = (
-            bounds[0]
-            if bounds[0] is not None
-            else (self.map_size[0] - self.viewport_size[0]) * self.tile_size[0]
-        )
-        bound_y = (
-            bounds[1]
-            if bounds[1] is not None
-            else (self.map_size[1] - self.viewport_size[1]) * self.tile_size[1]
-        )
-        position = (
-            random.randint(0, bound_x),
-            random.randint(0, bound_y),
-        )
-        self.set_target_position(position)
-        self.acceleration = [0.5, 0.5]
 
     def update(self):
         self._set_motion_props()
@@ -92,3 +54,15 @@ class Camera:
                     self.direction[axis] = 0
                     self.target_position[axis] = None
                     self.position[axis] = float(round(self.position[axis]))
+
+
+class Projection:
+    def __init__(self, rect, camera_position=(0, 0)):
+        self.rect = rect
+        self.camera = Camera(position=camera_position)
+
+    def update(self):
+        self.camera.update()
+
+    def __str__(self):
+        return f"<Projection rect={self.rect} camera={self.camera}>"
