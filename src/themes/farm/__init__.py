@@ -160,11 +160,9 @@ class Theme(BaseTheme):
                 screen,
             )
             for structure in self.group_collidables:
-                p.blit(
-                    structure.image, structure.get_viewport_position(p.camera), screen
-                )
+                p.blit(structure.image, structure.rect, screen)
             for actor in self.actors_animals:
-                p.blit(actor.image, actor.get_viewport_position(p.camera), screen)
+                p.blit(actor.image, actor.rect, screen)
 
         """
         screen.blit(
