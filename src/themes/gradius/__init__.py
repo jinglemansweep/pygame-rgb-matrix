@@ -8,7 +8,7 @@ from pygame.locals import *
 from utils.camera import Projection
 from utils.themes import BaseTheme
 
-from .sprites import WallSprite
+from .sprites import WallSprite, PlayerSprite
 
 logger = logging.getLogger("theme")
 
@@ -18,9 +18,8 @@ THEME_DIR = os.path.dirname(__file__)
 pygame.font.init()
 # FONT_LARGE = pygame.font.Font(FONT_PATH, 24)
 # FONT_SMALL = pygame.font.Font(FONT_PATH, 14)
-
 VIEWPORT_SIZE = (64, 64)
-MAP_SIZE = (VIEWPORT_SIZE[0] * 4, VIEWPORT_SIZE[1])
+MAP_SIZE = (VIEWPORT_SIZE[0] * 8, VIEWPORT_SIZE[1])
 CAMERA_BOUNDS = (MAP_SIZE[0] - VIEWPORT_SIZE[0], MAP_SIZE[1] - VIEWPORT_SIZE[1])
 
 ROOF_FLOOR_WIDTH = 4
@@ -30,9 +29,11 @@ class Theme(BaseTheme):
     def __init__(self):
         self.projections = [
             Projection((0, 0, 64, 64)),
-            Projection((64, 0, 64, 64), (72, 2)),
-            Projection((128, 0, 64, 64), (128, 0)),
-            Projection((192, 0, 64, 64), (183, 3)),
+            Projection((64 * 1, 0, 64, 64), (64 * 1, 2)),
+            Projection((64 * 2, 0, 64, 64), (64 * 2, 0)),
+            Projection((64 * 4, 0, 64, 64), (64 * 4, 3)),
+            Projection((64 * 5, 0, 64, 64), (64 * 5, 3)),
+            Projection((64 * 7, 0, 64, 64), (64 * 7, 3)),
         ]
         self.roof_height = 8
         self.floor_height = 8
@@ -61,20 +62,35 @@ class Theme(BaseTheme):
             )
             self.floor_height += random.randint(-1, 1)
             self.floor_height = max(min(self.floor_height, 10), 6)
+            self.player_sprites = pygame.sprite.Group()
+            self.player = PlayerSprite(x=10, y=(VIEWPORT_SIZE[0] // 2) - 8)
+            self.player_sprites.add(self.player)
+            pygame.key.set_repeat(1, 1)
 
     def update(self, ctx):
-        frame, screen, hass = ctx
+        frame, key, screen, hass = ctx
         super().update(frame)
+        if key is not None:
+            print(key, pygame.K_LEFT)
+            if key == pygame.K_LEFT:
+                self.player.move((-1, 0))
+            if key == pygame.K_RIGHT:
+                self.player.move((1, 0))
+            if key == pygame.K_UP:
+                self.player.move((0, -1))
+            if key == pygame.K_DOWN:
+                self.player.move((0, 1))
         self.roof_sprites.update(frame)
         self.floor_sprites.update(frame)
         for idx, p in enumerate(self.projections):
             p.update()
 
     def blit(self, ctx):
-        frame, screen, hass = ctx
+        frame, key, screen, hass = ctx
         super().blit(screen)
         for p in self.projections:
             for roof in self.roof_sprites:
                 p.blit(roof.image, roof.rect, screen)
             for floor in self.floor_sprites:
                 p.blit(floor.image, floor.rect, screen)
+            p.blit(self.player.image, self.player.rect, screen)

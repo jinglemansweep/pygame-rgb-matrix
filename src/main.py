@@ -92,13 +92,16 @@ async def main():
 
 async def tick():
     global frame, screen
-    ctx = build_context(frame, screen, hass)
     # events
+    key = None
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.KEYDOWN:
+            key = event.key
     # frame start
+    ctx = build_context(frame, key, screen, hass)
     now = time.localtime()
     screen.fill((0, 0, 0))
     # updates

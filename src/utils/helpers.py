@@ -29,5 +29,5 @@ def render_pygame(screen, matrix=None):
     pygame.display.flip()
 
 
-def build_context(frame, screen, hass):
-    return (frame, screen, hass)
+def build_context(frame, key, screen, hass):
+    return (frame, key, screen, hass)
