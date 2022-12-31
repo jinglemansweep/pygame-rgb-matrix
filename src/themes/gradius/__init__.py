@@ -7,6 +7,12 @@ from pygame.locals import *
 
 from utils.camera import Projection
 from utils.themes import BaseTheme
+from utils.helpers import (
+    EVDEV_KEY_CURSOR_LEFT,
+    EVDEV_KEY_CURSOR_RIGHT,
+    EVDEV_KEY_CURSOR_UP,
+    EVDEV_KEY_CURSOR_DOWN,
+)
 
 from .sprites import WallSprite, PlayerSprite
 
@@ -19,7 +25,7 @@ pygame.font.init()
 # FONT_LARGE = pygame.font.Font(FONT_PATH, 24)
 # FONT_SMALL = pygame.font.Font(FONT_PATH, 14)
 VIEWPORT_SIZE = (64, 64)
-MAP_SIZE = (VIEWPORT_SIZE[0] * 8, VIEWPORT_SIZE[1])
+MAP_SIZE = (VIEWPORT_SIZE[0] * 3, VIEWPORT_SIZE[1])
 CAMERA_BOUNDS = (MAP_SIZE[0] - VIEWPORT_SIZE[0], MAP_SIZE[1] - VIEWPORT_SIZE[1])
 
 ROOF_FLOOR_WIDTH = 4
@@ -29,11 +35,8 @@ class Theme(BaseTheme):
     def __init__(self):
         self.projections = [
             Projection((0, 0, 64, 64)),
-            Projection((64 * 1, 0, 64, 64), (64 * 1, 2)),
+            Projection((64 * 1, 0, 64, 64), (64 * 1, 0)),
             Projection((64 * 2, 0, 64, 64), (64 * 2, 0)),
-            Projection((64 * 4, 0, 64, 64), (64 * 4, 3)),
-            Projection((64 * 5, 0, 64, 64), (64 * 5, 3)),
-            Projection((64 * 7, 0, 64, 64), (64 * 7, 3)),
         ]
         self.roof_height = 8
         self.floor_height = 8
@@ -71,14 +74,13 @@ class Theme(BaseTheme):
         frame, key, screen, hass = ctx
         super().update(frame)
         if key is not None:
-            print(key, pygame.K_LEFT)
-            if key == pygame.K_LEFT:
+            if key == EVDEV_KEY_CURSOR_LEFT:
                 self.player.move((-1, 0))
-            if key == pygame.K_RIGHT:
+            if key == EVDEV_KEY_CURSOR_RIGHT:
                 self.player.move((1, 0))
-            if key == pygame.K_UP:
+            if key == EVDEV_KEY_CURSOR_UP:
                 self.player.move((0, -1))
-            if key == pygame.K_DOWN:
+            if key == EVDEV_KEY_CURSOR_DOWN:
                 self.player.move((0, 1))
         self.roof_sprites.update(frame)
         self.floor_sprites.update(frame)

@@ -26,6 +26,8 @@ MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
 MQTT_USER = os.environ.get("MQTT_USER", None)
 MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD", "")
 
+EVDEV_NAME = os.environ.get("EVDEV_NAME", None)
+
 VIRTUAL_SCREEN_WIDTH = int(os.environ.get("VIRTUAL_SCREEN_WIDTH", 64))
 VIRTUAL_SCREEN_HEIGHT = int(os.environ.get("VIRTUAL_SCREEN_HEIGHT", 64))
 VIRTUAL_SCREEN_SIZE = (VIRTUAL_SCREEN_WIDTH, VIRTUAL_SCREEN_HEIGHT)

@@ -1,13 +1,16 @@
 import asyncio
+import curses
 import logging
 import os
 import pygame
 import pygame.pkgdata
+import socket
 import sys
 import traceback
 import time
 import uuid
 from argparse import ArgumentParser
+from evdev import InputDevice, list_devices, ecodes
 from pygame.locals import QUIT
 
 sys.path.append(
@@ -16,7 +19,7 @@ sys.path.append(
     )
 )
 
-from config import matrix_options, LED_ENABLED
+from config import matrix_options, LED_ENABLED, EVDEV_NAME
 from integrations import setup_mqtt_client, HASSManager
 from utils.helpers import (
     render_pygame,
@@ -39,6 +42,17 @@ logger = logging.getLogger("main")
 
 device_id = uuid.getnode()
 
+devices = [InputDevice(fn) for fn in list_devices()]
+device_found = False
+dev = None
+for dev in devices:
+    if dev.name == EVDEV_NAME:
+        device_found = True
+        dev.repeat = (20, 50)
+        break
+if not device_found:
+    print(f"Input device '{EVDEV_NAME}' not found")
+
 matrix = None
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
@@ -46,7 +60,6 @@ if LED_ENABLED:
     matrix = RGBMatrix(options=matrix_options)
 
 store = dict()
-
 
 mqtt = setup_mqtt_client()
 
@@ -94,12 +107,20 @@ async def tick():
     global frame, screen
     # events
     key = None
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            key = event.key
+    if dev:
+        event = dev.read_one()
+        if event:
+            if event.type == ecodes.EV_KEY:
+                if event.value == 2:  # keypress
+                    if event.code == 1:  # escape
+                        pygame.quit()
+                        sys.exit()
+                    else:
+                        key = event.code
+                if event.value == 1:  # keydown
+                    pass
+                elif event.value == 0:  # keyup
+                    pass
     # frame start
     ctx = build_context(frame, key, screen, hass)
     now = time.localtime()

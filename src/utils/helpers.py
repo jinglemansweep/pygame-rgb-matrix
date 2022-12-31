@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import pygame
 import random
@@ -5,6 +6,13 @@ from PIL import Image
 from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
 from config import VIRTUAL_SCREEN_SIZE
+
+EVDEV_KEY_ESCAPE = 1
+EVDEV_KEY_CURSOR_UP = 103
+EVDEV_KEY_CURSOR_DOWN = 108
+EVDEV_KEY_CURSOR_LEFT = 105
+EVDEV_KEY_CURSOR_RIGHT = 106
+EVDEV_KEY_SPACE = 57
 
 
 def setup_logger(debug=False):
