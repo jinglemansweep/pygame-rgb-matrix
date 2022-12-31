@@ -12,6 +12,8 @@ from utils.helpers import (
     EVDEV_KEY_CURSOR_RIGHT,
     EVDEV_KEY_CURSOR_UP,
     EVDEV_KEY_CURSOR_DOWN,
+    EVDEV_KEY_A,
+    EVDEV_KEY_D,
 )
 
 from .sprites import WallSprite, PlayerSprite
@@ -57,7 +59,7 @@ class Theme(BaseTheme):
             self.floor_sprites.add(
                 WallSprite(
                     x=(i + 1) * ROOF_FLOOR_WIDTH,
-                    y=VIEWPORT_SIZE[1] - self.floor_height - 10,
+                    y=VIEWPORT_SIZE[1] - self.floor_height,
                     width=ROOF_FLOOR_WIDTH,
                     height=self.floor_height,
                     map_width=MAP_SIZE[0],
@@ -82,6 +84,12 @@ class Theme(BaseTheme):
                 self.player.move((0, -1))
             if key == EVDEV_KEY_CURSOR_DOWN:
                 self.player.move((0, 1))
+            if key == EVDEV_KEY_A:
+                self.floor_sprites.update(frame, -0.1)
+                self.roof_sprites.update(frame, -0.1)
+            if key == EVDEV_KEY_D:
+                self.floor_sprites.update(frame, 0.1)
+                self.roof_sprites.update(frame, 0.1)
         self.roof_sprites.update(frame)
         self.floor_sprites.update(frame)
         for idx, p in enumerate(self.projections):

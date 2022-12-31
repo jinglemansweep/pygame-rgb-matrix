@@ -25,7 +25,7 @@ class PlayerSprite(pygame.sprite.Sprite):
 
 
 class WallSprite(pygame.sprite.Sprite):
-    def __init__(self, x, y, map_width, height=8, width=16, color=(128, 0, 0)):
+    def __init__(self, x, y, map_width, height=8, width=8, color=(128, 0, 0)):
         super().__init__()
         self.width = width
         self.height = height
@@ -37,8 +37,9 @@ class WallSprite(pygame.sprite.Sprite):
         self.rect[1] = y
         self.speed = 2.0
 
-    def update(self, frame):
-
+    def update(self, frame, speed_adj=None):
+        if speed_adj is not None:
+            self.speed += speed_adj
         self.rect[0] -= self.speed
         if self.rect[0] < 1:
             self.rect[0] = self.map_width

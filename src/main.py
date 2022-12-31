@@ -19,13 +19,20 @@ sys.path.append(
     )
 )
 
-from config import matrix_options, LED_ENABLED, EVDEV_NAME
+from config import (
+    matrix_options,
+    LED_ENABLED,
+    EVDEV_NAME,
+    EVDEV_REPEAT_DELAY,
+    EVDEV_REPEAT_RATE,
+)
 from integrations import setup_mqtt_client, HASSManager
 from utils.helpers import (
     render_pygame,
     build_pygame_screen,
     build_context,
     setup_logger,
+    get_evdev_key,
 )
 from themes.gradius import Theme
 
@@ -48,7 +55,7 @@ dev = None
 for dev in devices:
     if dev.name == EVDEV_NAME:
         device_found = True
-        dev.repeat = (20, 50)
+        dev.repeat = (EVDEV_REPEAT_RATE, EVDEV_REPEAT_DELAY)
         break
 if not device_found:
     print(f"Input device '{EVDEV_NAME}' not found")
@@ -92,7 +99,7 @@ def run():
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
         finally:
-            logger.warn(f"asyncio restarting")
+            logger.warning(f"asyncio restarting")
             time.sleep(1)
             asyncio.new_event_loop()
 
@@ -106,21 +113,10 @@ async def main():
 async def tick():
     global frame, screen
     # events
-    key = None
-    if dev:
-        event = dev.read_one()
-        if event:
-            if event.type == ecodes.EV_KEY:
-                if event.value == 2:  # keypress
-                    if event.code == 1:  # escape
-                        pygame.quit()
-                        sys.exit()
-                    else:
-                        key = event.code
-                if event.value == 1:  # keydown
-                    pass
-                elif event.value == 0:  # keyup
-                    pass
+    key = get_evdev_key(dev)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
     # frame start
     ctx = build_context(frame, key, screen, hass)
     now = time.localtime()
@@ -133,7 +129,7 @@ async def tick():
     render_pygame(screen, matrix)
     # frame end
     # logger.debug(store)
-    clock.tick(120)
+    clock.tick(320)
     frame += 1
 
 

@@ -27,6 +27,8 @@ MQTT_USER = os.environ.get("MQTT_USER", None)
 MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD", "")
 
 EVDEV_NAME = os.environ.get("EVDEV_NAME", None)
+EVDEV_REPEAT_RATE = int(os.environ.get("EVDEV_REPEAT_RATE", 1))
+EVDEV_REPEAT_DELAY = int(os.environ.get("EVDEV_REPEAT_DELAY", 38))
 
 VIRTUAL_SCREEN_WIDTH = int(os.environ.get("VIRTUAL_SCREEN_WIDTH", 64))
 VIRTUAL_SCREEN_HEIGHT = int(os.environ.get("VIRTUAL_SCREEN_HEIGHT", 64))
