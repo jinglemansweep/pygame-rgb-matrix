@@ -3,7 +3,7 @@ import logging
 import pygame
 import random
 import sys
-from evdev import InputDevice, list_devices, ecodes
+from evdev import InputDevice, KeyEvent, categorize, list_devices, ecodes
 from PIL import Image
 from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
@@ -17,6 +17,21 @@ EVDEV_KEY_CURSOR_RIGHT = 106
 EVDEV_KEY_SPACE = 57
 EVDEV_KEY_A = 30
 EVDEV_KEY_D = 32
+
+EVDEV_GAMEPAD_DPAD_X = 16
+EVDEV_GAMEPAD_DPAD_Y = 17
+EVDEV_GAMEPAD_CROSS = 304
+EVDEV_GAMEPAD_CIRCLE = 305
+EVDEV_GAMEPAD_SQUARE = 307
+EVDEV_GAMEPAD_TRIANGLE = 308
+EVDEV_GAMEPAD_L1 = 310
+EVDEV_GAMEPAD_R1 = 311
+EVDEV_GAMEPAD_L2 = 312
+EVDEV_GAMEPAD_R2 = 313
+EVDEV_GAMEPAD_SELECT = 314
+EVDEV_GAMEPAD_START = 315
+EVDEV_GAMEPAD_L3 = 317
+EVDEV_GAMEPAD_R3 = 318
 
 
 def setup_logger(debug=False):
@@ -52,16 +67,30 @@ def get_evdev_key(dev):
     if not event:
         return None
     key = None
-    if event.type == ecodes.EV_KEY:
-        if event.value == 2:  # keypress
-            if event.code == 1:  # escape
-                pygame.quit()
-                sys.exit()
-            else:
-                print(event.code)
-                key = event.code
-        if event.value == 1:  # keydown
-            pass
-        elif event.value == 0:  # keyup
-            pass
+    if event.type in (ecodes.EV_KEY, ecodes.EV_ABS):
+        key_event = categorize(event)
+        code, value = key_event.event.code, key_event.event.value
+        print(code, value)
+        if code == EVDEV_GAMEPAD_DPAD_X:
+            if value < 0:
+                key = "left"
+            if value > 0:
+                key = "right"
+        if code == EVDEV_GAMEPAD_DPAD_Y:
+            if value < 0:
+                key = "up"
+            if value > 0:
+                key = "down"
+        if code == EVDEV_GAMEPAD_CIRCLE:
+            key = "circle"
+        if code == EVDEV_GAMEPAD_CROSS:
+            key = "cross"
+        if code == EVDEV_GAMEPAD_SQUARE:
+            key = "square"
+        if code == EVDEV_GAMEPAD_TRIANGLE:
+            key = "triangle"
+        if code == EVDEV_GAMEPAD_L1:
+            key = "l1"
+        if code == EVDEV_GAMEPAD_R1:
+            key = "r1"
     return key

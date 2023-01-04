@@ -76,18 +76,18 @@ class Theme(BaseTheme):
         frame, key, screen, hass = ctx
         super().update(frame)
         if key is not None:
-            if key == EVDEV_KEY_CURSOR_LEFT:
+            if key == "left":
                 self.player.move((-1, 0))
-            if key == EVDEV_KEY_CURSOR_RIGHT:
+            if key == "right":
                 self.player.move((1, 0))
-            if key == EVDEV_KEY_CURSOR_UP:
+            if key == "up":
                 self.player.move((0, -1))
-            if key == EVDEV_KEY_CURSOR_DOWN:
+            if key == "down":
                 self.player.move((0, 1))
-            if key == EVDEV_KEY_A:
+            if key == "l1":
                 self.floor_sprites.update(frame, -0.1)
                 self.roof_sprites.update(frame, -0.1)
-            if key == EVDEV_KEY_D:
+            if key == "r1":
                 self.floor_sprites.update(frame, 0.1)
                 self.roof_sprites.update(frame, 0.1)
         self.roof_sprites.update(frame)

@@ -53,6 +53,7 @@ devices = [InputDevice(fn) for fn in list_devices()]
 device_found = False
 dev = None
 for dev in devices:
+    print(dev.name)
     if dev.name == EVDEV_NAME:
         device_found = True
         dev.repeat = (EVDEV_REPEAT_RATE, EVDEV_REPEAT_DELAY)
@@ -114,6 +115,8 @@ async def tick():
     global frame, screen
     # events
     key = get_evdev_key(dev)
+    if key is not None:
+        print(key)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
