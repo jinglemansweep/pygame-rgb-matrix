@@ -80,11 +80,11 @@ def tick():
     global frame, screen
     # events
     for event in pygame.event.get():
-        print(event)
+        joypad.process_event(event)
         if event.type == pygame.QUIT:
             sys.exit()
     # frame start
-    ctx = build_context(frame, screen)
+    ctx = build_context(frame, screen, joypad)
     now = time.localtime()
     screen.fill((0, 0, 0))
     # updates

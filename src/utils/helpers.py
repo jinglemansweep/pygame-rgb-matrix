@@ -39,7 +39,7 @@ def setup_logger(debug=False):
 
 def build_pygame_screen():
     pygame.display.set_caption("RGB MATRIX")
-    return pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, 32)
+    return pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, 16)
 
 
 def render_pygame(screen, matrix=None):
@@ -55,8 +55,8 @@ def render_pygame(screen, matrix=None):
     pygame.display.flip()
 
 
-def build_context(frame, screen):
-    return (frame, screen)
+def build_context(frame, screen, joypad):
+    return (frame, screen, joypad)
 
 
 class JoyPad:
@@ -68,7 +68,6 @@ class JoyPad:
         self.direction = (0, 0)
 
     def process_event(self, event):
-        print(event)
         if event.type == pygame.JOYBUTTONDOWN:
             self.button = event.dict["button"]
         if event.type == pygame.JOYHATMOTION:

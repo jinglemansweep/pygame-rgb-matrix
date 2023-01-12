@@ -68,36 +68,18 @@ class Theme(BaseTheme):
             self.player_sprites = pygame.sprite.Group()
             self.player = PlayerSprite(x=10, y=(VIEWPORT_SIZE[0] // 2) - 8)
             self.player_sprites.add(self.player)
-            pygame.key.set_repeat(1, 1)
 
     def update(self, ctx):
-        frame, screen = ctx
+        frame, screen, joypad = ctx
         super().update(frame)
-        # print(joypad.direction)
-        """
-        if key is not None:
-            if key == "left":
-                self.player.move((-1, 0))
-            if key == "right":
-                self.player.move((1, 0))
-            if key == "up":
-                self.player.move((0, -1))
-            if key == "down":
-                self.player.move((0, 1))
-            if key == "l1":
-                self.floor_sprites.update(frame, -0.1)
-                self.roof_sprites.update(frame, -0.1)
-            if key == "r1":
-                self.floor_sprites.update(frame, 0.1)
-                self.roof_sprites.update(frame, 0.1)
-        """
+        self.player.move((joypad.direction[0], 0-joypad.direction[1]))        
         self.roof_sprites.update(frame)
         self.floor_sprites.update(frame)
         for idx, p in enumerate(self.projections):
             p.update()
 
     def blit(self, ctx):
-        frame, screen = ctx
+        frame, screen, joypad = ctx
         super().blit(screen)
         for p in self.projections:
             for roof in self.roof_sprites:
