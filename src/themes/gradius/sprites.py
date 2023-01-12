@@ -35,7 +35,7 @@ class WallSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect[0] = x
         self.rect[1] = y
-        self.speed = 2.0
+        self.speed = 8.0
 
     def update(self, frame, speed_adj=None):
         if speed_adj is not None:

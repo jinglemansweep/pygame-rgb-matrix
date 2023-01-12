@@ -27,18 +27,16 @@ pygame.font.init()
 # FONT_LARGE = pygame.font.Font(FONT_PATH, 24)
 # FONT_SMALL = pygame.font.Font(FONT_PATH, 14)
 VIEWPORT_SIZE = (64, 64)
-MAP_SIZE = (VIEWPORT_SIZE[0] * 3, VIEWPORT_SIZE[1])
+MAP_SIZE = (VIEWPORT_SIZE[0] * 7, VIEWPORT_SIZE[1])
 CAMERA_BOUNDS = (MAP_SIZE[0] - VIEWPORT_SIZE[0], MAP_SIZE[1] - VIEWPORT_SIZE[1])
 
-ROOF_FLOOR_WIDTH = 4
+ROOF_FLOOR_WIDTH = 16
 
 
 class Theme(BaseTheme):
     def __init__(self):
         self.projections = [
-            Projection((0, 0, 64, 64)),
-            Projection((64 * 1, 0, 64, 64), (64 * 1, 0)),
-            Projection((64 * 2, 0, 64, 64), (64 * 2, 0)),
+            Projection((0, 0, 64 * 7, 64)),
         ]
         self.roof_height = 8
         self.floor_height = 8
@@ -73,8 +71,10 @@ class Theme(BaseTheme):
             pygame.key.set_repeat(1, 1)
 
     def update(self, ctx):
-        frame, key, screen, hass = ctx
+        frame, screen = ctx
         super().update(frame)
+        # print(joypad.direction)
+        """
         if key is not None:
             if key == "left":
                 self.player.move((-1, 0))
@@ -90,13 +90,14 @@ class Theme(BaseTheme):
             if key == "r1":
                 self.floor_sprites.update(frame, 0.1)
                 self.roof_sprites.update(frame, 0.1)
+        """
         self.roof_sprites.update(frame)
         self.floor_sprites.update(frame)
         for idx, p in enumerate(self.projections):
             p.update()
 
     def blit(self, ctx):
-        frame, key, screen, hass = ctx
+        frame, screen = ctx
         super().blit(screen)
         for p in self.projections:
             for roof in self.roof_sprites:

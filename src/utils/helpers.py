@@ -3,7 +3,6 @@ import logging
 import pygame
 import random
 import sys
-from evdev import InputDevice, KeyEvent, categorize, list_devices, ecodes
 from PIL import Image
 from pygame.locals import QUIT, RESIZABLE, SCALED, BLEND_RGBA_ADD
 
@@ -40,7 +39,7 @@ def setup_logger(debug=False):
 
 def build_pygame_screen():
     pygame.display.set_caption("RGB MATRIX")
-    return pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, SCALED | RESIZABLE, 32)
+    return pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, 32)
 
 
 def render_pygame(screen, matrix=None):
@@ -56,41 +55,21 @@ def render_pygame(screen, matrix=None):
     pygame.display.flip()
 
 
-def build_context(frame, key, screen, hass):
-    return (frame, key, screen, hass)
+def build_context(frame, screen):
+    return (frame, screen)
 
 
-def get_evdev_key(dev):
-    if not dev:
-        return None
-    event = dev.read_one()
-    if not event:
-        return None
-    key = None
-    if event.type in (ecodes.EV_KEY, ecodes.EV_ABS):
-        key_event = categorize(event)
-        code, value = key_event.event.code, key_event.event.value
-        print(code, value)
-        if code == EVDEV_GAMEPAD_DPAD_X:
-            if value < 0:
-                key = "left"
-            if value > 0:
-                key = "right"
-        if code == EVDEV_GAMEPAD_DPAD_Y:
-            if value < 0:
-                key = "up"
-            if value > 0:
-                key = "down"
-        if code == EVDEV_GAMEPAD_CIRCLE:
-            key = "circle"
-        if code == EVDEV_GAMEPAD_CROSS:
-            key = "cross"
-        if code == EVDEV_GAMEPAD_SQUARE:
-            key = "square"
-        if code == EVDEV_GAMEPAD_TRIANGLE:
-            key = "triangle"
-        if code == EVDEV_GAMEPAD_L1:
-            key = "l1"
-        if code == EVDEV_GAMEPAD_R1:
-            key = "r1"
-    return key
+class JoyPad:
+    def __init__(self, device_index):
+        pygame.joystick.init()
+        self.joypad = pygame.joystick.Joystick(device_index)
+        self.joypad.init()
+        self.button = None
+        self.direction = (0, 0)
+
+    def process_event(self, event):
+        print(event)
+        if event.type == pygame.JOYBUTTONDOWN:
+            self.button = event.dict["button"]
+        if event.type == pygame.JOYHATMOTION:
+            self.direction = event.dict["value"]

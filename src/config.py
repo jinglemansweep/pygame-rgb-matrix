@@ -21,15 +21,6 @@ LED_ROW_ADDR_TYPE = int(os.environ.get("LED_ROW_ADDR_TYPE", 0))
 LED_MULTIPLEXING = int(os.environ.get("LED_MULTIPLEXING", 0))
 LED_PANEL_TYPE = os.environ.get("LED_PANEL_TYPE", "")
 
-MQTT_HOST = os.environ.get("MQTT_HOST", "localhost")
-MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
-MQTT_USER = os.environ.get("MQTT_USER", None)
-MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD", "")
-
-EVDEV_NAME = os.environ.get("EVDEV_NAME", None)
-EVDEV_REPEAT_RATE = int(os.environ.get("EVDEV_REPEAT_RATE", 1))
-EVDEV_REPEAT_DELAY = int(os.environ.get("EVDEV_REPEAT_DELAY", 38))
-
 VIRTUAL_SCREEN_WIDTH = int(os.environ.get("VIRTUAL_SCREEN_WIDTH", 64))
 VIRTUAL_SCREEN_HEIGHT = int(os.environ.get("VIRTUAL_SCREEN_HEIGHT", 64))
 VIRTUAL_SCREEN_SIZE = (VIRTUAL_SCREEN_WIDTH, VIRTUAL_SCREEN_HEIGHT)
@@ -63,5 +54,4 @@ if LED_ENABLED:
     matrix_options.drop_privileges = True
 
 if not GUI_ENABLED:
-    pass
-    os.putenv("SDL_VIDEODRIVER", "dummy")
+    os.putenv("SDL_VIDEODRIVER", "x11")
