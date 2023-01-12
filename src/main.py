@@ -47,6 +47,8 @@ device_id = uuid.getnode()
 pygame.init()
 clock = pygame.time.Clock()
 
+screen = build_pygame_screen()
+joypad = JoyPad(0)
 
 matrix = None
 if LED_ENABLED:
@@ -54,8 +56,7 @@ if LED_ENABLED:
 
     matrix = RGBMatrix(options=matrix_options)
 
-screen = build_pygame_screen()
-joypad = JoyPad(0)
+
 
 theme = Theme()
 frame = 0

@@ -1,7 +1,7 @@
 import os
 
 # Read environment variable configuration and set any default values
-GUI_ENABLED = os.environ.get("GUI_ENABLED", "false").lower() == "true"
+
 LED_ENABLED = os.environ.get("LED_ENABLED", "true").lower() == "true"
 LED_ROWS = int(os.environ.get("LED_ROWS", 64))
 LED_COLS = int(os.environ.get("LED_COLS", 64))
@@ -53,5 +53,3 @@ if LED_ENABLED:
         matrix_options.hardware_mapping = LED_HARDWARE_MAPPING
     matrix_options.drop_privileges = True
 
-if not GUI_ENABLED:
-    os.putenv("SDL_VIDEODRIVER", "x11")
