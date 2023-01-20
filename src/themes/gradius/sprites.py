@@ -25,17 +25,18 @@ class PlayerSprite(pygame.sprite.Sprite):
 
 
 class WallSprite(pygame.sprite.Sprite):
-    def __init__(self, x, y, map_width, height=8, width=8, color=(128, 0, 0)):
+    def __init__(self, x, y, map_width, height=8, width=32, color=(128, 0, 0)):
         super().__init__()
         self.width = width
         self.height = height
         self.map_width = map_width
         self.image = pygame.Surface([width, height])
+        color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         pygame.draw.rect(self.image, color, pygame.Rect(0, 0, width, height))
         self.rect = self.image.get_rect()
         self.rect[0] = x
         self.rect[1] = y
-        self.speed = 8.0
+        self.speed = 1.0
 
     def update(self, frame, speed_adj=None):
         if speed_adj is not None:

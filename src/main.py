@@ -86,7 +86,7 @@ def tick():
     # frame start
     ctx = build_context(frame, screen, joypad)
     now = time.localtime()
-    screen.fill((0, 0, 0))
+    #screen.fill((0, 0, 0))
     # updates
     theme.update(ctx)
     # blitting
@@ -94,7 +94,7 @@ def tick():
     # rendering
     render_pygame(screen, matrix)
     # frame end
-    clock.tick(100)
+    clock.tick(120)
     frame += 1
 
 

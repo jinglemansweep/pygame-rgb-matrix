@@ -44,15 +44,10 @@ def build_pygame_screen():
 
 def render_pygame(screen, matrix=None):
     if matrix is not None:
-        flipped = pygame.transform.flip(screen, True, False)
-        screen.blit(
-            flipped,
-            (0, 0),
-        )
         imgdata = pygame.surfarray.array3d(screen)
         image_rgb = Image.fromarray(imgdata, mode="RGB")
         matrix.SetImage(image_rgb)
-    pygame.display.flip()
+    pygame.display.update()
 
 
 def build_context(frame, screen, joypad):
