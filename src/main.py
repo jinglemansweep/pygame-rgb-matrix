@@ -16,7 +16,7 @@ sys.path.append(
     )
 )
 
-from config import matrix_options, LED_ENABLED, LED_REFRESH_RATE, VIRTUAL_SCREEN_SIZE
+from config import matrix_options, LED_ENABLED, LED_LIMIT_REFRESH, VIRTUAL_SCREEN_SIZE
 from utils.helpers import (
     random_color,
     render_led_matrix,
@@ -39,7 +39,7 @@ device_id = uuid.getnode()
 
 pygame.init()
 clock = pygame.time.Clock()
-pygame.event.set_allowed([QUIT])
+# pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
 screen_flags = RESIZABLE | SCALED
 screen = pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, screen_flags, 16)
