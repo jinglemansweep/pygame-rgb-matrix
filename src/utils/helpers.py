@@ -3,19 +3,43 @@ import numpy as np
 import pygame
 import random
 from PIL import Image
+from config import LED_ROWS, LED_COLS, LED_CHAIN, LED_PARALLEL, PANEL_ROWS, PANEL_COLS
 
 
 def setup_logger(debug=False):
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
 
 
+# PyGame renders wall like this:
+#
+# | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+#
+# We need to render to the LED panels (if using
+# parallel chains and panels are arranged on a single row):
+#
+# | 0 | 1 | 2 | 3 |
+# | 4 | 5 | 6 | 7 |
+#
+
+
 def render_led_matrix(screen, matrix=None):
     if not matrix:
         return
-    image_array = pygame.surfarray.array3d(screen)
-    image_array = np.rot90(image_array, 1)
-    image_array = np.flip(image_array, 0)
-    image_rgb = Image.fromarray(image_array, mode="RGB")
+    led_surface = pygame.Surface((LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL))
+    # Blit first 4 panels to top row
+    led_surface.blit(
+        screen,
+        (0, 0),
+        (0, 0, LED_COLS * LED_CHAIN, LED_ROWS * 1),
+    )
+    # Blit next 4 panels to next row
+    led_surface.blit(
+        screen,
+        (0, 64),
+        (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), 64),
+    )
+    led_array = np.flip(np.rot90(pygame.surfarray.array3d(led_surface), 1), 0)
+    image_rgb = Image.fromarray(led_array, mode="RGB")
     matrix.SetImage(image_rgb)
 
 

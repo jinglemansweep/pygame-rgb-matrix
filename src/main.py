@@ -19,6 +19,8 @@ sys.path.append(
 from config import (
     matrix_options,
     LED_ENABLED,
+    LED_CHAIN,
+    LED_PARALLEL,
     LED_ROWS,
     LED_COLS,
     PANEL_ROWS,
@@ -53,6 +55,16 @@ screen_flags = RESIZABLE | SCALED
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags, 16
 )
+
+logger.info(f"RGB Matrix")
+logger.info(f"Panel Dimensions:  {LED_COLS}px x {LED_ROWS}px")
+logger.info(f"Wall Dimensions:   {PANEL_COLS*LED_COLS}px x {PANEL_ROWS*LED_ROWS}px")
+logger.info(f"Wall Layout:       {PANEL_COLS} x {PANEL_ROWS} (panels)")
+logger.info(
+    f"GUI Dimensions:    {LED_COLS*LED_CHAIN}px x {LED_ROWS*LED_PARALLEL}px",
+)
+
+
 # joypad = JoyPad(0)
 
 LED_ENABLED = True
@@ -63,13 +75,6 @@ if LED_ENABLED:
 
     matrix = RGBMatrix(options=matrix_options)
 
-
-logger.info(f"RGB Matrix")
-logger.info(f"Wall Size (panels): rows={PANEL_ROWS} cols={PANEL_COLS}")
-logger.info(f"Panel Size (pixels): rows={LED_ROWS} cols={LED_COLS}")
-logger.info(
-    f"Total Size (pixels): rows={PANEL_ROWS * LED_ROWS} cols={PANEL_COLS * LED_COLS}"
-)
 
 frame = 0
 
