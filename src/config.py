@@ -33,10 +33,8 @@ LED_NO_DROP_PRIVS = (
     os.environ.get("LED_NO_DROP_PRIVS", "false").lower() == "true"
 )  # true/false
 
-
-VIRTUAL_SCREEN_WIDTH = int(os.environ.get("VIRTUAL_SCREEN_WIDTH", 64))
-VIRTUAL_SCREEN_HEIGHT = int(os.environ.get("VIRTUAL_SCREEN_HEIGHT", 64))
-VIRTUAL_SCREEN_SIZE = (VIRTUAL_SCREEN_WIDTH, VIRTUAL_SCREEN_HEIGHT)
+PANEL_ROWS = int(os.environ.get("PANEL_ROWS", 1))
+PANEL_COLS = int(os.environ.get("PANEL_COLS", 1))
 
 # Construct RGB Matrix options object
 matrix_options = None

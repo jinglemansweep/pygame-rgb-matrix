@@ -16,7 +16,14 @@ sys.path.append(
     )
 )
 
-from config import matrix_options, LED_ENABLED, LED_LIMIT_REFRESH, VIRTUAL_SCREEN_SIZE
+from config import (
+    matrix_options,
+    LED_ENABLED,
+    LED_ROWS,
+    LED_COLS,
+    PANEL_ROWS,
+    PANEL_COLS,
+)
 from utils.helpers import (
     random_color,
     render_led_matrix,
@@ -39,10 +46,13 @@ device_id = uuid.getnode()
 
 pygame.init()
 clock = pygame.time.Clock()
+font_large = pygame.font.SysFont(None, 96)
 # pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
 screen_flags = RESIZABLE | SCALED
-screen = pygame.display.set_mode(VIRTUAL_SCREEN_SIZE, screen_flags, 16)
+screen = pygame.display.set_mode(
+    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags, 16
+)
 # joypad = JoyPad(0)
 
 LED_ENABLED = True
@@ -54,11 +64,18 @@ if LED_ENABLED:
     matrix = RGBMatrix(options=matrix_options)
 
 
+logger.info(f"RGB Matrix")
+logger.info(f"Wall Size (panels): rows={PANEL_ROWS} cols={PANEL_COLS}")
+logger.info(f"Panel Size (pixels): rows={LED_ROWS} cols={LED_COLS}")
+logger.info(
+    f"Total Size (pixels): rows={PANEL_ROWS * LED_ROWS} cols={PANEL_COLS * LED_COLS}"
+)
+
 frame = 0
 
 
 class Square(pygame.sprite.Sprite):
-    def __init__(self, x, y, width=8, height=32, color=None):
+    def __init__(self, x, y, width=64, height=64, color=None, label=""):
         super().__init__()
         self.width = width
         self.height = height
@@ -68,23 +85,33 @@ class Square(pygame.sprite.Sprite):
             color or random_color(),
             pygame.Rect(0, 0, width, height),
         )
+        text_offset = (10, 1)
+        text_label_shadow = font_large.render(label, True, (0, 0, 0))
+        text_label = font_large.render(label, True, (255, 255, 255))
+        self.image.blit(text_label_shadow, (text_offset[0] + 2, text_offset[1] + 2))
+        self.image.blit(text_label, (text_offset[0], text_offset[1]))
         self.rect = self.image.get_rect()
         self.rect[0] = x
         self.rect[1] = y
-        self.speed = 2.0
-
-    def update(self, frame):
-        self.rect[0] -= self.speed
-        if self.rect[0] < 1:
-            self.rect[0] = 600
 
 
 def run():
     global frame
 
-    sprites = pygame.sprite.Group()
-    for i in range(0, 40):
-        sprites.add(Square(500 + (i * 20), 10))
+    px = 0
+    py = 0
+
+    sprites_panels = pygame.sprite.Group()
+
+    for pi in range(0, PANEL_ROWS * PANEL_COLS):
+        logger.info(f"panel index={pi}")
+        for pc in range(0, PANEL_COLS):
+            logger.info(f"PC={pc}")
+            sprites_panels.add(Square(px, py, LED_COLS, LED_ROWS, label=f"{pc}"))
+            px += LED_COLS
+            if px >= LED_COLS * PANEL_COLS:
+                px = 0
+                py += LED_ROWS
 
     while True:
         for event in pygame.event.get():
@@ -92,8 +119,7 @@ def run():
             if event.type == pygame.QUIT:
                 sys.exit()
         screen.fill((0, 0, 0))
-        sprites.update(frame)
-        sprites.draw(screen)
+        sprites_panels.draw(screen)
         render_led_matrix(screen, matrix)
         pygame.display.flip()
         # clock.tick(30)

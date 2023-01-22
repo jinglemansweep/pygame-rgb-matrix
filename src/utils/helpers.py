@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 import pygame
 import random
 from PIL import Image
@@ -12,6 +13,8 @@ def render_led_matrix(screen, matrix=None):
     if not matrix:
         return
     image_array = pygame.surfarray.array3d(screen)
+    image_array = np.rot90(image_array, 1)
+    image_array = np.flip(image_array, 0)
     image_rgb = Image.fromarray(image_array, mode="RGB")
     matrix.SetImage(image_rgb)
 
