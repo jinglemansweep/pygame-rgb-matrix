@@ -104,9 +104,7 @@ def run():
     sprites_panels = pygame.sprite.Group()
 
     for pi in range(0, PANEL_ROWS * PANEL_COLS):
-        logger.info(f"panel index={pi}")
         for pc in range(0, PANEL_COLS):
-            logger.info(f"PC={pc}")
             sprites_panels.add(Square(px, py, LED_COLS, LED_ROWS, label=f"{pc}"))
             px += LED_COLS
             if px >= LED_COLS * PANEL_COLS:
