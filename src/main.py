@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 import pygame
 import pygame.pkgdata
@@ -80,24 +81,47 @@ frame = 0
 
 
 class Square(pygame.sprite.Sprite):
-    def __init__(self, x, y, width=64, height=64, color=None, label=""):
+    def __init__(self, x, y, index, width=64, height=64, color=None):
         super().__init__()
         self.width = width
         self.height = height
-        self.image = pygame.Surface([width, height])
-        pygame.draw.rect(
-            self.image,
-            color or random_color(),
-            pygame.Rect(0, 0, width, height),
-        )
-        text_offset = (10, 1)
-        text_label_shadow = font_large.render(label, True, (0, 0, 0))
-        text_label = font_large.render(label, True, (255, 255, 255))
-        self.image.blit(text_label_shadow, (text_offset[0] + 2, text_offset[1] + 2))
-        self.image.blit(text_label, (text_offset[0], text_offset[1]))
+        self.index = index
+        self.color = color or random_color()
+        self.image = pygame.Surface([self.width, self.height])
         self.rect = self.image.get_rect()
         self.rect[0] = x
         self.rect[1] = y
+
+    def update(self, frame):
+        self.image = pygame.Surface([self.width, self.height])
+        pygame.draw.rect(
+            self.image,
+            self.color,
+            pygame.Rect(0, 0, self.width, self.height),
+        )
+        step = frame * 0.1
+        step %= 2 * math.pi
+        frame_sine = -1 * math.sin(step) * 1
+        text_offset = (10, 1)
+        text_label_shadow = font_large.render(
+            self._build_label(self.index), True, (0, 0, 0)
+        )
+        text_label = font_large.render(
+            self._build_label(self.index), True, (255, 255, 255)
+        )
+        scale = 0.9 + (frame_sine * 0.1)
+        rotation = frame_sine * 5
+        self.image.blit(
+            pygame.transform.rotozoom(text_label_shadow, rotation, scale),
+            (text_offset[0] + 2, text_offset[1] + 2),
+        )
+        self.image.blit(
+            pygame.transform.rotozoom(text_label, rotation, scale),
+            (text_offset[0], text_offset[1]),
+        )
+
+    def _build_label(self, index):
+        return f"{index}"
 
 
 def run():
@@ -110,7 +134,9 @@ def run():
 
     for pi in range(0, PANEL_ROWS * PANEL_COLS):
         for pc in range(0, PANEL_COLS):
-            sprites_panels.add(Square(px, py, LED_COLS, LED_ROWS, label=f"{pc}"))
+            sprites_panels.add(
+                Square(px, py, index=pc, width=LED_COLS, height=LED_ROWS)
+            )
             px += LED_COLS
             if px >= LED_COLS * PANEL_COLS:
                 px = 0
@@ -122,6 +148,7 @@ def run():
             if event.type == pygame.QUIT:
                 sys.exit()
         screen.fill((0, 0, 0))
+        sprites_panels.update(frame)
         sprites_panels.draw(screen)
         render_led_matrix(screen, matrix)
         pygame.display.flip()
