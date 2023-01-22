@@ -50,6 +50,7 @@ device_id = uuid.getnode()
 pygame.init()
 clock = pygame.time.Clock()
 font_large = pygame.font.SysFont(None, 96)
+font_tiny = pygame.font.SysFont(None, 16)
 # pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
 screen_flags = RESIZABLE | SCALED
@@ -102,22 +103,22 @@ class Square(pygame.sprite.Sprite):
         step = frame * 0.1
         step %= 2 * math.pi
         frame_sine = -1 * math.sin(step) * 1
-        text_offset = (10, 1)
-        text_label_shadow = font_large.render(
-            self._build_label(self.index), True, (0, 0, 0)
+        text_dimensions = font_tiny.render(
+            f"{self.width}x{self.height}", False, (255, 255, 255)
         )
-        text_label = font_large.render(
-            self._build_label(self.index), True, (255, 255, 255)
-        )
+        self.image.blit(text_dimensions, (2, 2))
+        text_index_offset = (10, 1)
+        text_index_shadow = font_large.render(str(self.index), True, (0, 0, 0))
+        text_index = font_large.render(str(self.index), True, (255, 255, 255))
         scale = 0.9 + (frame_sine * 0.1)
         rotation = frame_sine * 5
         self.image.blit(
-            pygame.transform.rotozoom(text_label_shadow, rotation, scale),
-            (text_offset[0] + 2, text_offset[1] + 2),
+            pygame.transform.rotozoom(text_index_shadow, rotation, scale),
+            (text_index_offset[0] + 2, text_index_offset[1] + 2),
         )
         self.image.blit(
-            pygame.transform.rotozoom(text_label, rotation, scale),
-            (text_offset[0], text_offset[1]),
+            pygame.transform.rotozoom(text_index, rotation, scale),
+            (text_index_offset[0], text_index_offset[1]),
         )
 
     def _build_label(self, index):
@@ -152,8 +153,7 @@ def run():
         sprites_panels.draw(screen)
         render_led_matrix(screen, matrix)
         pygame.display.flip()
-        # clock.tick(30)
-        time.sleep(0.005)
+        clock.tick(120)
         frame += 1
 
 
