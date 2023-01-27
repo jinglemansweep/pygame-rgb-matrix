@@ -1,3 +1,4 @@
+import html
 import logging
 import math
 import os
@@ -98,7 +99,7 @@ def run():
 
     news = get_rss_items(NEWS_RSS_URL)
     for article in news.entries:
-        ticker.add(article["title"])
+        ticker.add(html.unescape(article["title"]))
 
     while True:
         for event in pygame.event.get():

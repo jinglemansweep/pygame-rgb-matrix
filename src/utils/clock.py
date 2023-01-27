@@ -30,9 +30,21 @@ class ClockWidget(pygame.sprite.Sprite):
     def update(self, frame):
         now = datetime.now()
         date_str = now.strftime("%d/%m/%Y")
+        date_pos = (6, 36)
         time_str = now.strftime(self.time_fmt)
+        time_pos = (16, 0)
+        shadow_depth = 2
         self.image.fill(self.color_bg)
         date_sprite = self.font_date.render(date_str, self.antialias, self.color_fg)
+        date_sprite_shadow = self.font_date.render(date_str, self.antialias, (0, 0, 0))
         time_sprite = self.font_time.render(time_str, self.antialias, self.color_fg)
-        self.image.blit(date_sprite, (6, 36))
-        self.image.blit(time_sprite, (16, 0))
+        time_sprite_shadow = self.font_time.render(time_str, self.antialias, (0, 0, 0))
+        self.image.blit(
+            date_sprite_shadow, (date_pos[0] + shadow_depth, date_pos[1] + shadow_depth)
+        )
+        self.image.blit(date_sprite, date_pos)
+        self.image.blit(
+            time_sprite_shadow,
+            (time_pos[0] + shadow_depth, time_pos[1] + shadow_depth),
+        )
+        self.image.blit(time_sprite, time_pos)
