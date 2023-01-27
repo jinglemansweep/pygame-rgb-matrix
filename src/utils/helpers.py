@@ -1,7 +1,9 @@
+import feedparser
 import logging
 import numpy as np
 import pygame
 import random
+from pandas.io.json import json_normalize
 from PIL import Image
 from config import LED_ROWS, LED_COLS, LED_CHAIN, LED_PARALLEL, PANEL_ROWS, PANEL_COLS
 
@@ -45,6 +47,12 @@ def render_led_matrix(screen, matrix=None):
 
 def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+
+def get_rss_items(url):
+    return feedparser.parse(url)
+    flattened = json_normalize(feed.entries)
+    return flattened
 
 
 class JoyPad:

@@ -27,8 +27,10 @@ from config import (
     PANEL_ROWS,
     PANEL_COLS,
 )
+from utils.clock import ClockWidget
+from utils.ticker import TickerWidget
 from utils.helpers import (
-    random_color,
+    get_rss_items,
     render_led_matrix,
     setup_logger,
     JoyPad,
@@ -54,6 +56,7 @@ font_tiny = pygame.font.SysFont(None, 16)
 # pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
 screen_flags = RESIZABLE | SCALED
+
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags, 16
 )
@@ -80,77 +83,35 @@ if LED_ENABLED:
 
 frame = 0
 
-
-class Square(pygame.sprite.Sprite):
-    def __init__(self, x, y, index, width=64, height=64, color=None):
-        super().__init__()
-        self.width = width
-        self.height = height
-        self.index = index
-        self.color = color or random_color()
-        self.image = pygame.Surface([self.width, self.height])
-        self.rect = self.image.get_rect()
-        self.rect[0] = x
-        self.rect[1] = y
-
-    def update(self, frame):
-        self.image = pygame.Surface([self.width, self.height])
-        pygame.draw.rect(
-            self.image,
-            self.color,
-            pygame.Rect(0, 0, self.width, self.height),
-        )
-        step = frame * 0.1
-        step %= 2 * math.pi
-        frame_sine = -1 * math.sin(step) * 1
-        text_dimensions = font_tiny.render(
-            f"{self.width}x{self.height}", False, (255, 255, 255)
-        )
-        self.image.blit(text_dimensions, (2, 2))
-        text_index_offset = (10, 1)
-        text_index_shadow = font_large.render(str(self.index), True, (0, 0, 0))
-        text_index = font_large.render(str(self.index), True, (255, 255, 255))
-        scale = 0.9 + (frame_sine * 0.1)
-        rotation = frame_sine * 5
-        self.image.blit(
-            pygame.transform.rotozoom(text_index_shadow, rotation, scale),
-            (text_index_offset[0] + 2, text_index_offset[1] + 2),
-        )
-        self.image.blit(
-            pygame.transform.rotozoom(text_index, rotation, scale),
-            (text_index_offset[0], text_index_offset[1]),
-        )
-
-    def _build_label(self, index):
-        return f"{index}"
+NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
 
 
 def run():
     global frame
 
-    px = 0
-    py = 0
+    clock_widget = ClockWidget(
+        LED_COLS * (PANEL_COLS * 2), LED_ROWS, color_bg=(128, 0, 0)
+    )
+    ticker = TickerWidget(
+        LED_COLS * (PANEL_COLS - 2), LED_ROWS - 8, color_bg=(0, 0, 128), font_size=42
+    )
 
-    sprites_panels = pygame.sprite.Group()
-
-    for pi in range(0, PANEL_ROWS * PANEL_COLS):
-        for pc in range(0, PANEL_COLS):
-            sprites_panels.add(
-                Square(px, py, index=pc, width=LED_COLS, height=LED_ROWS)
-            )
-            px += LED_COLS
-            if px >= LED_COLS * PANEL_COLS:
-                px = 0
-                py += LED_ROWS
+    news = get_rss_items(NEWS_RSS_URL)
+    for article in news.entries:
+        ticker.add(article["title"])
 
     while True:
         for event in pygame.event.get():
             # joypad.process_event(event)
             if event.type == pygame.QUIT:
                 sys.exit()
-        screen.fill((0, 0, 0))
-        sprites_panels.update(frame)
-        sprites_panels.draw(screen)
+
+        clock_widget.update(frame)
+        ticker.update(frame)
+
+        screen.blit(ticker.image, (0, 0))
+        screen.blit(clock_widget.image, (LED_COLS * (PANEL_COLS - 2), 0))
+
         render_led_matrix(screen, matrix)
         pygame.display.flip()
         clock.tick(120)
