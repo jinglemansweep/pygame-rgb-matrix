@@ -3,6 +3,7 @@ import os
 import pygame
 import sys
 from pygame.locals import RESIZABLE, SCALED, DOUBLEBUF, SRCALPHA
+from utils.sprites import StageSprite
 
 logger = logging.getLogger("ticker")
 
@@ -47,11 +48,10 @@ class MessageSprite(pygame.sprite.Sprite):
         return self.rect[2] + self.margin
 
 
-class TickerWidget(pygame.sprite.Sprite):
+class TickerWidget(StageSprite):
     def __init__(
         self,
-        width,
-        height,
+        rect,
         font="freesans",
         font_size=32,
         color_bg=(0, 0, 0),
@@ -60,8 +60,10 @@ class TickerWidget(pygame.sprite.Sprite):
         item_margin=100,
         scroll_speed=1,
     ):
-        self.image = pygame.Surface((width, height), 16)
-        self.rect = self.image.get_rect()
+        super().__init__()
+        self.image = pygame.Surface((rect[2], rect[3]), 16)
+        self.rect = pygame.rect.Rect(*rect)
+        self.rect_start = self.rect.copy()
         pygame.font.init()
         self.font = pygame.font.SysFont(font, font_size)
         self.color_bg = color_bg
@@ -74,6 +76,8 @@ class TickerWidget(pygame.sprite.Sprite):
         self.remaining = None
 
     def update(self, frame):
+        super().update(frame)
+        frame_rel = self.frame - self.mode_change_frame_start
         if self.remaining is None or self.remaining <= 0:
             current = self.get_next()
             self.remaining = current.get_width()
@@ -83,6 +87,18 @@ class TickerWidget(pygame.sprite.Sprite):
         self.sprites.update(frame)
         self.image.fill(self.color_bg)
         self.sprites.draw(self.image)
+        if self.mode == "idle":
+            pass
+        elif self.mode == "hiding":
+            if self.rect[0] > self.rect_start[0] - self.rect_start[2]:
+                self.rect[0] -= 4
+            if frame_rel > self.rect_start[2] // 4:
+                self.set_mode("idle")
+        elif self.mode == "showing":
+            if self.rect[0] < self.rect_start[0]:
+                self.rect[0] += 4
+            if frame_rel > self.rect_start[2] // 4:
+                self.set_mode("idle")
 
     def add(self, text, transient=False):
         self.items.append(Message(text, transient))

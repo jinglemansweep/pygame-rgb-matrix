@@ -108,14 +108,22 @@ def run():
 
     mqtt.loop_start()
 
-    clock_widget = ClockWidget(LED_COLS * 2, LED_ROWS * 1, color_bg=(128, 0, 0))
+    sprites = pygame.sprite.Group()
+
+    clock_widget = ClockWidget(
+        (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * 1),
+        color_bg=(128, 0, 0),
+    )
     ticker = TickerWidget(
-        LED_COLS * (PANEL_COLS - 2),
-        LED_ROWS - 8,
+        (0, 0, LED_COLS * PANEL_COLS, LED_ROWS),
         color_bg=(0, 0, 128),
         font_size=42,
         scroll_speed=2,
     )
+
+    # Z-Order
+    sprites.add(ticker)
+    sprites.add(clock_widget)
 
     news = get_rss_items(NEWS_RSS_URL)
     for article in news.entries:
@@ -127,13 +135,18 @@ def run():
             if event.type == pygame.QUIT:
                 sys.exit()
 
+        screen.fill((0, 0, 0))
+
         if hass.store["power"].state["state"] == "ON":
-            clock_widget.update(frame)
-            ticker.update(frame)
-            screen.blit(ticker.image, (0, 0))
-            screen.blit(clock_widget.image, (LED_COLS * (PANEL_COLS - 2), 0))
-        else:
-            screen.fill((0, 0, 0))
+            sprites.update(frame)
+            sprites.draw(screen)
+
+        if frame % 1000 == 0:
+            clock_widget.set_mode("hiding")
+
+        if frame % 1000 == 500:
+            clock_widget.set_mode("showing")
+
         render_led_matrix(screen, matrix)
         pygame.display.flip()
         clock.tick(120)

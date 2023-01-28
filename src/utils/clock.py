@@ -1,16 +1,17 @@
 import logging
 import pygame
 from datetime import datetime
+from enum import Enum
 from pygame.locals import RESIZABLE, SCALED, DOUBLEBUF, SRCALPHA
+from utils.sprites import StageSprite
 
 logger = logging.getLogger("ticker")
 
 
-class ClockWidget(pygame.sprite.Sprite):
+class ClockWidget(StageSprite):
     def __init__(
         self,
-        width,
-        height,
+        rect,
         font_date="arial",
         font_time="impact",
         color_bg=(0, 0, 0),
@@ -18,8 +19,10 @@ class ClockWidget(pygame.sprite.Sprite):
         antialias=True,
         time_fmt="%H:%M",
     ):
-        self.image = pygame.Surface((width, height), 16)
-        self.rect = self.image.get_rect()
+        super().__init__()
+        self.image = pygame.Surface((rect[2], rect[3]), 16)
+        self.rect = pygame.rect.Rect(*rect)
+        self.rect_start = self.rect.copy()
         pygame.font.init()
         self.font_date = pygame.font.SysFont(font_date, 20)
         self.font_time = pygame.font.SysFont(font_time, 42)
@@ -29,6 +32,8 @@ class ClockWidget(pygame.sprite.Sprite):
         self.time_fmt = time_fmt
 
     def update(self, frame):
+        super().update(frame)
+        # Common updates
         now = datetime.now()
         dow_str = now.strftime("%A")[:3]
         ddmm_str = now.strftime("%d/%m")
@@ -51,3 +56,17 @@ class ClockWidget(pygame.sprite.Sprite):
             (time_pos[0] + shadow_depth, time_pos[1] + shadow_depth),
         )
         self.image.blit(time_sprite, time_pos)
+        # Mode handling
+        frame_rel = self.frame - self.mode_change_frame_start
+        if self.mode == "idle":
+            pass
+        elif self.mode == "hiding":
+            if self.rect[0] < self.rect_start[0] + self.rect_start[2]:
+                self.rect[0] += 1
+            if frame_rel > self.rect_start[2]:
+                self.set_mode("idle")
+        elif self.mode == "showing":
+            if self.rect[0] > self.rect_start[0]:
+                self.rect[0] -= 1
+            if frame_rel > self.rect_start[2]:
+                self.set_mode("idle")
