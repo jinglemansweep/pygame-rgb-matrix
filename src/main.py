@@ -92,7 +92,11 @@ def run():
 
     clock_widget = ClockWidget(LED_COLS * 2, LED_ROWS * 1, color_bg=(128, 0, 0))
     ticker = TickerWidget(
-        LED_COLS * (PANEL_COLS - 2), LED_ROWS - 8, color_bg=(0, 0, 128), font_size=42
+        LED_COLS * (PANEL_COLS - 2),
+        LED_ROWS - 8,
+        color_bg=(0, 0, 128),
+        font_size=42,
+        scroll_speed=2,
     )
 
     news = get_rss_items(NEWS_RSS_URL)
