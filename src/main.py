@@ -129,7 +129,7 @@ WOTD_RSS_URL = "https://www.oed.com/rss.xml"
 
 
 async def loop():
-    global frame
+    global frame, double_buffer
 
     mqtt.loop_start()
 
@@ -203,9 +203,8 @@ async def loop():
                 screen.blit(clock_widget.image, clock_widget.rect)
 
         pygame.display.flip()
-        render_led_matrix(screen, matrix, double_buffer)
-
-        clock.tick(100)
+        double_buffer = render_led_matrix(screen, matrix, double_buffer)
+        clock.tick(200)
         frame += 1
 
 

@@ -47,7 +47,7 @@ def render_led_matrix(screen, matrix=None, double_buffer=None):
     # Create image
     image_rgb = Image.fromarray(led_array, mode="RGB")
     double_buffer.SetImage(image_rgb)
-    double_buffer = matrix.SwapOnVSync(double_buffer)
+    return matrix.SwapOnVSync(double_buffer)
 
 
 def random_color():
