@@ -54,14 +54,14 @@ class TickerWidget(StageSprite):
         rect,
         font="freesans",
         font_size=32,
-        color_bg=(0, 0, 0),
-        color_fg=(255, 255, 255),
+        color_bg=(0, 0, 0, 0),
+        color_fg=(255, 255, 255, 255),
         padding=0,
         item_margin=100,
         scroll_speed=1,
     ):
         super().__init__()
-        self.image = pygame.Surface((rect[2], rect[3]), 0, 16)
+        self.image = pygame.Surface((rect[2], rect[3]), SRCALPHA, 16)
         self.rect = pygame.rect.Rect(*rect)
         self.rect_start = self.rect.copy()
         pygame.font.init()

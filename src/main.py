@@ -1,13 +1,10 @@
+import asyncio
 import html
 import logging
-import math
 import os
 import pygame
 import pygame.pkgdata
-import random
 import sys
-import time
-import uuid
 from argparse import ArgumentParser
 from pygame.locals import QUIT, RESIZABLE, SCALED, DOUBLEBUF
 
@@ -108,7 +105,7 @@ NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
 WOTD_RSS_URL = "https://www.oed.com/rss.xml"
 
 
-def run():
+async def loop():
     global frame
 
     mqtt.loop_start()
@@ -118,18 +115,18 @@ def run():
     background = Background((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
     clock_widget = ClockWidget(
         (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
-        color_bg=(128, 0, 0),
+        color_bg=(128, 0, 0, 128),
     )
     ticker = TickerWidget(
         (0, 0, LED_COLS * PANEL_COLS, 40),
-        color_bg=(0, 0, 128),
+        color_bg=(0, 0, 128, 128),
         font_size=34,
         scroll_speed=2,
     )
     ticker_alt = TickerWidget(
         (0, 40, LED_COLS * PANEL_COLS, 24),
-        color_bg=(255, 255, 255),
-        color_fg=(0, 0, 0),
+        color_bg=(255, 255, 255, 196),
+        color_fg=(0, 0, 0, 255),
         font_size=18,
         scroll_speed=1,
         padding=0,
@@ -171,8 +168,18 @@ def run():
 
         render_led_matrix(screen, matrix)
         pygame.display.flip()
-        clock.tick(50)
+        clock.tick(200)
+        await asyncio.sleep(0.001)
         frame += 1
+
+
+def run():
+    while True:
+        try:
+            asyncio.run(loop())
+        finally:
+            print(f"Manager > Error: asyncio crash, restarting")
+            asyncio.new_event_loop()
 
 
 if __name__ == "__main__":
