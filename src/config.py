@@ -36,6 +36,13 @@ LED_NO_DROP_PRIVS = (
 PANEL_ROWS = int(os.environ.get("PANEL_ROWS", 1))
 PANEL_COLS = int(os.environ.get("PANEL_COLS", 1))
 
+MQTT_HOST = os.environ.get("MQTT_HOST")
+MQTT_PORT = int(os.environ.get("MQTT_PORT", 8883))
+MQTT_USER = os.environ.get("MQTT_USER")
+MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD")
+
+DEVICE_NAME = os.environ.get("DEVICE_NAME", "default")
+
 # Construct RGB Matrix options object
 matrix_options = None
 

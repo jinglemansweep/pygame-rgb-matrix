@@ -27,9 +27,15 @@ from config import (
     LED_COLS,
     PANEL_ROWS,
     PANEL_COLS,
+    MQTT_HOST,
+    MQTT_PORT,
+    MQTT_USER,
+    MQTT_PASSWORD,
+    DEVICE_NAME,
 )
 from utils.clock import ClockWidget
 from utils.ticker import TickerWidget
+from utils.hass import HASSManager, setup_mqtt_client
 from utils.helpers import (
     get_rss_items,
     render_led_matrix,
@@ -48,7 +54,17 @@ args = parser.parse_args()
 setup_logger(debug=args.verbose)
 logger = logging.getLogger("main")
 
-device_id = uuid.getnode()
+mqtt = setup_mqtt_client(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
+hass = HASSManager(mqtt, DEVICE_NAME, _APP_NAME)
+hass.add_entity("power", "Power", "switch", {}, dict(state="ON"))
+hass.add_entity("show_date", "Show Date", "switch", {}, dict(state="ON"))
+
+
+def _on_message(client, userdata, msg):
+    hass.process_message(str(msg.topic), str(msg.payload))
+
+
+mqtt.on_message = _on_message
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -90,6 +106,8 @@ NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
 def run():
     global frame
 
+    mqtt.loop_start()
+
     clock_widget = ClockWidget(LED_COLS * 2, LED_ROWS * 1, color_bg=(128, 0, 0))
     ticker = TickerWidget(
         LED_COLS * (PANEL_COLS - 2),
@@ -109,12 +127,13 @@ def run():
             if event.type == pygame.QUIT:
                 sys.exit()
 
-        clock_widget.update(frame)
-        ticker.update(frame)
-
-        screen.blit(ticker.image, (0, 0))
-        screen.blit(clock_widget.image, (LED_COLS * (PANEL_COLS - 2), 0))
-
+        if hass.store["power"].state["state"] == "ON":
+            clock_widget.update(frame)
+            ticker.update(frame)
+            screen.blit(ticker.image, (0, 0))
+            screen.blit(clock_widget.image, (LED_COLS * (PANEL_COLS - 2), 0))
+        else:
+            screen.fill((0, 0, 0))
         render_led_matrix(screen, matrix)
         pygame.display.flip()
         clock.tick(120)
