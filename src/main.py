@@ -33,6 +33,7 @@ from config import (
     MQTT_PASSWORD,
     DEVICE_NAME,
 )
+from utils.background import Background
 from utils.clock import ClockWidget
 from utils.ticker import TickerWidget
 from utils.hass import HASSManager, setup_mqtt_client
@@ -101,6 +102,7 @@ if LED_ENABLED:
 frame = 0
 
 NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
+WOTD_RSS_URL = "https://www.oed.com/rss.xml"
 
 
 def run():
@@ -110,24 +112,41 @@ def run():
 
     sprites = pygame.sprite.Group()
 
+    background = Background((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
     clock_widget = ClockWidget(
-        (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * 1),
-        color_bg=(128, 0, 0),
+        (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
+        color_bg=(128, 0, 0, 255),
     )
     ticker = TickerWidget(
-        (0, 0, LED_COLS * PANEL_COLS, LED_ROWS),
-        color_bg=(0, 0, 128),
-        font_size=42,
+        (0, 0, LED_COLS * PANEL_COLS, 40),
+        color_bg=(0, 0, 128, 255),
+        font_size=34,
         scroll_speed=2,
+    )
+    ticker_alt = TickerWidget(
+        (0, 40, LED_COLS * PANEL_COLS, 24),
+        color_bg=(255, 255, 255, 255),
+        color_fg=(0, 0, 0, 255),
+        font_size=18,
+        scroll_speed=1,
+        padding=0,
+        item_margin=30,
     )
 
     # Z-Order
+    sprites.add(background)
     sprites.add(ticker)
+    sprites.add(ticker_alt)
     sprites.add(clock_widget)
 
     news = get_rss_items(NEWS_RSS_URL)
-    for article in news.entries:
-        ticker.add(html.unescape(article["title"]))
+    for item in news.entries:
+        ticker.add(html.unescape(item["title"]))
+
+    wotd = get_rss_items(WOTD_RSS_URL)
+    for item in wotd.entries:
+        title = str(item["description"]).replace("OED Word of the Day: ", "")
+        ticker_alt.add(html.unescape(title))
 
     while True:
         for event in pygame.event.get():
@@ -141,11 +160,12 @@ def run():
             sprites.update(frame)
             sprites.draw(screen)
 
-        if frame % 1000 == 0:
+        """
+        if frame % 5000 == 100:
             clock_widget.set_mode("hiding")
-
-        if frame % 1000 == 500:
+        if frame % 5000 == 500:
             clock_widget.set_mode("showing")
+        """
 
         render_led_matrix(screen, matrix)
         pygame.display.flip()
