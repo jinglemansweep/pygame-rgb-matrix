@@ -73,7 +73,7 @@ font_large = pygame.font.SysFont(None, 96)
 font_tiny = pygame.font.SysFont(None, 16)
 # pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
-screen_flags = RESIZABLE | SCALED | DOUBLEBUF
+screen_flags = RESIZABLE | SCALED
 
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags, 16
@@ -93,11 +93,12 @@ logger.info(
 LED_ENABLED = True
 
 matrix = None
+double_buffer = None
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
 
     matrix = RGBMatrix(options=matrix_options)
-
+    double_buffer = matrix.CreateFrameCanvas()
 
 frame = 0
 
@@ -166,10 +167,10 @@ async def loop():
             if hass.store["show_clock"].state["state"] == "ON":
                 screen.blit(clock_widget.image, clock_widget.rect)
 
-        render_led_matrix(screen, matrix)
         pygame.display.flip()
-        clock.tick(200)
-        await asyncio.sleep(0.001)
+        render_led_matrix(screen, matrix, double_buffer)
+
+        clock.tick(100)
         frame += 1
 
 

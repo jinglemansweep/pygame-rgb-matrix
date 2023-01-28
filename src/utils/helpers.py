@@ -24,9 +24,11 @@ def setup_logger(debug=False):
 #
 
 
-def render_led_matrix(screen, matrix=None):
+def render_led_matrix(screen, matrix=None, double_buffer=None):
     if not matrix:
         return
+    if not double_buffer:
+        double_buffer = matrix.CreateFrameCanvas()
     led_surface = pygame.Surface((LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL))
     # Blit first 4 panels to top row
     led_surface.blit(
@@ -40,9 +42,12 @@ def render_led_matrix(screen, matrix=None):
         (0, 64),
         (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), 64),
     )
+    # Rotate surface
     led_array = np.flip(np.rot90(pygame.surfarray.array3d(led_surface), 1), 0)
+    # Create image
     image_rgb = Image.fromarray(led_array, mode="RGB")
-    matrix.SetImage(image_rgb)
+    double_buffer.SetImage(image_rgb)
+    double_buffer = matrix.SwapOnVSync(double_buffer)
 
 
 def random_color():
