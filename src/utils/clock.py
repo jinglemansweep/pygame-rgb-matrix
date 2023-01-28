@@ -11,7 +11,8 @@ class ClockWidget(pygame.sprite.Sprite):
         self,
         width,
         height,
-        font="freesans",
+        font_date="arial",
+        font_time="impact",
         color_bg=(0, 0, 0),
         color_fg=(255, 255, 255),
         antialias=True,
@@ -20,8 +21,8 @@ class ClockWidget(pygame.sprite.Sprite):
         self.image = pygame.Surface((width, height), 16)
         self.rect = self.image.get_rect()
         pygame.font.init()
-        self.font_date = pygame.font.SysFont(font, 20)
-        self.font_time = pygame.font.SysFont(font, 36)
+        self.font_date = pygame.font.SysFont(font_date, 20)
+        self.font_time = pygame.font.SysFont(font_time, 42)
         self.color_bg = color_bg
         self.color_fg = color_fg
         self.antialias = antialias
@@ -29,18 +30,18 @@ class ClockWidget(pygame.sprite.Sprite):
 
     def update(self, frame):
         now = datetime.now()
-        dow_str = now.strftime("%A")[:3].upper()
+        dow_str = now.strftime("%A")[:3]
         ddmm_str = now.strftime("%d/%m")
         date_str = f"{dow_str} {ddmm_str}"
-        date_pos = (20, 36)
         time_str = now.strftime(self.time_fmt)
-        time_pos = (16, 0)
         shadow_depth = 2
         self.image.fill(self.color_bg)
         date_sprite = self.font_date.render(date_str, self.antialias, self.color_fg)
         date_sprite_shadow = self.font_date.render(date_str, self.antialias, (0, 0, 0))
+        date_pos = ((self.rect[2] - date_sprite.get_rect()[2]) // 2, 40)
         time_sprite = self.font_time.render(time_str, self.antialias, self.color_fg)
         time_sprite_shadow = self.font_time.render(time_str, self.antialias, (0, 0, 0))
+        time_pos = ((self.rect[2] - time_sprite.get_rect()[2]) // 2, -6)
         self.image.blit(
             date_sprite_shadow, (date_pos[0] + shadow_depth, date_pos[1] + shadow_depth)
         )
