@@ -58,7 +58,10 @@ logger = logging.getLogger("main")
 mqtt = setup_mqtt_client(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
 hass = HASSManager(mqtt, DEVICE_NAME, _APP_NAME)
 hass.add_entity("power", "Power", "switch", {}, dict(state="ON"))
-hass.add_entity("show_date", "Show Date", "switch", {}, dict(state="ON"))
+hass.add_entity("show_background", "Show Background", "switch", {}, dict(state="ON"))
+hass.add_entity("show_clock", "Show Clock", "switch", {}, dict(state="ON"))
+hass.add_entity("show_news", "Show News", "switch", {}, dict(state="ON"))
+hass.add_entity("show_updates", "Show Updates", "switch", {}, dict(state="ON"))
 
 
 def _on_message(client, userdata, msg):
@@ -133,7 +136,7 @@ def run():
         item_margin=30,
     )
 
-    # Z-Order
+    # Z-order
     sprites.add(background)
     sprites.add(ticker)
     sprites.add(ticker_alt)
@@ -155,17 +158,16 @@ def run():
                 sys.exit()
 
         screen.fill((0, 0, 0))
-
         if hass.store["power"].state["state"] == "ON":
-            sprites.update(frame)
-            sprites.draw(screen)
-
-        """
-        if frame % 5000 == 100:
-            clock_widget.set_mode("hiding")
-        if frame % 5000 == 500:
-            clock_widget.set_mode("showing")
-        """
+            if hass.store["show_background"].state["state"] == "ON":
+                screen.blit(background.image, background.rect)
+            if hass.store["show_news"].state["state"] == "ON":
+                screen.blit(ticker.image, ticker.rect)
+            if hass.store["show_updates"].state["state"] == "ON":
+                screen.blit(ticker_alt.image, ticker_alt.rect)
+            if hass.store["show_clock"].state["state"] == "ON":
+                screen.blit(clock_widget.image, clock_widget.rect)
+        sprites.update(frame)
 
         render_led_matrix(screen, matrix)
         pygame.display.flip()
