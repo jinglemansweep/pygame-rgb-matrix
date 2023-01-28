@@ -33,9 +33,10 @@ from config import (
 from utils.background import Background
 from utils.clock import ClockWidget
 from utils.ticker import TickerWidget
-from utils.hass import HASSManager, setup_mqtt_client
+from utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from utils.helpers import (
     get_rss_items,
+    hass_to_color,
     render_led_matrix,
     setup_logger,
     JoyPad,
@@ -59,10 +60,31 @@ hass.add_entity("show_background", "Show Background", "switch", {}, dict(state="
 hass.add_entity("show_clock", "Show Clock", "switch", {}, dict(state="ON"))
 hass.add_entity("show_news", "Show News", "switch", {}, dict(state="ON"))
 hass.add_entity("show_updates", "Show Updates", "switch", {}, dict(state="ON"))
+hass.add_entity(
+    "color_clock",
+    "Clock Color",
+    "light",
+    OPTS_LIGHT_RGB,
+    dict(state="ON", color=dict(r=0x90, g=0x00, b=0x00), brightness=255),
+)
+hass.add_entity(
+    "color_news",
+    "News Color",
+    "light",
+    OPTS_LIGHT_RGB,
+    dict(state="ON", color=dict(r=0x00, g=0x00, b=0x90), brightness=255),
+)
+hass.add_entity(
+    "color_updates",
+    "Updates Color",
+    "light",
+    OPTS_LIGHT_RGB,
+    dict(state="ON", color=dict(r=0xFF, g=0xFF, b=0xFF), brightness=255),
+)
 
 
 def _on_message(client, userdata, msg):
-    hass.process_message(str(msg.topic), str(msg.payload))
+    hass.process_message(msg.topic, msg.payload.decode("UTF-8"))
 
 
 mqtt.on_message = _on_message
@@ -154,6 +176,19 @@ async def loop():
             # joypad.process_event(event)
             if event.type == pygame.QUIT:
                 sys.exit()
+
+        clock_widget.color_bg = hass_to_color(
+            hass.store["color_clock"].state["color"],
+            hass.store["color_clock"].state["brightness"],
+        )
+        ticker.color_bg = hass_to_color(
+            hass.store["color_news"].state["color"],
+            hass.store["color_news"].state["brightness"],
+        )
+        ticker_alt.color_bg = hass_to_color(
+            hass.store["color_updates"].state["color"],
+            hass.store["color_updates"].state["brightness"],
+        )
 
         screen.fill((0, 0, 0))
         if hass.store["power"].state["state"] == "ON":

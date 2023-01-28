@@ -20,7 +20,7 @@ class ClockWidget(StageSprite):
         time_fmt="%H:%M",
     ):
         super().__init__()
-        self.image = pygame.Surface((rect[2], rect[3]), 16)
+        self.image = pygame.Surface((rect[2], rect[3]), SRCALPHA, 16)
         self.rect = pygame.rect.Rect(*rect)
         self.rect_start = self.rect.copy()
         pygame.font.init()

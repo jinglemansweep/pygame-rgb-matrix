@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 
 HASS_DISCOVERY_TOPIC_PREFIX = "homeassistant"
 HASS_DISCOVERY_MANUFACTURER = "WideBoy"
-OPTS_LIGHT_RGB = dict(color_mode=True, supported_color_modes=["rgb"], brightness=False)
+OPTS_LIGHT_RGB = dict(color_mode=True, supported_color_modes=["rgb"], brightness=True)
 
 logger = logging.getLogger("hass")
 
@@ -168,8 +168,9 @@ class HASSManager:
 
 
 def _message_to_hass(message, entity):
+    print(message, entity.device_class)
     return (
         dict(state="ON" if "ON" in message else "OFF")
         if entity.device_class == "switch"
-        else json.loads(message)
+        else json.loads(str(message))
     )

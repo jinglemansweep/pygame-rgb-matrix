@@ -60,6 +60,15 @@ def get_rss_items(url):
     return flattened
 
 
+def hass_to_color(rgb_dict, brightness=255):
+    color = [
+        rgb_dict.get("r") * (brightness / 255),
+        rgb_dict.get("g") * (brightness / 255),
+        rgb_dict.get("b") * (brightness / 255),
+    ]
+    return tuple(color)
+
+
 class JoyPad:
     def __init__(self, device_index):
         pygame.joystick.init()
