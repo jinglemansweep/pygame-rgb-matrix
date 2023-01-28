@@ -9,7 +9,7 @@ import sys
 import time
 import uuid
 from argparse import ArgumentParser
-from pygame.locals import QUIT, RESIZABLE, SCALED
+from pygame.locals import QUIT, RESIZABLE, SCALED, DOUBLEBUF
 
 
 sys.path.append(
@@ -76,7 +76,7 @@ font_large = pygame.font.SysFont(None, 96)
 font_tiny = pygame.font.SysFont(None, 16)
 # pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
-screen_flags = RESIZABLE | SCALED
+screen_flags = RESIZABLE | SCALED | DOUBLEBUF
 
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags, 16
@@ -118,18 +118,18 @@ def run():
     background = Background((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
     clock_widget = ClockWidget(
         (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
-        color_bg=(128, 0, 0, 255),
+        color_bg=(128, 0, 0),
     )
     ticker = TickerWidget(
         (0, 0, LED_COLS * PANEL_COLS, 40),
-        color_bg=(0, 0, 128, 255),
+        color_bg=(0, 0, 128),
         font_size=34,
         scroll_speed=2,
     )
     ticker_alt = TickerWidget(
         (0, 40, LED_COLS * PANEL_COLS, 24),
-        color_bg=(255, 255, 255, 255),
-        color_fg=(0, 0, 0, 255),
+        color_bg=(255, 255, 255),
+        color_fg=(0, 0, 0),
         font_size=18,
         scroll_speed=1,
         padding=0,
@@ -159,6 +159,7 @@ def run():
 
         screen.fill((0, 0, 0))
         if hass.store["power"].state["state"] == "ON":
+            sprites.update(frame)
             if hass.store["show_background"].state["state"] == "ON":
                 screen.blit(background.image, background.rect)
             if hass.store["show_news"].state["state"] == "ON":
@@ -167,11 +168,10 @@ def run():
                 screen.blit(ticker_alt.image, ticker_alt.rect)
             if hass.store["show_clock"].state["state"] == "ON":
                 screen.blit(clock_widget.image, clock_widget.rect)
-        sprites.update(frame)
 
         render_led_matrix(screen, matrix)
         pygame.display.flip()
-        clock.tick(120)
+        clock.tick(50)
         frame += 1
 
 
