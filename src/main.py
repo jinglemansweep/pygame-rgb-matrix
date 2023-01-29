@@ -1,3 +1,4 @@
+import cProfile
 import asyncio
 import html
 import logging
@@ -126,6 +127,7 @@ frame = 0
 
 NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
 WOTD_RSS_URL = "https://www.oed.com/rss.xml"
+HN_RSS_URL = "https://hnrss.org/frontpage"
 
 
 async def loop():
@@ -166,9 +168,10 @@ async def loop():
     for item in news.entries:
         ticker.add(html.unescape(item["title"]))
 
-    wotd = get_rss_items(WOTD_RSS_URL)
-    for item in wotd.entries:
-        title = str(item["description"]).replace("OED Word of the Day: ", "")
+    updates = get_rss_items(HN_RSS_URL)
+    for item in updates.entries:
+        title = str(item["title"])
+        # title = str(item["description"]).replace("OED Word of the Day: ", "")
         ticker_alt.add(html.unescape(title))
 
     while True:
@@ -218,4 +221,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    cProfile.run("run()", None, sort="tottime")

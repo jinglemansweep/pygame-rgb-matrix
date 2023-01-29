@@ -39,13 +39,13 @@ def render_led_matrix(screen, matrix=None, double_buffer=None):
     # Blit next 4 panels to next row
     led_surface.blit(
         screen,
-        (0, 64),
-        (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), 64),
+        (0, LED_ROWS),
+        (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
     )
-    # Rotate surface
-    led_array = np.flip(np.rot90(pygame.surfarray.array3d(led_surface), 1), 0)
+    led_array = pygame.surfarray.array3d(led_surface)
     # Create image
     image_rgb = Image.fromarray(led_array, mode="RGB")
+    # image_rgb = Image.frombytes(led_surface)
     double_buffer.SetImage(image_rgb)
     return matrix.SwapOnVSync(double_buffer)
 

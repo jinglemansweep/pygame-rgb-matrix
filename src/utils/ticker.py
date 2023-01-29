@@ -2,7 +2,7 @@ import logging
 import os
 import pygame
 import sys
-from pygame.locals import RESIZABLE, SCALED, DOUBLEBUF, SRCALPHA
+from pygame.locals import SRCALPHA
 from utils.sprites import StageSprite
 
 logger = logging.getLogger("ticker")
