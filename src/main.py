@@ -1,5 +1,4 @@
 import cProfile
-import asyncio
 import html
 import logging
 import os
@@ -7,7 +6,7 @@ import pygame
 import pygame.pkgdata
 import sys
 from argparse import ArgumentParser
-from pygame.locals import QUIT, RESIZABLE, SCALED, DOUBLEBUF
+from pygame.locals import QUIT, FULLSCREEN, DOUBLEBUF
 
 
 sys.path.append(
@@ -18,6 +17,10 @@ sys.path.append(
 
 from config import (
     matrix_options,
+    DEBUG,
+    GUI_ENABLED,
+    PYGAME_FPS,
+    PYGAME_BITS_PER_PIXEL,
     LED_ENABLED,
     LED_CHAIN,
     LED_PARALLEL,
@@ -51,7 +54,7 @@ parser = ArgumentParser(description=f"{_APP_DESCRIPTION} v{_APP_VERSION}")
 parser.add_argument("-v", "--verbose", action="store_true")
 
 args = parser.parse_args()
-setup_logger(debug=args.verbose)
+setup_logger(debug=DEBUG or args.verbose)
 logger = logging.getLogger("main")
 
 mqtt = setup_mqtt_client(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
@@ -92,14 +95,13 @@ mqtt.on_message = _on_message
 
 pygame.init()
 clock = pygame.time.Clock()
-font_large = pygame.font.SysFont(None, 96)
-font_tiny = pygame.font.SysFont(None, 16)
-# pygame.event.set_allowed([QUIT])
+pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
-screen_flags = RESIZABLE | SCALED
 
 screen = pygame.display.set_mode(
-    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags, 16
+    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
+    FULLSCREEN | DOUBLEBUF,
+    PYGAME_BITS_PER_PIXEL,
 )
 
 logger.info(f"RGB Matrix")
@@ -110,10 +112,7 @@ logger.info(
     f"GUI Dimensions:    {LED_COLS*LED_CHAIN}px x {LED_ROWS*LED_PARALLEL}px",
 )
 
-
 # joypad = JoyPad(0)
-
-LED_ENABLED = True
 
 matrix = None
 double_buffer = None
@@ -130,7 +129,7 @@ WOTD_RSS_URL = "https://www.oed.com/rss.xml"
 HN_RSS_URL = "https://hnrss.org/frontpage"
 
 
-async def loop():
+def loop():
     global frame, double_buffer
 
     mqtt.loop_start()
@@ -193,11 +192,12 @@ async def loop():
             hass.store["color_updates"].state["brightness"],
         )
 
-        screen.fill((0, 0, 0))
         if hass.store["power"].state["state"] == "ON":
             sprites.update(frame)
             if hass.store["show_background"].state["state"] == "ON":
                 screen.blit(background.image, background.rect)
+            else:
+                screen.fill((0, 0, 0))
             if hass.store["show_news"].state["state"] == "ON":
                 screen.blit(ticker.image, ticker.rect)
             if hass.store["show_updates"].state["state"] == "ON":
@@ -205,20 +205,18 @@ async def loop():
             if hass.store["show_clock"].state["state"] == "ON":
                 screen.blit(clock_widget.image, clock_widget.rect)
 
-        pygame.display.flip()
+        if GUI_ENABLED:
+            pygame.display.flip()
         double_buffer = render_led_matrix(screen, matrix, double_buffer)
-        clock.tick(200)
+
+        clock.tick(PYGAME_FPS)
         frame += 1
 
 
 def run():
     while True:
-        try:
-            asyncio.run(loop())
-        finally:
-            print(f"Manager > Error: asyncio crash, restarting")
-            asyncio.new_event_loop()
+        loop()
 
 
 if __name__ == "__main__":
-    cProfile.run("run()", None, sort="tottime")
+    cProfile.run("run()", None, sort="cumtime")

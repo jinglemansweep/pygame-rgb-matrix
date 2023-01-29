@@ -1,12 +1,9 @@
 import logging
 import os
 import pygame
-from datetime import datetime
-from enum import Enum
-from pygame.locals import RESIZABLE, SCALED, DOUBLEBUF, SRCALPHA
 from utils.sprites import StageSprite
 
-logger = logging.getLogger("ticker")
+logger = logging.getLogger("background")
 
 
 class Background(StageSprite):

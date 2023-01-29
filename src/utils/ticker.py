@@ -3,6 +3,8 @@ import os
 import pygame
 import sys
 from pygame.locals import SRCALPHA
+
+from config import PYGAME_BITS_PER_PIXEL
 from utils.sprites import StageSprite
 
 logger = logging.getLogger("ticker")
@@ -61,7 +63,9 @@ class TickerWidget(StageSprite):
         scroll_speed=1,
     ):
         super().__init__()
-        self.image = pygame.Surface((rect[2], rect[3]), SRCALPHA, 16)
+        self.image = pygame.Surface(
+            (rect[2], rect[3]), SRCALPHA, depth=PYGAME_BITS_PER_PIXEL
+        )
         self.rect = pygame.rect.Rect(*rect)
         self.rect_start = self.rect.copy()
         pygame.font.init()

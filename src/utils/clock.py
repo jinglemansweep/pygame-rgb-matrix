@@ -1,11 +1,11 @@
 import logging
 import pygame
 from datetime import datetime
-from enum import Enum
-from pygame.locals import RESIZABLE, SCALED, DOUBLEBUF, SRCALPHA
+from pygame.locals import SRCALPHA
+from config import PYGAME_BITS_PER_PIXEL
 from utils.sprites import StageSprite
 
-logger = logging.getLogger("ticker")
+logger = logging.getLogger("clock")
 
 
 class ClockWidget(StageSprite):
@@ -20,7 +20,9 @@ class ClockWidget(StageSprite):
         time_fmt="%H:%M",
     ):
         super().__init__()
-        self.image = pygame.Surface((rect[2], rect[3]), SRCALPHA, 16)
+        self.image = pygame.Surface(
+            (rect[2], rect[3]), SRCALPHA, depth=PYGAME_BITS_PER_PIXEL
+        )
         self.rect = pygame.rect.Rect(*rect)
         self.rect_start = self.rect.copy()
         pygame.font.init()
@@ -30,11 +32,16 @@ class ClockWidget(StageSprite):
         self.color_fg = color_fg
         self.antialias = antialias
         self.time_fmt = time_fmt
+        self.sec_prev = None
 
     def update(self, frame):
         super().update(frame)
         # Common updates
         now = datetime.now()
+        # Only render text every new second
+        if self.sec_prev is not None and now.second <= self.sec_prev:
+            return
+        self.sec_prev = now.second
         dow_str = now.strftime("%A")[:3]
         ddmm_str = now.strftime("%d/%m")
         date_str = f"{dow_str} {ddmm_str}"
