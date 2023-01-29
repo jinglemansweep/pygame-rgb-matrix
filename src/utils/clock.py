@@ -39,7 +39,7 @@ class ClockWidget(StageSprite):
         # Common updates
         now = datetime.now()
         # Only render text every new second
-        if self.sec_prev is not None and now.second <= self.sec_prev:
+        if self.sec_prev is not None and now.second == self.sec_prev:
             return
         self.sec_prev = now.second
         dow_str = now.strftime("%A")[:3]
