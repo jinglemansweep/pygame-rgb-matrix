@@ -210,6 +210,10 @@ def loop():
         double_buffer = render_led_matrix(screen, matrix, double_buffer)
 
         clock.tick(PYGAME_FPS)
+
+        if frame % 200 == 0:
+            logger.info(f"FPS: {clock.get_fps()}")
+
         frame += 1
 
 
@@ -219,4 +223,4 @@ def run():
 
 
 if __name__ == "__main__":
-    cProfile.run("run()", None, sort="cumtime")
+    cProfile.run("run()", None, sort="ncalls")

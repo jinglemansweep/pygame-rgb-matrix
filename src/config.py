@@ -3,7 +3,7 @@ import os
 # Read environment variable configuration and set any default values
 DEBUG = os.environ.get("DEBUG", "false") == "true"
 GUI_ENABLED = os.environ.get("SDL_VIDEODRIVER") != "dummy"
-PYGAME_FPS = int(os.environ.get("PYGAME_FPS", 200))
+PYGAME_FPS = int(os.environ.get("PYGAME_FPS", 60))
 PYGAME_BITS_PER_PIXEL = int(os.environ.get("PYGAME_BITS_PER_PIXEL", 16))
 
 LED_ENABLED = os.environ.get("LED_ENABLED", "true").lower() == "true"

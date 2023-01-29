@@ -5,7 +5,7 @@ import pygame
 import random
 from pandas.io.json import json_normalize
 from PIL import Image
-from config import LED_ROWS, LED_COLS, LED_CHAIN, LED_PARALLEL, PANEL_ROWS, PANEL_COLS
+from config import LED_ROWS, LED_COLS, LED_CHAIN, LED_PARALLEL, PYGAME_BITS_PER_PIXEL
 
 
 def setup_logger(debug=False):
@@ -29,7 +29,9 @@ def render_led_matrix(screen, matrix=None, double_buffer=None):
         return
     if not double_buffer:
         double_buffer = matrix.CreateFrameCanvas()
-    led_surface = pygame.Surface((LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL))
+    led_surface = pygame.Surface(
+        (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
+    )
     # Blit first 4 panels to top row
     led_surface.blit(
         screen,
@@ -42,10 +44,10 @@ def render_led_matrix(screen, matrix=None, double_buffer=None):
         (0, LED_ROWS),
         (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
     )
-    led_array = pygame.surfarray.array3d(led_surface)
-    # Create image
-    image_rgb = Image.fromarray(led_array, mode="RGB")
-    # image_rgb = Image.frombytes(led_surface)
+    image_str = pygame.image.tostring(led_surface, "RGB", False)
+    image_rgb = Image.frombytes(
+        "RGB", (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), image_str
+    )
     double_buffer.SetImage(image_rgb)
     return matrix.SwapOnVSync(double_buffer)
 
