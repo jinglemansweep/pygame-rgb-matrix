@@ -40,6 +40,9 @@ LED_NO_DROP_PRIVS = (
 PANEL_ROWS = int(os.environ.get("PANEL_ROWS", 1))
 PANEL_COLS = int(os.environ.get("PANEL_COLS", 1))
 
+RSS_URL = os.environ.get("RSS_URL")
+RSS_UPDATE_INTERVAL = int(os.environ.get("RSS_UPDATE_INTERVAL", 600))  # 10 mins
+
 MQTT_HOST = os.environ.get("MQTT_HOST")
 MQTT_PORT = int(os.environ.get("MQTT_PORT", 8883))
 MQTT_USER = os.environ.get("MQTT_USER")

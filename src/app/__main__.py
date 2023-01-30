@@ -1,6 +1,7 @@
 import asyncio
 import cProfile
 import html
+import json
 import logging
 import os
 import pygame
@@ -9,6 +10,7 @@ import sys
 import traceback
 
 from argparse import ArgumentParser
+from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
 from pygame.locals import QUIT, FULLSCREEN, DOUBLEBUF
 
@@ -34,6 +36,8 @@ from app.config import (
     LED_COLS,
     PANEL_ROWS,
     PANEL_COLS,
+    RSS_URL,
+    RSS_UPDATE_INTERVAL,
     MQTT_HOST,
     MQTT_PORT,
     MQTT_USER,
@@ -128,19 +132,21 @@ if LED_ENABLED:
 
 frame = 0
 
-NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
 
-
-async def _update_ticker(ticker, url):
-    INTERVAL = 60 * 10
+async def _update_ticker(loop, ticker, url, interval):
     ticker.expire_all()
-    feed = get_rss_items(url)
-    for idx, item in enumerate(feed.entries):
+    feed = await get_rss_items(loop, url)
+    now = datetime.now()
+    time_fmt = now.strftime("%H:%M")
+    header = f"Latest News @ {time_fmt}"
+    ticker.add(header)
+    entries = feed.entries
+    for idx, item in enumerate(entries):
         # ticker.add(f"idx {idx}", transient=True)
         ticker.add(html.unescape(item["title"]))
-    logger.info(f"rss:fetch url={url} entries={len(feed.entries)}")
-    await asyncio.sleep(INTERVAL)
-    asyncio.create_task(_update_ticker(ticker))
+    logger.info(f"rss:fetch url={url} entries={len(entries)} interval={interval}")
+    await asyncio.sleep(interval)
+    asyncio.create_task(_update_ticker(loop, ticker, url, interval))
 
 
 async def start_main_loop():
@@ -168,7 +174,8 @@ async def start_main_loop():
     sprites.add(ticker)
     sprites.add(clock_widget)
 
-    asyncio.create_task(_update_ticker(ticker, NEWS_RSS_URL))
+    loop = asyncio.get_event_loop()
+    asyncio.create_task(_update_ticker(loop, ticker, RSS_URL, RSS_UPDATE_INTERVAL))
 
     while True:
         for event in pygame.event.get():

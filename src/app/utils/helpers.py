@@ -1,9 +1,11 @@
+import aiohttp
+import asyncio
+import async_timeout
 import feedparser
 import logging
 import numpy as np
 import pygame
 import random
-from pandas.io.json import json_normalize
 from PIL import Image
 
 from app.config import (
@@ -72,10 +74,18 @@ def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 
-def get_rss_items(url):
-    return feedparser.parse(url)
-    flattened = json_normalize(feed.entries)
-    return flattened
+async def async_fetch(session, url):
+    with async_timeout.timeout(10):
+        async with session.get(url) as response:
+            return await response.text()
+
+
+async def get_rss_items(loop, url):
+    feed = None
+    async with aiohttp.ClientSession(loop=loop) as session:
+        html = await async_fetch(session, url)
+        feed = feedparser.parse(html)
+    return feed
 
 
 def hass_to_color(rgb_dict, brightness=255):
