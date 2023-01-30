@@ -6,16 +6,18 @@ import pygame
 import pygame.pkgdata
 import sys
 from argparse import ArgumentParser
+from dotenv import load_dotenv, find_dotenv
 from pygame.locals import QUIT, FULLSCREEN, DOUBLEBUF
 
+load_dotenv(find_dotenv())
 
 sys.path.append(
     os.path.abspath(
-        os.path.dirname(__file__) + "/../lib/rpi-rgb-led-matrix/bindings/python"
+        os.path.dirname(__file__) + "/../../lib/rpi-rgb-led-matrix/bindings/python"
     )
 )
 
-from config import (
+from app.config import (
     matrix_options,
     DEBUG,
     GUI_ENABLED,
@@ -34,11 +36,11 @@ from config import (
     MQTT_PASSWORD,
     DEVICE_NAME,
 )
-from utils.background import Background
-from utils.clock import ClockWidget
-from utils.ticker import TickerWidget
-from utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
-from utils.helpers import (
+from app.utils.background import Background
+from app.utils.clock import ClockWidget
+from app.utils.ticker import TickerWidget
+from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
+from app.utils.helpers import (
     get_rss_items,
     hass_to_color,
     render_led_matrix,
@@ -146,8 +148,8 @@ def loop():
 
     news = get_rss_items(NEWS_RSS_URL)
     for idx, item in enumerate(news.entries):
-        ticker.add(f"idx {idx}", transient=True)
-        # ticker.add(html.unescape(item["title"]))
+        # ticker.add(f"idx {idx}", transient=True)
+        ticker.add(html.unescape(item["title"]))
 
     while True:
         for event in pygame.event.get():

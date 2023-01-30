@@ -4,8 +4,8 @@ import pygame
 import sys
 from pygame.locals import SRCALPHA
 
-from config import PYGAME_BITS_PER_PIXEL
-from utils.sprites import StageSprite
+from app.config import PYGAME_BITS_PER_PIXEL
+from app.utils.sprites import StageSprite
 
 logger = logging.getLogger("ticker")
 

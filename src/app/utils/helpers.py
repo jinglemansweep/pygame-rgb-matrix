@@ -5,7 +5,14 @@ import pygame
 import random
 from pandas.io.json import json_normalize
 from PIL import Image
-from config import LED_ROWS, LED_COLS, LED_CHAIN, LED_PARALLEL, PYGAME_BITS_PER_PIXEL
+
+from app.config import (
+    LED_ROWS,
+    LED_COLS,
+    LED_CHAIN,
+    LED_PARALLEL,
+    PYGAME_BITS_PER_PIXEL,
+)
 
 
 def setup_logger(debug=False):
@@ -44,11 +51,15 @@ def render_led_matrix(screen, matrix=None, double_buffer=None):
         (0, LED_ROWS),
         (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
     )
+    # Convert PyGame surface to RGB byte array
     image_str = pygame.image.tostring(led_surface, "RGB", False)
+    # Create a PIL compatible image from the byte array
     image_rgb = Image.frombytes(
         "RGB", (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), image_str
     )
+    # Render PIL image to buffer
     double_buffer.SetImage(image_rgb)
+    # Flip and return next buffer
     return matrix.SwapOnVSync(double_buffer)
 
 

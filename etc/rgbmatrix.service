@@ -2,11 +2,13 @@
 Description=RGB Matrix
 
 [Service]
-WorkingDirectory=/home/louis/data/dev/pygame-rgb-matrix
-ExecStart=/bin/bash ./scripts/start.sh
+WorkingDirectory=/opt/rgbmatrix
+ExecStart=/bin/bash -c "cd /opt/rgbmatrix/src && /opt/rgbmatrix/venv/bin/python -m app"
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 Type=simple
+StandardOutput=null
+StandardError=null
 
 [Install]
 WantedBy=default.target
