@@ -5,7 +5,6 @@ import sys
 from pygame.locals import SRCALPHA
 
 from app.config import PYGAME_BITS_PER_PIXEL
-from app.utils.sprites import StageSprite
 
 logger = logging.getLogger("ticker")
 
@@ -16,7 +15,7 @@ class Message:
         self.transient = transient
 
 
-class MessageSprite(pygame.sprite.Sprite):
+class MessageSprite(pygame.sprite.DirtySprite):
     def __init__(
         self,
         position,
@@ -28,7 +27,7 @@ class MessageSprite(pygame.sprite.Sprite):
         antialias=True,
         transient=False,
     ):
-        super().__init__()
+        pygame.sprite.DirtySprite.__init__(self)
         self.position = position
         self.text = text
         self.margin = margin
@@ -37,6 +36,8 @@ class MessageSprite(pygame.sprite.Sprite):
         self.image = font.render(self.text, antialias, color)
         self.rect = self.image.get_rect()
         self.reset()
+        self.dirty = 2
+        self.visible = 0
 
     def reset(self):
         self.rect[0], self.rect[1] = self.position[0], self.position[1]
@@ -50,7 +51,7 @@ class MessageSprite(pygame.sprite.Sprite):
         return self.rect[2] + self.margin
 
 
-class TickerWidget(StageSprite):
+class TickerWidget(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
@@ -62,7 +63,7 @@ class TickerWidget(StageSprite):
         item_margin=100,
         scroll_speed=1,
     ):
-        super().__init__()
+        pygame.sprite.DirtySprite.__init__(self)
         self.image = pygame.Surface(
             (rect[2], rect[3]), SRCALPHA, depth=PYGAME_BITS_PER_PIXEL
         )
@@ -92,6 +93,7 @@ class TickerWidget(StageSprite):
         self.sprites.update(frame)
         self.image.fill(self.color_bg)
         self.sprites.draw(self.image)
+        self.visible = 0
 
     def add(self, text, transient=False):
         self.items.append(Message(text, transient))

@@ -2,17 +2,15 @@ import logging
 import os
 import pygame
 
-from app.utils.sprites import StageSprite
-
 logger = logging.getLogger("background")
 
 
-class Background(StageSprite):
+class Background(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
     ):
-        super().__init__()
+        pygame.sprite.DirtySprite.__init__(self)
         self.image = pygame.Surface((rect[2], rect[3]))
         self.rect = pygame.Rect(*rect)
         self.png = pygame.image.load(

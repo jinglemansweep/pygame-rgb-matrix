@@ -4,12 +4,11 @@ from datetime import datetime
 from pygame.locals import SRCALPHA
 
 from app.config import PYGAME_BITS_PER_PIXEL
-from app.utils.sprites import StageSprite
 
 logger = logging.getLogger("clock")
 
 
-class ClockWidget(StageSprite):
+class ClockWidget(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
