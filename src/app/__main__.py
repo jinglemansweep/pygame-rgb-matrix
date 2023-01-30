@@ -12,7 +12,7 @@ import traceback
 from argparse import ArgumentParser
 from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
-from pygame.locals import QUIT, FULLSCREEN, DOUBLEBUF
+from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 
 load_dotenv(find_dotenv())
 
@@ -106,9 +106,13 @@ pygame.init()
 clock = pygame.time.Clock()
 pygame.display.set_caption(_APP_DESCRIPTION)
 
+screen_flags = DOUBLEBUF
+if GUI_ENABLED:
+    screen_flags |= SCALED | RESIZABLE
+
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
-    FULLSCREEN | DOUBLEBUF,
+    screen_flags,
     PYGAME_BITS_PER_PIXEL,
 )
 
@@ -180,7 +184,7 @@ async def start_main_loop():
     while True:
         for event in pygame.event.get():
             # joypad.process_event(event)
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 sys.exit()
             if event.type == MQTT_MESSAGE_RECEIVED:
                 logger.info(
