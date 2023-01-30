@@ -106,11 +106,12 @@ class HASSEntity:
         return f"{self.discovery_topic_prefix}/{self.device_class}/{self._build_full_name()}"
 
     def _get_hass_state(self):
-        return (
-            self.state["state"]
-            if self.device_class == "switch"
-            else json.dumps(self.state)
-        )
+        if self.device_class == "switch":
+            return self.state["state"]
+        elif self.device_class == "text":
+            return json.dumps(self.state)
+        else:
+            return json.dumps(self.state)
 
 
 class HASSManager:
@@ -168,9 +169,9 @@ class HASSManager:
 
 
 def _message_to_hass(message, entity):
-    print(message, entity.device_class)
-    return (
-        dict(state="ON" if "ON" in message else "OFF")
-        if entity.device_class == "switch"
-        else json.loads(str(message))
-    )
+    if entity.device_class == "switch":
+        return dict(state="ON" if "ON" in message else "OFF")
+    elif entity.device_class == "text":
+        return dict(text=message)
+    else:
+        return json.loads(str(message))

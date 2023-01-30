@@ -61,9 +61,6 @@ mqtt = setup_mqtt_client(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
 hass = HASSManager(mqtt, DEVICE_NAME, _APP_NAME)
 hass.add_entity("power", "Power", "switch", {}, dict(state="ON"))
 hass.add_entity("show_background", "Show Background", "switch", {}, dict(state="ON"))
-hass.add_entity("show_clock", "Show Clock", "switch", {}, dict(state="ON"))
-hass.add_entity("show_news", "Show News", "switch", {}, dict(state="ON"))
-hass.add_entity("show_updates", "Show Updates", "switch", {}, dict(state="ON"))
 hass.add_entity(
     "color_clock",
     "Clock Color",
@@ -79,11 +76,7 @@ hass.add_entity(
     dict(state="ON", color=dict(r=0x00, g=0x00, b=0x90), brightness=255),
 )
 hass.add_entity(
-    "color_updates",
-    "Updates Color",
-    "light",
-    OPTS_LIGHT_RGB,
-    dict(state="ON", color=dict(r=0xFF, g=0xFF, b=0xFF), brightness=255),
+    "command_test", "Command", "text", dict(mode="text"), dict(text="HELLO")
 )
 
 
@@ -125,8 +118,6 @@ if LED_ENABLED:
 frame = 0
 
 NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
-WOTD_RSS_URL = "https://www.oed.com/rss.xml"
-HN_RSS_URL = "https://hnrss.org/frontpage"
 
 
 def loop():
@@ -147,31 +138,16 @@ def loop():
         font_size=34,
         scroll_speed=2,
     )
-    ticker_alt = TickerWidget(
-        (0, 40, LED_COLS * PANEL_COLS, 24),
-        color_bg=(255, 255, 255, 196),
-        color_fg=(0, 0, 0, 255),
-        font_size=18,
-        scroll_speed=1,
-        padding=0,
-        item_margin=30,
-    )
 
     # Z-order
     sprites.add(background)
     sprites.add(ticker)
-    sprites.add(ticker_alt)
     sprites.add(clock_widget)
 
     news = get_rss_items(NEWS_RSS_URL)
-    for item in news.entries:
-        ticker.add(html.unescape(item["title"]))
-
-    updates = get_rss_items(HN_RSS_URL)
-    for item in updates.entries:
-        title = str(item["title"])
-        # title = str(item["description"]).replace("OED Word of the Day: ", "")
-        ticker_alt.add(html.unescape(title))
+    for idx, item in enumerate(news.entries):
+        ticker.add(f"idx {idx}", transient=True)
+        # ticker.add(html.unescape(item["title"]))
 
     while True:
         for event in pygame.event.get():
@@ -187,10 +163,6 @@ def loop():
             hass.store["color_news"].state["color"],
             hass.store["color_news"].state["brightness"],
         )
-        ticker_alt.color_bg = hass_to_color(
-            hass.store["color_updates"].state["color"],
-            hass.store["color_updates"].state["brightness"],
-        )
 
         if hass.store["power"].state["state"] == "ON":
             sprites.update(frame)
@@ -198,12 +170,12 @@ def loop():
                 screen.blit(background.image, background.rect)
             else:
                 screen.fill((0, 0, 0))
-            if hass.store["show_news"].state["state"] == "ON":
+            if hass.store["color_news"].state["state"] == "ON":
                 screen.blit(ticker.image, ticker.rect)
-            if hass.store["show_updates"].state["state"] == "ON":
-                screen.blit(ticker_alt.image, ticker_alt.rect)
-            if hass.store["show_clock"].state["state"] == "ON":
+            if hass.store["color_clock"].state["state"] == "ON":
                 screen.blit(clock_widget.image, clock_widget.rect)
+        else:
+            screen.fill((0, 0, 0))
 
         if GUI_ENABLED:
             pygame.display.flip()

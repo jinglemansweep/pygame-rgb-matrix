@@ -11,7 +11,7 @@ logger = logging.getLogger("ticker")
 
 
 class Message:
-    def __init__(self, text, transient):
+    def __init__(self, text, transient=False):
         self.text = text
         self.transient = transient
 
@@ -76,6 +76,7 @@ class TickerWidget(StageSprite):
         self.item_margin = item_margin
         self.scroll_speed = scroll_speed
         self.sprites = pygame.sprite.Group()
+        self.item_idx = 0
         self.items = []
         self.remaining = None
 
@@ -83,36 +84,30 @@ class TickerWidget(StageSprite):
         super().update(frame)
         frame_rel = self.frame - self.mode_change_frame_start
         if self.remaining is None or self.remaining <= 0:
-            current = self.get_next()
-            self.remaining = current.get_width()
-            self.sprites.add(current)
+            message_sprite = self.build_next_sprite()
+            if message_sprite:
+                self.remaining = message_sprite.get_width()
+                self.sprites.add(message_sprite)
         if self.remaining > 0:
             self.remaining -= self.scroll_speed
         self.sprites.update(frame)
         self.image.fill(self.color_bg)
         self.sprites.draw(self.image)
-        if self.mode == "idle":
-            pass
-        elif self.mode == "hiding":
-            if self.rect[0] > self.rect_start[0] - self.rect_start[2]:
-                self.rect[0] -= 4
-            if frame_rel > self.rect_start[2] // 4:
-                self.set_mode("idle")
-        elif self.mode == "showing":
-            if self.rect[0] < self.rect_start[0]:
-                self.rect[0] += 4
-            if frame_rel > self.rect_start[2] // 4:
-                self.set_mode("idle")
 
     def add(self, text, transient=False):
         self.items.append(Message(text, transient))
 
-    def get_next(self):
+    def build_next_sprite(self):
         if not len(self.items):
             return
-        next_item = self.items.pop(0)
-        if not next_item.transient:
-            self.items.append(next_item)
+        # logger.debug(f"ticket: item_idx={self.item_idx} count={len(self.items)}")
+        next_item = self.items[self.item_idx]
+        if next_item.transient:
+            self.items.pop(self.item_idx)
+        else:
+            self.item_idx += 1
+        if self.item_idx + 1 > len(self.items):
+            self.item_idx = 0
         return MessageSprite(
             (self.rect[2], self.padding),
             text=next_item.text,
