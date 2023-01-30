@@ -64,17 +64,3 @@ class ClockWidget(StageSprite):
             (time_pos[0] + shadow_depth, time_pos[1] + shadow_depth),
         )
         self.image.blit(time_sprite, time_pos)
-        # Mode handling
-        frame_rel = self.frame - self.mode_change_frame_start
-        if self.mode == "idle":
-            pass
-        elif self.mode == "hiding":
-            if self.rect[0] < self.rect_start[0] + self.rect_start[2]:
-                self.rect[0] += 1
-            if frame_rel > self.rect_start[2]:
-                self.set_mode("idle")
-        elif self.mode == "showing":
-            if self.rect[0] > self.rect_start[0]:
-                self.rect[0] -= 1
-            if frame_rel > self.rect_start[2]:
-                self.set_mode("idle")

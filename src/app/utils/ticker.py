@@ -82,13 +82,12 @@ class TickerWidget(StageSprite):
 
     def update(self, frame):
         super().update(frame)
-        frame_rel = self.frame - self.mode_change_frame_start
         if self.remaining is None or self.remaining <= 0:
             message_sprite = self.build_next_sprite()
             if message_sprite:
                 self.remaining = message_sprite.get_width()
                 self.sprites.add(message_sprite)
-        if self.remaining > 0:
+        if self.remaining is not None and self.remaining > 0:
             self.remaining -= self.scroll_speed
         self.sprites.update(frame)
         self.image.fill(self.color_bg)
@@ -96,6 +95,10 @@ class TickerWidget(StageSprite):
 
     def add(self, text, transient=False):
         self.items.append(Message(text, transient))
+
+    def expire_all(self):
+        for item in self.items:
+            item.transient = True
 
     def build_next_sprite(self):
         if not len(self.items):

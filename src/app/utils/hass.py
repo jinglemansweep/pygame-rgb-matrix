@@ -13,17 +13,16 @@ logger = logging.getLogger("hass")
 
 
 def _on_connect(client, userdata, flags, rc):
-    logger.info(f"MQTT connected (rc: {str(rc)})")
+    logger.info(f"mqtt:connected rc={str(rc)}")
 
 
 def _on_message(client, userdata, msg):
-    logger.info(f"MQTT message: topic={msg.topic} msg={str(msg.payload)}")
+    pass
+    # logger.debug(f"mqtt:message topic={msg.topic} message={str(msg.payload)}")
 
 
 def setup_mqtt_client(host, port, user, password):
-    logger.info(
-        f"MQTT connect: host={host} port={port} user={user} password={password}"
-    )
+    logger.info(f"mqtt:connect host={host} port={port} user={user} password={password}")
     client = mqtt.Client()
     client.on_connect = _on_connect
     client.on_message = _on_message
@@ -85,7 +84,7 @@ class HASSEntity:
         )
         config = auto_config.copy()
         config.update(self.options)
-        logger.info(f"hass entity configure: name={self.name} config={config}")
+        logger.debug(f"hass:entity:configure name={self.name} config={config}")
         self.client.publish(self.topic_config, json.dumps(config), retain=True, qos=1)
         self.client.subscribe(self.topic_command, 1)
         del auto_config, config
@@ -94,7 +93,7 @@ class HASSEntity:
         if new_state is None:
             new_state = dict()
         self.state.update(new_state)
-        logger.info(f"hass entity update: name={self.name} state={self.state}")
+        logger.debug(f"hass:entity:update: name={self.name} state={self.state}")
         self.client.publish(
             self.topic_state, self._get_hass_state(), retain=True, qos=1
         )
@@ -150,20 +149,20 @@ class HASSManager:
         entity.update(initial_state)
         self.store[name] = entity
         logger.info(
-            f"hass entity created: name={name} device_class={device_class} options={options} initial_state={initial_state}"
+            f"hass:entity:create name={name} device_class={device_class} options={options} initial_state={initial_state}"
         )
         return entity
 
     def process_message(self, topic, message):
-        logger.info(f"hass process message: topic={topic} message={message}")
+        # logger.debug(f"hass:mqtt:message topic={topic} message={message}")
         for name, entity in self.store.items():
             if topic == entity.topic_command:
-                logger.debug(f"hass topic match entity={entity.name}")
+                # logger.debug(f"hass:mqtt:message:topic match={entity.name}")
                 entity.update(_message_to_hass(message, entity))
                 break
 
     def advertise_entities(self):
-        logger.info("advertising entities")
+        # logger.info("hass:entities:advertise")
         for name, entity in self.store.items():
             entity.configure()
 

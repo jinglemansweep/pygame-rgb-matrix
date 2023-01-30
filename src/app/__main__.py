@@ -1,3 +1,4 @@
+import asyncio
 import cProfile
 import html
 import logging
@@ -5,6 +6,8 @@ import os
 import pygame
 import pygame.pkgdata
 import sys
+import traceback
+
 from argparse import ArgumentParser
 from dotenv import load_dotenv, find_dotenv
 from pygame.locals import QUIT, FULLSCREEN, DOUBLEBUF
@@ -20,6 +23,7 @@ sys.path.append(
 from app.config import (
     matrix_options,
     DEBUG,
+    PROFILING,
     GUI_ENABLED,
     PYGAME_FPS,
     PYGAME_BITS_PER_PIXEL,
@@ -52,6 +56,8 @@ _APP_NAME = "wideboy"
 _APP_DESCRIPTION = "WideBoy RGB Matrix Platform"
 _APP_VERSION = "0.0.1"
 
+MQTT_MESSAGE_RECEIVED = pygame.USEREVENT + 1
+
 parser = ArgumentParser(description=f"{_APP_DESCRIPTION} v{_APP_VERSION}")
 parser.add_argument("-v", "--verbose", action="store_true")
 
@@ -83,14 +89,17 @@ hass.add_entity(
 
 
 def _on_message(client, userdata, msg):
-    hass.process_message(msg.topic, msg.payload.decode("UTF-8"))
+    payload = msg.payload.decode("UTF-8")
+    pygame.event.post(
+        pygame.event.Event(MQTT_MESSAGE_RECEIVED, topic=msg.topic, message=payload)
+    )
 
 
 mqtt.on_message = _on_message
 
+
 pygame.init()
 clock = pygame.time.Clock()
-pygame.event.set_allowed([QUIT])
 pygame.display.set_caption(_APP_DESCRIPTION)
 
 screen = pygame.display.set_mode(
@@ -99,12 +108,12 @@ screen = pygame.display.set_mode(
     PYGAME_BITS_PER_PIXEL,
 )
 
-logger.info(f"RGB Matrix")
-logger.info(f"Panel Dimensions:  {LED_COLS}px x {LED_ROWS}px")
-logger.info(f"Wall Dimensions:   {PANEL_COLS*LED_COLS}px x {PANEL_ROWS*LED_ROWS}px")
-logger.info(f"Wall Layout:       {PANEL_COLS} x {PANEL_ROWS} (panels)")
+logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
+logger.info(f"panel:size w={LED_COLS}px h={LED_ROWS}px")
+logger.info(f"wall:size: w={PANEL_COLS*LED_COLS}px h={PANEL_ROWS*LED_ROWS}px")
+logger.info(f"wall:layout w={PANEL_COLS} h={PANEL_ROWS}")
 logger.info(
-    f"GUI Dimensions:    {LED_COLS*LED_CHAIN}px x {LED_ROWS*LED_PARALLEL}px",
+    f"gui:size w={LED_COLS*LED_CHAIN}px h={LED_ROWS*LED_PARALLEL}px",
 )
 
 # joypad = JoyPad(0)
@@ -122,7 +131,20 @@ frame = 0
 NEWS_RSS_URL = "https://feeds.skynews.com/feeds/rss/home.xml"
 
 
-def loop():
+async def _update_ticker(ticker, url):
+    INTERVAL = 60 * 10
+    ticker.expire_all()
+    feed = get_rss_items(url)
+    for idx, item in enumerate(feed.entries):
+        # ticker.add(f"idx {idx}", transient=True)
+        ticker.add(html.unescape(item["title"]))
+    logger.info(f"rss:fetch url={url} entries={len(feed.entries)}")
+    await asyncio.sleep(INTERVAL)
+    asyncio.create_task(_update_ticker(ticker))
+
+
+async def start_main_loop():
+
     global frame, double_buffer
 
     mqtt.loop_start()
@@ -146,16 +168,18 @@ def loop():
     sprites.add(ticker)
     sprites.add(clock_widget)
 
-    news = get_rss_items(NEWS_RSS_URL)
-    for idx, item in enumerate(news.entries):
-        # ticker.add(f"idx {idx}", transient=True)
-        ticker.add(html.unescape(item["title"]))
+    asyncio.create_task(_update_ticker(ticker, NEWS_RSS_URL))
 
     while True:
         for event in pygame.event.get():
             # joypad.process_event(event)
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == MQTT_MESSAGE_RECEIVED:
+                logger.info(
+                    f"mqtt:message: topic={event.topic} message={event.message}"
+                )
+                hass.process_message(event.topic, event.message)
 
         clock_widget.color_bg = hass_to_color(
             hass.store["color_clock"].state["color"],
@@ -184,17 +208,24 @@ def loop():
         double_buffer = render_led_matrix(screen, matrix, double_buffer)
 
         clock.tick(PYGAME_FPS)
+        await asyncio.sleep(0)
 
         if frame % 200 == 0:
-            logger.info(f"FPS: {clock.get_fps()}")
+            logger.info(f"debug:clock fps={clock.get_fps()}")
 
         frame += 1
 
 
 def run():
     while True:
-        loop()
+        try:
+            asyncio.run(start_main_loop())
+        except Exception as e:
+            logging.error(traceback.format_exc())
 
 
 if __name__ == "__main__":
-    cProfile.run("run()", None, sort="ncalls")
+    if PROFILING in ["ncalls", "tottime"]:
+        cProfile.run("run()", None, sort=PROFILING)
+    else:
+        run()

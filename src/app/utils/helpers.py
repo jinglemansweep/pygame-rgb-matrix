@@ -14,9 +14,14 @@ from app.config import (
     PYGAME_BITS_PER_PIXEL,
 )
 
+LOG_FORMAT = "%(message)s"
+
 
 def setup_logger(debug=False):
-    logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
+
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO, format=LOG_FORMAT
+    )
 
 
 # PyGame renders wall like this:
