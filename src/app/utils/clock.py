@@ -19,7 +19,7 @@ class ClockWidget(pygame.sprite.DirtySprite):
         antialias=True,
         time_fmt="%H:%M",
     ):
-        super().__init__()
+        pygame.sprite.DirtySprite.__init__(self)
         self.image = pygame.Surface(
             (rect[2], rect[3]), SRCALPHA, depth=PYGAME_BITS_PER_PIXEL
         )
@@ -63,3 +63,4 @@ class ClockWidget(pygame.sprite.DirtySprite):
             (time_pos[0] + shadow_depth, time_pos[1] + shadow_depth),
         )
         self.image.blit(time_sprite, time_pos)
+        self.dirty = 1

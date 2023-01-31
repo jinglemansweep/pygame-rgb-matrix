@@ -51,6 +51,7 @@ from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
     get_rss_items,
     hass_to_color,
+    hass_to_visible,
     render_led_matrix,
     setup_logger,
     JoyPad,
@@ -159,7 +160,7 @@ async def start_main_loop():
 
     mqtt.loop_start()
 
-    sprites = pygame.sprite.Group()
+    sprites = pygame.sprite.LayeredDirty()
 
     background = Background((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
     clock_widget = ClockWidget(
@@ -167,9 +168,9 @@ async def start_main_loop():
         color_bg=(128, 0, 0, 128),
     )
     ticker = TickerWidget(
-        (0, 0, LED_COLS * PANEL_COLS, 40),
-        color_bg=(0, 0, 128, 128),
-        font_size=34,
+        (0, 40, LED_COLS * PANEL_COLS, 24),
+        color_bg=(0, 0, 0, 128),
+        font_size=20,
         scroll_speed=2,
     )
 
@@ -196,23 +197,25 @@ async def start_main_loop():
             hass.store["color_clock"].state["color"],
             hass.store["color_clock"].state["brightness"],
         )
-        ticker.color_bg = hass_to_color(
-            hass.store["color_news"].state["color"],
-            hass.store["color_news"].state["brightness"],
-        )
 
-        if hass.store["power"].state["state"] == "ON":
-            sprites.update(frame)
-            if hass.store["show_background"].state["state"] == "ON":
-                screen.blit(background.image, background.rect)
-            else:
-                screen.fill((0, 0, 0))
-            if hass.store["color_news"].state["state"] == "ON":
-                screen.blit(ticker.image, ticker.rect)
-            if hass.store["color_clock"].state["state"] == "ON":
-                screen.blit(clock_widget.image, clock_widget.rect)
-        else:
+        # ticker.color_bg = hass_to_color(
+        #     hass.store["color_news"].state["color"],
+        #     hass.store["color_news"].state["brightness"],
+        # )
+
+        switch_master = hass.store["power"].state["state"] == "ON"
+        switch_background = hass.store["show_background"].state["state"] == "ON"
+        color_clock = hass.store["color_clock"].state["state"] == "ON"
+        color_ticker = hass.store["color_news"].state["state"] == "ON"
+
+        if not switch_background:
             screen.fill((0, 0, 0))
+        background.visible = hass_to_visible(switch_background, switch_master)
+        clock_widget.visible = hass_to_visible(color_clock, switch_master)
+        ticker.visible = hass_to_visible(color_ticker, switch_master)
+
+        sprites.update(frame)
+        sprites.draw(screen)
 
         if GUI_ENABLED:
             pygame.display.flip()

@@ -20,6 +20,7 @@ class Background(pygame.sprite.DirtySprite):
         while tile_x < self.rect[2]:
             self.image.blit(self.png, (tile_x, 0))
             tile_x += self.png.get_rect()[2]
+        self.dirty = 0
 
     def update(self, frame):
         super().update(frame)

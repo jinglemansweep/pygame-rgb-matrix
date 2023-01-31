@@ -97,6 +97,12 @@ def hass_to_color(rgb_dict, brightness=255):
     return tuple(color)
 
 
+def hass_to_visible(control, master):
+    if not master:
+        return 0
+    return 1 if control else 0
+
+
 class JoyPad:
     def __init__(self, device_index):
         pygame.joystick.init()

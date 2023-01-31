@@ -37,7 +37,6 @@ class MessageSprite(pygame.sprite.DirtySprite):
         self.rect = self.image.get_rect()
         self.reset()
         self.dirty = 2
-        self.visible = 0
 
     def reset(self):
         self.rect[0], self.rect[1] = self.position[0], self.position[1]
@@ -80,6 +79,7 @@ class TickerWidget(pygame.sprite.DirtySprite):
         self.item_idx = 0
         self.items = []
         self.remaining = None
+        self.dirty = 2
 
     def update(self, frame):
         super().update(frame)
@@ -93,7 +93,6 @@ class TickerWidget(pygame.sprite.DirtySprite):
         self.sprites.update(frame)
         self.image.fill(self.color_bg)
         self.sprites.draw(self.image)
-        self.visible = 0
 
     def add(self, text, transient=False):
         self.items.append(Message(text, transient))
