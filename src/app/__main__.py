@@ -171,7 +171,6 @@ async def start_main_loop():
         (0, 40, LED_COLS * PANEL_COLS, 24),
         color_bg=(0, 0, 0, 128),
         font_size=20,
-        scroll_speed=2,
     )
 
     # Z-order
