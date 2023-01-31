@@ -3,3 +3,6 @@ venv
 __pycache__
 .env
 dietpi.txt
+gphotos.secret.json
+*.token
+*.log
