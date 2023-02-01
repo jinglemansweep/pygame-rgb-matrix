@@ -30,22 +30,31 @@ class ImageSprite(pygame.sprite.DirtySprite):
         self,
         rect,
         filename,
-        margin,
         scroll_speed,
+        margin=0,
+        padding=2,
         transient=False,
     ):
         pygame.sprite.DirtySprite.__init__(self)
         self.filename = filename
         self.margin = margin
+        self.padding = padding
         self.scroll_speed = scroll_speed
         self.transient = transient
         rotation = random.randint(-5, 5)
         if image_cache.get(self.filename) is not None:
-            self.image = image_cache.get(self.filename)
+            image = image_cache.get(self.filename)
         else:
             # logger.debug(f"sprite:image:cache:miss filename={self.filename}")
-            self.image = image_cache[self.filename] = self.load_image(self.filename)
+            image = image_cache[self.filename] = self.load_image(self.filename)
             # self.image = pygame.transform.rotozoom(image, rotation, 1)
+        self.image = pygame.Surface(
+            (image.get_rect()[2] + self.padding, image.get_rect()[3]),
+            0,
+            depth=PYGAME_BITS_PER_PIXEL,
+        )
+        self.image.fill((0, 0, 0))
+        self.image.blit(image, (0, 0))
         self.rect = self.image.get_rect()
         self.rect[0], self.rect[1] = rect[0], rect[1]  # - abs(rotation)
         self.x_float = rect[0]
@@ -74,7 +83,8 @@ class ImageWidget(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
-        item_margin=5,
+        item_margin=0,
+        item_padding=2,
         scroll_speed=0.5,
     ):
         pygame.sprite.DirtySprite.__init__(self)
@@ -84,6 +94,7 @@ class ImageWidget(pygame.sprite.DirtySprite):
         self.rect = list(rect)
         self.rect_start = list(self.rect[:])
         self.item_margin = item_margin
+        self.item_padding = item_padding
         self.scroll_speed = scroll_speed
         self.sprites = pygame.sprite.Group()
         self.item_idx = 0
@@ -102,7 +113,6 @@ class ImageWidget(pygame.sprite.DirtySprite):
         if self.remaining is not None and self.remaining > 0:
             self.remaining -= self.scroll_speed
         self.sprites.update(frame)
-        self.image.fill((0, 0, 0, 255))
         self.sprites.draw(self.image)
 
     def expire_all(self):
@@ -123,8 +133,9 @@ class ImageWidget(pygame.sprite.DirtySprite):
         return ImageSprite(
             (self.rect[2], 0),
             next_item.filename,
+            self.scroll_speed,
             self.item_margin,
-            scroll_speed=self.scroll_speed,
+            self.item_padding,
             transient=next_item.transient,
         )
 

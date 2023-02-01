@@ -164,10 +164,10 @@ async def start_main_loop():
     widget_images = ImageWidget((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
     widget_clock = ClockWidget(
         (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
-        color_bg=(32, 0, 64, 192),
+        color_bg=(128, 0, 0, 192),
     )
     widget_ticker = TickerWidget(
-        (0, 39, LED_COLS * PANEL_COLS, 24),
+        (0, 40, LED_COLS * (PANEL_COLS - 2), 24),
         color_bg=(0, 0, 0, 128),
         font_size=20,
     )
@@ -202,13 +202,13 @@ async def start_main_loop():
         switch_master = hass.store["power"].state["state"] == "ON"
         # switch_background = hass.store["show_background"].state["state"] == "ON"
         # color_clock = hass.store["color_clock"].state["state"] == "ON"
-        # scolor_ticker = hass.store["color_news"].state["state"] == "ON"
+        color_ticker = hass.store["color_news"].state["state"] == "ON"
 
         if switch_master:
             # TODO: this is slow, needs to only update sprite props once on change (~10fps)
             # background.visible = hass_to_visible(switch_background, switch_master)
             # clock_widget.visible = hass_to_visible(color_clock, switch_master)
-            # ticker.visible = hass_to_visible(color_ticker, switch_master)
+            widget_ticker.visible = hass_to_visible(color_ticker, switch_master)
             sprites.update(frame)
             sprites.draw(screen)
         else:

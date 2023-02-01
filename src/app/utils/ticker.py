@@ -63,9 +63,7 @@ class TickerWidget(pygame.sprite.DirtySprite):
         scroll_speed=1,
     ):
         pygame.sprite.DirtySprite.__init__(self)
-        self.image = pygame.Surface(
-            (rect[2], rect[3]), SRCALPHA, depth=PYGAME_BITS_PER_PIXEL
-        )
+        self.image = pygame.Surface((rect[2], rect[3]), SRCALPHA, depth=16)
         self.rect = pygame.rect.Rect(*rect)
         self.rect_start = self.rect.copy()
         pygame.font.init()
