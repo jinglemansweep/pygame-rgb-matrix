@@ -16,6 +16,8 @@ logging.getLogger("PIL").setLevel(logging.CRITICAL + 1)
 
 logger = logging.getLogger("images")
 
+image_cache = dict()
+
 
 class ImageObject:
     def __init__(self, filename, transient=False):
@@ -37,24 +39,32 @@ class ImageSprite(pygame.sprite.DirtySprite):
         self.margin = margin
         self.scroll_speed = scroll_speed
         self.transient = transient
-        with Image.open(self.filename) as im:
-            im.thumbnail((128, 64), Image.Resampling.LANCZOS)
-            image = pygame.image.fromstring(im.tobytes(), im.size, im.mode)
-            self.image = pygame.transform.rotozoom(
-                image, random.randint(-5, 5), random.uniform(0.9, 1.1)
-            )
-            self.rect = self.image.get_rect()
-            self.rect.center = (im.size[0] // 2, im.size[1] // 2)
-
-        self.rect[0], self.rect[1] = rect[0], rect[1]
+        rotation = random.randint(-5, 5)
+        if image_cache.get(self.filename) is not None:
+            self.image = image_cache.get(self.filename)
+        else:
+            # logger.debug(f"sprite:image:cache:miss filename={self.filename}")
+            self.image = image_cache[self.filename] = self.load_image(self.filename)
+            # self.image = pygame.transform.rotozoom(image, rotation, 1)
+        self.rect = self.image.get_rect()
+        self.rect[0], self.rect[1] = rect[0], rect[1]  # - abs(rotation)
         self.x_float = rect[0]
-        self.dirty = 2
+        self.dirty = 0
 
     def update(self, frame):
         self.x_float -= self.scroll_speed
         self.rect[0] = int(self.x_float)
         if self.rect[0] < 0 - self.get_width():
+            # logger.debug(f"image:kill filename={self.filename}")
             self.kill()
+
+    def load_image(self, filename):
+        with Image.open(self.filename) as im:
+            im.thumbnail((128, 64), Image.Resampling.LANCZOS)
+            image = pygame.image.fromstring(
+                im.tobytes(), im.size, im.mode
+            ).convert_alpha()
+        return image
 
     def get_width(self):
         return self.rect[2] + self.margin
@@ -64,7 +74,7 @@ class ImageWidget(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
-        item_margin=20,
+        item_margin=5,
         scroll_speed=0.5,
     ):
         pygame.sprite.DirtySprite.__init__(self)

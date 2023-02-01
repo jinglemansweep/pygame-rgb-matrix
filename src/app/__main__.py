@@ -44,7 +44,6 @@ from app.config import (
     MQTT_PASSWORD,
     DEVICE_NAME,
 )
-from app.utils.background import Background
 from app.utils.clock import ClockWidget
 from app.utils.images import ImageWidget
 from app.utils.ticker import TickerWidget
@@ -74,7 +73,6 @@ logger = logging.getLogger("main")
 mqtt = setup_mqtt_client(MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD)
 hass = HASSManager(mqtt, DEVICE_NAME, _APP_NAME)
 hass.add_entity("power", "Power", "switch", {}, dict(state="ON"))
-hass.add_entity("show_background", "Show Background", "switch", {}, dict(state="ON"))
 hass.add_entity(
     "color_clock",
     "Clock Color",
@@ -163,26 +161,26 @@ async def start_main_loop():
 
     sprites = pygame.sprite.LayeredDirty()
 
-    background = Background((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
-    images = ImageWidget((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
-    clock_widget = ClockWidget(
+    widget_images = ImageWidget((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
+    widget_clock = ClockWidget(
         (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
-        color_bg=(128, 0, 0, 128),
+        color_bg=(32, 0, 64, 192),
     )
-    ticker = TickerWidget(
+    widget_ticker = TickerWidget(
         (0, 39, LED_COLS * PANEL_COLS, 24),
         color_bg=(0, 0, 0, 128),
         font_size=20,
     )
 
     # Z-order
-    sprites.add(background)
-    sprites.add(images)
-    sprites.add(ticker)
-    sprites.add(clock_widget)
+    sprites.add(widget_images)
+    sprites.add(widget_ticker)
+    sprites.add(widget_clock)
 
     loop = asyncio.get_event_loop()
-    asyncio.create_task(_update_ticker(loop, ticker, RSS_URL, RSS_UPDATE_INTERVAL))
+    asyncio.create_task(
+        _update_ticker(loop, widget_ticker, RSS_URL, RSS_UPDATE_INTERVAL)
+    )
 
     while True:
         for event in pygame.event.get():
@@ -195,25 +193,22 @@ async def start_main_loop():
                 )
                 hass.process_message(event.topic, event.message)
 
-        clock_widget.color_bg = hass_to_color(
-            hass.store["color_clock"].state["color"],
-            hass.store["color_clock"].state["brightness"],
-        )
-
-        # ticker.color_bg = hass_to_color(
-        #     hass.store["color_news"].state["color"],
-        #     hass.store["color_news"].state["brightness"],
+        # TODO: slow also, see below
+        # clock_widget.color_bg = hass_to_color(
+        #     hass.store["color_clock"].state["color"],
+        #     hass.store["color_clock"].state["brightness"],
         # )
 
         switch_master = hass.store["power"].state["state"] == "ON"
-        switch_background = hass.store["show_background"].state["state"] == "ON"
-        color_clock = hass.store["color_clock"].state["state"] == "ON"
-        color_ticker = hass.store["color_news"].state["state"] == "ON"
+        # switch_background = hass.store["show_background"].state["state"] == "ON"
+        # color_clock = hass.store["color_clock"].state["state"] == "ON"
+        # scolor_ticker = hass.store["color_news"].state["state"] == "ON"
 
         if switch_master:
-            background.visible = hass_to_visible(switch_background, switch_master)
-            clock_widget.visible = hass_to_visible(color_clock, switch_master)
-            ticker.visible = hass_to_visible(color_ticker, switch_master)
+            # TODO: this is slow, needs to only update sprite props once on change (~10fps)
+            # background.visible = hass_to_visible(switch_background, switch_master)
+            # clock_widget.visible = hass_to_visible(color_clock, switch_master)
+            # ticker.visible = hass_to_visible(color_ticker, switch_master)
             sprites.update(frame)
             sprites.draw(screen)
         else:
