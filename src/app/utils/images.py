@@ -2,6 +2,7 @@ import glob
 import logging
 import os
 import pygame
+import random
 import sys
 from pygame.locals import SRCALPHA
 from PIL import Image
@@ -27,20 +28,26 @@ class ImageSprite(pygame.sprite.DirtySprite):
         self,
         rect,
         filename,
+        margin,
         scroll_speed,
         transient=False,
     ):
         pygame.sprite.DirtySprite.__init__(self)
         self.filename = filename
+        self.margin = margin
         self.scroll_speed = scroll_speed
         self.transient = transient
         with Image.open(self.filename) as im:
             im.thumbnail((128, 64), Image.Resampling.LANCZOS)
-            self.image = pygame.image.fromstring(im.tobytes(), im.size, im.mode)
+            image = pygame.image.fromstring(im.tobytes(), im.size, im.mode)
+            self.image = pygame.transform.rotozoom(
+                image, random.randint(-5, 5), random.uniform(0.9, 1.1)
+            )
             self.rect = self.image.get_rect()
             self.rect.center = (im.size[0] // 2, im.size[1] // 2)
-            self.rect[0], self.rect[1] = rect[0], rect[1]
-            self.x_float = rect[0]
+
+        self.rect[0], self.rect[1] = rect[0], rect[1]
+        self.x_float = rect[0]
         self.dirty = 2
 
     def update(self, frame):
@@ -50,13 +57,14 @@ class ImageSprite(pygame.sprite.DirtySprite):
             self.kill()
 
     def get_width(self):
-        return self.rect[2]
+        return self.rect[2] + self.margin
 
 
 class ImageWidget(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
+        item_margin=20,
         scroll_speed=0.5,
     ):
         pygame.sprite.DirtySprite.__init__(self)
@@ -65,6 +73,7 @@ class ImageWidget(pygame.sprite.DirtySprite):
         )
         self.rect = list(rect)
         self.rect_start = list(self.rect[:])
+        self.item_margin = item_margin
         self.scroll_speed = scroll_speed
         self.sprites = pygame.sprite.Group()
         self.item_idx = 0
@@ -104,12 +113,12 @@ class ImageWidget(pygame.sprite.DirtySprite):
         return ImageSprite(
             (self.rect[2], 0),
             next_item.filename,
+            self.item_margin,
             scroll_speed=self.scroll_speed,
             transient=next_item.transient,
         )
 
     def get_images(self):
         files = glob.glob(os.path.join(IMAGE_PATH, "*.*"))
-        print(files)
         for file in files:
             self.items.append(ImageObject(file))
