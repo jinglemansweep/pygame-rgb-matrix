@@ -46,6 +46,7 @@ from app.config import (
 )
 from app.utils.background import Background
 from app.utils.clock import ClockWidget
+from app.utils.images import ImageWidget
 from app.utils.ticker import TickerWidget
 from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
@@ -163,6 +164,7 @@ async def start_main_loop():
     sprites = pygame.sprite.LayeredDirty()
 
     background = Background((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
+    images = ImageWidget((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
     clock_widget = ClockWidget(
         (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
         color_bg=(128, 0, 0, 128),
@@ -175,6 +177,7 @@ async def start_main_loop():
 
     # Z-order
     sprites.add(background)
+    sprites.add(images)
     sprites.add(ticker)
     sprites.add(clock_widget)
 

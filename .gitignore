@@ -2,6 +2,7 @@ lib/**
 venv
 __pycache__
 .env
+images/photos/*
 dietpi.txt
 gphotos.secret.json
 *.token
