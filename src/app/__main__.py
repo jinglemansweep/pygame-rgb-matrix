@@ -127,11 +127,12 @@ logger.info(
 # joypad = JoyPad(0)
 
 matrix = None
-double_buffer = None
+matrix_buffer = None
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
 
     matrix = RGBMatrix(options=matrix_options)
+    matrix_buffer = matrix.CreateFrameCanvas()
     matrix_surface = pygame.Surface(
         (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
     )
@@ -157,7 +158,7 @@ async def _update_ticker(loop, ticker, url, interval):
 
 async def start_main_loop():
 
-    global frame, double_buffer
+    global frame, matrix, matrix_surface, matrix_buffer
 
     mqtt.loop_start()
 
@@ -218,7 +219,7 @@ async def start_main_loop():
 
         if GUI_ENABLED:
             pygame.display.flip()
-        render_led_matrix(screen, matrix, matrix_surface)
+        matrix_buffer = render_led_matrix(screen, matrix, matrix_surface, matrix_buffer)
 
         clock.tick(PYGAME_FPS)
         await asyncio.sleep(0)

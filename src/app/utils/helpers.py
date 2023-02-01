@@ -38,7 +38,7 @@ def setup_logger(debug=False):
 #
 
 
-def render_led_matrix(screen, matrix=None, matrix_surface=None):
+def render_led_matrix(screen, matrix=None, matrix_surface=None, matrix_buffer=None):
     if not matrix:
         return
     # Blit first 4 panels to top row
@@ -60,7 +60,9 @@ def render_led_matrix(screen, matrix=None, matrix_surface=None):
         "RGB", (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), image_str
     )
     # Render PIL image to buffer
-    matrix.SetImage(image_rgb)
+    matrix_buffer.SetImage(image_rgb)
+    # Flip and return next buffer
+    return matrix.SwapOnVSync(matrix_buffer)
 
 
 def random_color():
