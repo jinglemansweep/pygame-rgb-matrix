@@ -70,9 +70,7 @@ class ImageSprite(pygame.sprite.DirtySprite):
     def load_image(self, filename):
         with Image.open(self.filename) as im:
             im.thumbnail((128, 64), Image.Resampling.LANCZOS)
-            image = pygame.image.fromstring(
-                im.tobytes(), im.size, im.mode
-            ).convert_alpha()
+            image = pygame.image.fromstring(im.tobytes(), im.size, im.mode).convert()
         return image
 
     def get_width(self):
