@@ -168,7 +168,7 @@ async def start_main_loop():
         color_bg=(128, 0, 0, 128),
     )
     ticker = TickerWidget(
-        (0, 40, LED_COLS * PANEL_COLS, 24),
+        (0, 39, LED_COLS * PANEL_COLS, 24),
         color_bg=(0, 0, 0, 128),
         font_size=20,
     )
@@ -207,14 +207,14 @@ async def start_main_loop():
         color_clock = hass.store["color_clock"].state["state"] == "ON"
         color_ticker = hass.store["color_news"].state["state"] == "ON"
 
-        if not switch_background:
-            screen.fill((0, 0, 0))
-        background.visible = hass_to_visible(switch_background, switch_master)
-        clock_widget.visible = hass_to_visible(color_clock, switch_master)
-        ticker.visible = hass_to_visible(color_ticker, switch_master)
-
-        sprites.update(frame)
-        sprites.draw(screen)
+        if switch_master:
+            background.visible = hass_to_visible(switch_background, switch_master)
+            clock_widget.visible = hass_to_visible(color_clock, switch_master)
+            ticker.visible = hass_to_visible(color_ticker, switch_master)
+            sprites.update(frame)
+            sprites.draw(screen)
+        else:
+            screen.fill((0, 0, 0, 0))
 
         if GUI_ENABLED:
             pygame.display.flip()
