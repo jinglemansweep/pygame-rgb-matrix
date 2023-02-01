@@ -28,14 +28,14 @@ def setup_logger(debug=False):
 
 # PyGame renders wall like this:
 #
-# | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+# | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
 #
 # We need to render to the LED panels (if using
 # parallel chains and panels are arranged on a single row):
 #
-# | 0 | 1 | 2 | 3 |
-# | 4 | 5 | 6 | 7 |
-#
+# |  0 |  1 |  2 |  3 | <- chain 1
+# |  4 |  5 |  6 |  7 | <- chain 2
+# |  8 |  9 | 10 | 11 | <- chain 3
 
 
 def render_led_matrix(screen, matrix=None, matrix_surface=None, matrix_buffer=None):
@@ -58,7 +58,8 @@ def render_led_matrix(screen, matrix=None, matrix_surface=None, matrix_buffer=No
     # Create a PIL compatible image from the byte array
     image_rgb = Image.frombytes(
         "RGB", (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), image_str
-    )
+    ).convert()
+
     # Render PIL image to buffer
     matrix_buffer.SetImage(image_rgb)
     # Flip and return next buffer
