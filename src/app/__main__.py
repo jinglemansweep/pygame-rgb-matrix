@@ -132,7 +132,9 @@ if LED_ENABLED:
     from rgbmatrix import RGBMatrix
 
     matrix = RGBMatrix(options=matrix_options)
-    double_buffer = matrix.CreateFrameCanvas()
+    matrix_surface = pygame.Surface(
+        (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
+    )
 
 frame = 0
 
@@ -216,7 +218,7 @@ async def start_main_loop():
 
         if GUI_ENABLED:
             pygame.display.flip()
-        double_buffer = render_led_matrix(screen, matrix, double_buffer)
+        render_led_matrix(screen, matrix, matrix_surface)
 
         clock.tick(PYGAME_FPS)
         await asyncio.sleep(0)

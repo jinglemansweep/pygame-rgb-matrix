@@ -38,36 +38,29 @@ def setup_logger(debug=False):
 #
 
 
-def render_led_matrix(screen, matrix=None, double_buffer=None):
+def render_led_matrix(screen, matrix=None, matrix_surface=None):
     if not matrix:
         return
-    if not double_buffer:
-        double_buffer = matrix.CreateFrameCanvas()
-    led_surface = pygame.Surface(
-        (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
-    )
     # Blit first 4 panels to top row
-    led_surface.blit(
+    matrix_surface.blit(
         screen,
         (0, 0),
         (0, 0, LED_COLS * LED_CHAIN, LED_ROWS * 1),
     )
     # Blit next 4 panels to next row
-    led_surface.blit(
+    matrix_surface.blit(
         screen,
         (0, LED_ROWS),
         (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
     )
     # Convert PyGame surface to RGB byte array
-    image_str = pygame.image.tostring(led_surface, "RGB", False)
+    image_str = pygame.image.tostring(matrix_surface, "RGB", False)
     # Create a PIL compatible image from the byte array
     image_rgb = Image.frombytes(
         "RGB", (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), image_str
     )
     # Render PIL image to buffer
-    double_buffer.SetImage(image_rgb)
-    # Flip and return next buffer
-    return matrix.SwapOnVSync(double_buffer)
+    matrix.SetImage(image_rgb)
 
 
 def random_color():
