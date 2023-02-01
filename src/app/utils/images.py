@@ -34,7 +34,7 @@ class ImageSprite(pygame.sprite.DirtySprite):
         self.filename = filename
         self.scroll_speed = scroll_speed
         self.transient = transient
-        with Image.open(os.path.join(IMAGE_PATH, self.filename)) as im:
+        with Image.open(self.filename) as im:
             im.thumbnail((128, 64), Image.Resampling.LANCZOS)
             self.image = pygame.image.fromstring(im.tobytes(), im.size, im.mode)
             self.rect = self.image.get_rect()
@@ -109,6 +109,7 @@ class ImageWidget(pygame.sprite.DirtySprite):
         )
 
     def get_images(self):
-        files = glob.glob("*.*", root_dir=IMAGE_PATH)
+        files = glob.glob(os.path.join(IMAGE_PATH, "*.*"))
+        print(files)
         for file in files:
             self.items.append(ImageObject(file))
