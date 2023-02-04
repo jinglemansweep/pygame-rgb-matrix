@@ -12,7 +12,7 @@ import traceback
 from argparse import ArgumentParser
 from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
-from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
+from pygame.locals import QUIT, DOUBLEBUF, FULLSCREEN
 
 load_dotenv(find_dotenv())
 
@@ -108,7 +108,7 @@ pygame.display.set_caption(_APP_DESCRIPTION)
 
 screen_flags = DOUBLEBUF
 if GUI_ENABLED:
-    screen_flags |= SCALED | RESIZABLE
+    screen_flags |= FULLSCREEN
 
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
@@ -216,7 +216,8 @@ async def start_main_loop():
             screen.fill((0, 0, 0, 0))
 
         if GUI_ENABLED:
-            pygame.display.flip()
+            pass
+            # pygame.display.flip()
         matrix_buffer = render_led_matrix(screen, matrix, matrix_surface, matrix_buffer)
 
         clock.tick(PYGAME_FPS)
