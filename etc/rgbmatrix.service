@@ -1,9 +1,11 @@
 [Unit]
 Description=RGB Matrix
+Requires=xvfb.service
+After=xvfb.service
 
 [Service]
 WorkingDirectory=/opt/rgbmatrix
-ExecStart=/bin/bash -c "cd /opt/rgbmatrix/src && /opt/rgbmatrix/venv/bin/python -m app"
+ExecStart=/bin/bash ./start.sh
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 Type=simple
