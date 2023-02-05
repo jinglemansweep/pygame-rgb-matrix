@@ -50,8 +50,13 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         antialias = antialias or self.text_antialias
         if not self.font_cache.get(font):
             self.font_cache[font] = pygame.font.SysFont(font, size)
-        temp_surface = pygame.Surface((1000, 1000), SRCALPHA, PYGAME_BITS_PER_PIXEL)
         text_surface = self.font_cache.get(font).render(text, antialias, color)
+        temp_surface = pygame.Surface(
+            (text_surface.get_rect().width, text_surface.get_rect().height),
+            SRCALPHA,
+            PYGAME_BITS_PER_PIXEL,
+        )
+
         for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
             outline_surface = self.font_cache.get(font).render(
                 text, antialias, (0, 0, 0, 255)
