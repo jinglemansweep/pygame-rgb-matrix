@@ -172,13 +172,13 @@ async def start_main_loop():
     background = pygame.Surface(
         (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0, PYGAME_BITS_PER_PIXEL
     )
-    background.fill((0, 0, 32, 255))
+    background.fill((0, 0, 64, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)
 
     sprite_images = TickerWidgetSprite(
         ((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS)),
         item_margin=16,
-        scroll_speed=0.1,
+        scroll_speed=0.5,
     )
     sprites.add(sprite_images)
 
