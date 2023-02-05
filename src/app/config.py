@@ -52,6 +52,8 @@ MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD")
 
 DEVICE_NAME = os.environ.get("DEVICE_NAME", "default")
 
+IMAGE_PATH = "images/photos"
+
 # Construct RGB Matrix options object
 matrix_options = None
 

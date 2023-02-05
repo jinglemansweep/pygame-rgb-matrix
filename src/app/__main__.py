@@ -43,12 +43,16 @@ from app.config import (
     MQTT_USER,
     MQTT_PASSWORD,
     DEVICE_NAME,
+    IMAGE_PATH,
 )
-from app.utils.clock import ClockWidget
+
+# from app.utils.clock import ClockWidget
 from app.utils.images import ImageWidget
 from app.utils.ticker import TickerWidget
 
+from app.sprites.clock import ClockWidgetSprite
 from app.sprites.ticker import TickerWidgetSprite
+from app.sprites.utils.images import glob_files, load_and_resize_image
 
 from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
@@ -149,11 +153,10 @@ async def _update_ticker(loop, ticker, url, interval):
     now = datetime.now()
     time_fmt = now.strftime("%H:%M")
     header = f"Latest News @ {time_fmt}"
-
     ticker.add_text_item(header)
     entries = feed.entries
     for idx, item in enumerate(entries):
-        ticker.add_text_item(html.unescape(item["title"])[:10])
+        ticker.add_text_item(html.unescape(item["title"]))
     ticker.render_surface()
     logger.info(f"rss:fetch url={url} entries={len(entries)} interval={interval}")
     await asyncio.sleep(interval)
@@ -169,12 +172,32 @@ async def start_main_loop():
     background = pygame.Surface(
         (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0, PYGAME_BITS_PER_PIXEL
     )
+    background.fill((0, 0, 32, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)
 
+    sprite_images = TickerWidgetSprite(
+        ((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS)),
+        item_margin=16,
+        scroll_speed=0.1,
+    )
+    sprites.add(sprite_images)
+
     sprite_ticker = TickerWidgetSprite(
-        (0, 40, LED_COLS * PANEL_COLS, 24),
+        (0, 40, LED_COLS * PANEL_COLS, 24), item_margin=100
     )
     sprites.add(sprite_ticker)
+
+    sprite_clock = ClockWidgetSprite(
+        (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
+        color_bg=(128, 0, 0, 192),
+    )
+    sprites.add(sprite_clock)
+
+    image_path = os.path.join("..", IMAGE_PATH)
+    images = glob_files(image_path, "*.jpg")
+    for image_filename in images:
+        sprite_images.add_image_item(image_filename, (LED_COLS, LED_ROWS))
+    sprite_images.render_surface()
 
     loop = asyncio.get_event_loop()
     asyncio.create_task(
@@ -193,7 +216,6 @@ async def start_main_loop():
                 hass.process_message(event.topic, event.message)
 
         sprites.update(frame)
-
         sprites.clear(screen, background)
         update_rects = sprites.draw(screen)
         # logger.debug(f"main:ticker:draw updates={update_rects}")

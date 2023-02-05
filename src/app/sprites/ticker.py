@@ -3,6 +3,7 @@ import logging
 
 from pygame.locals import SRCALPHA
 
+from app.sprites.utils.images import load_and_resize_image
 
 logger = logging.getLogger("sprites.ticker")
 
@@ -12,16 +13,17 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         self,
         rect,
         text_font="freesans",
-        text_size=32,
+        text_size=20,
         text_color=(255, 255, 255, 255),
         text_antialias=True,
         padding=0,
-        item_margin=100,
-        scroll_speed=1,
+        item_margin=0,
+        scroll_speed=1.0,
     ):
         super().__init__()
         pygame.font.init()
         self.rect = pygame.Rect(*rect)
+        self.x, self.y = float(self.rect.x), float(self.rect.y)
         self.text_font = text_font
         self.text_size = text_size
         self.text_color = text_color
@@ -51,6 +53,9 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
             self.font_cache.get(font).render(text, antialias, color)
         )
 
+    def add_image_item(self, filename, size):
+        self.item_surfaces.append(load_and_resize_image(filename, size))
+
     def render_surface(self):
         surface_width = 0
         for item_surface in self.item_surfaces:
@@ -72,7 +77,8 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
 
     def update(self, frame):
         super().update(frame)
-        self.rect.x -= self.scroll_speed
-        if self.rect.x < 0 - self.image.get_rect().width:
-            self.rect.x = self.rect.width
+        self.x -= self.scroll_speed
+        if self.x < 0 - self.image.get_rect().width:
+            self.x = self.rect.width
+        self.rect.x = int(self.x)
         # logger.debug(f"sprite:ticker x={self.rect.x}")
