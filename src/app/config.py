@@ -43,7 +43,7 @@ PANEL_ROWS = int(os.environ.get("PANEL_ROWS", 1))
 PANEL_COLS = int(os.environ.get("PANEL_COLS", 1))
 
 RSS_URL = os.environ.get("RSS_URL")
-RSS_UPDATE_INTERVAL = int(os.environ.get("RSS_UPDATE_INTERVAL", 600))  # 10 mins
+RSS_UPDATE_INTERVAL = int(os.environ.get("RSS_UPDATE_INTERVAL", 3600))  # 1 hour
 
 MQTT_HOST = os.environ.get("MQTT_HOST")
 MQTT_PORT = int(os.environ.get("MQTT_PORT", 8883))
@@ -53,6 +53,7 @@ MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD")
 DEVICE_NAME = os.environ.get("DEVICE_NAME", "default")
 
 IMAGE_PATH = "images/photos"
+TICKER_DISPLAY_INTERVAL = int(os.environ.get("TICKER_DISPLAY_INTERVAL", 300))  # 5 mins
 
 # Construct RGB Matrix options object
 matrix_options = None

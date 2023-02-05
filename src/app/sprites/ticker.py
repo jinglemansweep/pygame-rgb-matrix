@@ -20,6 +20,8 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         padding=0,
         item_margin=0,
         scroll_speed=1.0,
+        loop_count=0,
+        autorun=True,
     ):
         super().__init__()
         pygame.font.init()
@@ -32,11 +34,28 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         self.padding = padding
         self.item_margin = item_margin
         self.scroll_speed = scroll_speed
+        self.loop_count = loop_count
+        self.autorun = autorun
         self.image = None
         self.item_surfaces = list()
         self.font_cache = dict()
+        self.loop_idx = 0
         self.dirty = 2
         self.render_surface()
+        if self.autorun:
+            self.run()
+
+    def run(self, reset_position=True, reset_loop=True):
+        if reset_position:
+            self.reset_position()
+        if reset_loop:
+            self.loop_idx = 0
+        self.next_loop(True)
+        self.running = True
+
+    def stop(self, now=False):
+        self.repeat = False
+        self.running = not now
 
     def clear_items(self):
         logger.debug(f"sprite:ticker:clear_items")
@@ -52,21 +71,23 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
             self.font_cache[font] = pygame.font.SysFont(font, size)
         text_surface = self.font_cache.get(font).render(text, antialias, color)
         temp_surface = pygame.Surface(
-            (text_surface.get_rect().width, text_surface.get_rect().height),
+            (text_surface.get_rect().width + 2, text_surface.get_rect().height + 2),
             SRCALPHA,
             PYGAME_BITS_PER_PIXEL,
         )
-
         for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
             outline_surface = self.font_cache.get(font).render(
                 text, antialias, (0, 0, 0, 255)
             )
-            temp_surface.blit(outline_surface, (offset[0], offset[1]))
-        temp_surface.blit(text_surface, (0, 0))
+            temp_surface.blit(outline_surface, (offset[0] + 1, offset[1] + 1))
+        temp_surface.blit(text_surface, (1, 1))
         self.item_surfaces.append(temp_surface)
 
     def add_image_item(self, filename, size):
         self.item_surfaces.append(load_and_resize_image(filename, size))
+
+    def reset_position(self):
+        self.x = self.rect.width
 
     def render_surface(self):
         surface_width = 0
@@ -83,14 +104,24 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
             f"sprite:ticker:render_surface width={sprite_surface.get_rect().width} height={sprite_surface.get_rect().height}"
         )
         self.image = sprite_surface
+        self.reset_position()
 
     def _get_surface_width(self, surface):
         return surface.get_rect().width + self.item_margin
 
+    def next_loop(self, run_now=False):
+        if run_now or self.x < 0 - self.image.get_rect().width:
+            if self.loop_count == 0 or self.loop_idx < self.loop_count:
+                self.loop_idx += 1
+                logger.debug(
+                    f"sprite:ticker:loop idx={self.loop_idx}/{self.loop_count}"
+                )
+                self.reset_position()
+
     def update(self, frame):
         super().update(frame)
-        self.x -= self.scroll_speed
-        if self.x < 0 - self.image.get_rect().width:
-            self.x = self.rect.width
+        if self.running:
+            self.x -= self.scroll_speed
+            self.next_loop()
         self.rect.x = int(self.x)
         # logger.debug(f"sprite:ticker x={self.rect.x}")

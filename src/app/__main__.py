@@ -44,6 +44,7 @@ from app.config import (
     MQTT_PASSWORD,
     DEVICE_NAME,
     IMAGE_PATH,
+    TICKER_DISPLAY_INTERVAL,
 )
 
 # from app.utils.clock import ClockWidget
@@ -148,7 +149,9 @@ if LED_ENABLED:
 frame = 0
 
 
-async def _update_ticker(loop, ticker, url, interval):
+async def _update_ticker(loop, ticker, url, interval, update_now=False):
+    if not update_now:
+        await asyncio.sleep(interval)
     feed = await get_rss_items(loop, url)
     now = datetime.now()
     time_fmt = now.strftime("%H:%M")
@@ -156,11 +159,23 @@ async def _update_ticker(loop, ticker, url, interval):
     ticker.add_text_item(header)
     entries = feed.entries
     for idx, item in enumerate(entries):
-        ticker.add_text_item(html.unescape(item["title"]))
+        if DEBUG:
+            ticker.add_text_item(f"DEBUG:{idx}")
+        else:
+            ticker.add_text_item(html.unescape(item["title"]))
     ticker.render_surface()
-    logger.info(f"rss:fetch url={url} entries={len(entries)} interval={interval}")
-    await asyncio.sleep(interval)
-    asyncio.create_task(_update_ticker(loop, ticker, url, interval))
+    logger.info(
+        f"ticker:update:rss url={url} entries={len(entries)} interval={interval} update_now={update_now}"
+    )
+    asyncio.create_task(_update_ticker(loop, ticker, url, interval, False))
+
+
+async def _show_ticker(ticker, interval, show_now=False):
+    if not show_now:
+        await asyncio.sleep(interval)
+    logger.info(f"ticker:show interval={interval}")
+    ticker.run()
+    asyncio.create_task(_show_ticker(ticker, interval, False))
 
 
 async def start_main_loop():
@@ -183,7 +198,10 @@ async def start_main_loop():
     sprites.add(sprite_images)
 
     sprite_ticker = TickerWidgetSprite(
-        (0, 40, LED_COLS * PANEL_COLS, 24), item_margin=100
+        (0, 40, LED_COLS * PANEL_COLS, 24),
+        item_margin=100,
+        loop_count=3,
+        autorun=True,
     )
     sprites.add(sprite_ticker)
 
@@ -201,8 +219,9 @@ async def start_main_loop():
 
     loop = asyncio.get_event_loop()
     asyncio.create_task(
-        _update_ticker(loop, sprite_ticker, RSS_URL, RSS_UPDATE_INTERVAL)
+        _update_ticker(loop, sprite_ticker, RSS_URL, RSS_UPDATE_INTERVAL, True)
     )
+    asyncio.create_task(_show_ticker(sprite_ticker, TICKER_DISPLAY_INTERVAL, True))
 
     while True:
         for event in pygame.event.get():
