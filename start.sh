@@ -1,6 +1,8 @@
 #!/bin/bash
 
-export DISPLAY=:99 
+declare -r display="${1:-99}"
+
+export DISPLAY=":${display}"
 
 . ./venv/bin/activate
 
