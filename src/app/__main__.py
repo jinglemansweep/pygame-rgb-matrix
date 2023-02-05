@@ -196,7 +196,7 @@ async def start_main_loop():
     image_path = os.path.join("..", IMAGE_PATH)
     images = glob_files(image_path, "*.jpg")
     for image_filename in images:
-        sprite_images.add_image_item(image_filename, (LED_COLS, LED_ROWS))
+        sprite_images.add_image_item(image_filename, (LED_COLS * 2, LED_ROWS))
     sprite_images.render_surface()
 
     loop = asyncio.get_event_loop()
