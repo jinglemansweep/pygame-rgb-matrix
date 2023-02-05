@@ -224,7 +224,7 @@ async def start_main_loop():
             pygame.display.update(update_rects)
         matrix_buffer = render_led_matrix(screen, matrix, matrix_surface, matrix_buffer)
 
-        clock.tick(255)
+        clock.tick(PYGAME_FPS)
         await asyncio.sleep(0)
 
         if frame % 200 == 0:
