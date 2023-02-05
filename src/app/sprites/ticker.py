@@ -4,6 +4,7 @@ import logging
 from pygame.locals import SRCALPHA
 
 from app.sprites.utils.images import load_and_resize_image
+from app.config import PYGAME_BITS_PER_PIXEL
 
 logger = logging.getLogger("sprites.ticker")
 
@@ -49,9 +50,15 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         antialias = antialias or self.text_antialias
         if not self.font_cache.get(font):
             self.font_cache[font] = pygame.font.SysFont(font, size)
-        self.item_surfaces.append(
-            self.font_cache.get(font).render(text, antialias, color)
-        )
+        temp_surface = pygame.Surface((1000, 1000), SRCALPHA, PYGAME_BITS_PER_PIXEL)
+        text_surface = self.font_cache.get(font).render(text, antialias, color)
+        for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            outline_surface = self.font_cache.get(font).render(
+                text, antialias, (0, 0, 0, 255)
+            )
+            temp_surface.blit(outline_surface, (offset[0], offset[1]))
+        temp_surface.blit(text_surface, (0, 0))
+        self.item_surfaces.append(temp_surface)
 
     def add_image_item(self, filename, size):
         self.item_surfaces.append(load_and_resize_image(filename, size))
