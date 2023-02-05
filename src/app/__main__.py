@@ -47,9 +47,6 @@ from app.config import (
     TICKER_DISPLAY_INTERVAL,
 )
 
-# from app.utils.clock import ClockWidget
-from app.utils.images import ImageWidget
-from app.utils.ticker import TickerWidget
 
 from app.sprites.clock import ClockWidgetSprite
 from app.sprites.ticker import TickerWidgetSprite
