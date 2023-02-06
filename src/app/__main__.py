@@ -55,11 +55,8 @@ from app.sprites.utils.images import glob_files, load_and_resize_image
 from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
     get_rss_items,
-    hass_to_color,
-    hass_to_visible,
     render_led_matrix,
     setup_logger,
-    JoyPad,
 )
 
 _APP_NAME = "wideboy"
@@ -111,9 +108,9 @@ pygame.init()
 clock = pygame.time.Clock()
 pygame.display.set_caption(_APP_DESCRIPTION)
 
-screen_flags = DOUBLEBUF
+screen_flags = 0
 if GUI_ENABLED:
-    screen_flags |= RESIZABLE | SCALED
+    screen_flags |= RESIZABLE | SCALED | DOUBLEBUF
 
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
@@ -150,16 +147,17 @@ async def _update_ticker(loop, ticker, url, interval, update_now=False):
     if not update_now:
         await asyncio.sleep(interval)
     feed = await get_rss_items(loop, url)
+    ticker.clear_items()
     now = datetime.now()
     time_fmt = now.strftime("%H:%M")
     header = f"Latest News @ {time_fmt}"
     ticker.add_text_item(header)
     entries = feed.entries
     for idx, item in enumerate(entries):
+        content = html.unescape(item["title"])
         if DEBUG:
-            ticker.add_text_item(f"DEBUG:{idx}")
-        else:
-            ticker.add_text_item(html.unescape(item["title"]))
+            content = f"{idx}:{content[:15]}..."
+        ticker.add_text_item(content)
     ticker.render_surface()
     logger.info(
         f"ticker:update:rss url={url} entries={len(entries)} interval={interval} update_now={update_now}"
@@ -186,6 +184,7 @@ async def start_main_loop():
     )
     background.fill((0, 0, 64, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)
+    sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
 
     sprite_images = TickerWidgetSprite(
         ((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS)),
@@ -195,7 +194,7 @@ async def start_main_loop():
     sprites.add(sprite_images)
 
     sprite_ticker = TickerWidgetSprite(
-        (0, 40, LED_COLS * PANEL_COLS, 24),
+        (0, 38, LED_COLS * PANEL_COLS, 26),
         item_margin=100,
         loop_count=3,
         autorun=True,
