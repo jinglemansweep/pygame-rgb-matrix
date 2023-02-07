@@ -17,9 +17,12 @@ from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 load_dotenv(find_dotenv())
 
 sys.path.append(
-    os.path.abspath(
-        os.path.dirname(__file__) + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python"
-    )
+    [
+        os.path.abspath(
+            os.path.dirname(__file__)
+            + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python",
+        ),
+    ]
 )
 
 from app.config import (
@@ -58,6 +61,14 @@ from app.utils.helpers import (
     render_led_matrix,
     setup_logger,
 )
+
+"""
+from app.utils.flaschen import Flaschen
+ft = Flaschen("10.0.2.83", 1337, width=128, height=64, layer=1)
+row = [(255, 255, 255) for i in range(0, 64)]
+block = [row for i in range(0, 32)]
+ft.send_array(block, (10, 10, 1))
+"""
 
 _APP_NAME = "wideboy"
 _APP_DESCRIPTION = "WideBoy RGB Matrix Platform"
