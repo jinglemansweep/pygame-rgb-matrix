@@ -26,8 +26,25 @@ Create a `virtualenv` and install the project requirements:
     source ./venv/bin/activate
     pip install -r ./requirements.txt
 
-The [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) library by [hzeller](https://github.com/hzeller)'s should be installed as a Git submodule in `lib/rpi-rgb-led-matrix`. Build the required Python bindings:
+Clone and pull both the [flaschen-taschen](https://github.com/hzeller/flaschen-taschen) library as well the [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) library dependency, both developed by [hzeller](https://github.com/hzeller). `flaschen-taschen` should be installed as a Git submodule in `lib/flaschen-taschen` and the `rpi-rgb-led-matrix` dependency should be installed as a recursive Git submodule in `lib/flaschen-taschen/server/rgb-matrix`.
 
+Initialise submodules:
+
+    # init flaschen-taschen submodule
+    git submodule update --init --recursive
+    cd ./lib/flaschen-taschen
+
+    # init rgb-matrix dependency submodule
+    git submodule update --init --recursive
+    
+    # make python bindings
+    cd ./server/rgb-matrix
+    make build-python
+
+    cd ./lib/rpi-rgb-led-matrix
+    
+
+ Build the required Python bindings:
     git submodule update --init --recursive
     cd ./lib/rpi-rgb-led-matrix
     make build-python
