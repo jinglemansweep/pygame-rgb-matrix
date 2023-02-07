@@ -18,7 +18,7 @@ load_dotenv(find_dotenv())
 
 sys.path.append(
     os.path.abspath(
-        os.path.dirname(__file__) + "/../../lib/rpi-rgb-led-matrix/bindings/python"
+        os.path.dirname(__file__) + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python"
     )
 )
 
