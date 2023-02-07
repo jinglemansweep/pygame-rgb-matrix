@@ -17,13 +17,12 @@ from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 load_dotenv(find_dotenv())
 
 sys.path.append(
-    [
         os.path.abspath(
-            os.path.dirname(__file__)
-            + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python",
+            os.path.dirname(__file__) + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python",
         ),
-    ]
 )
+
+import rgbmatrix
 
 from app.config import (
     matrix_options,
