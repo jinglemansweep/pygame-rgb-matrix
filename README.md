@@ -20,6 +20,10 @@ By utilising PyGame, we can leverage the awesome graphics, spriting and animatio
 
 ## Installation
 
+Clone repository (including dependency submodules):
+
+    git clone --recurse https://github.com/jinglemansweep/pygame-rgb-matrix.git
+
 Create a `virtualenv` and install the project requirements:
 
     python3 -m venv ./venv
@@ -28,27 +32,15 @@ Create a `virtualenv` and install the project requirements:
 
 Clone and pull both the [flaschen-taschen](https://github.com/hzeller/flaschen-taschen) library as well the [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix) library dependency, both developed by [hzeller](https://github.com/hzeller). `flaschen-taschen` should be installed as a Git submodule in `lib/flaschen-taschen` and the `rpi-rgb-led-matrix` dependency should be installed as a recursive Git submodule in `lib/flaschen-taschen/server/rgb-matrix`.
 
-Initialise submodules:
+Update and build `flaschen-taschen` dependencies:
 
-    # init flaschen-taschen submodule
     git submodule update --init --recursive
-    cd ./lib/flaschen-taschen
 
-    # init rgb-matrix dependency submodule
-    git submodule update --init --recursive
-    
-    # make python bindings
-    cd ./server/rgb-matrix
+    cd ./lib/flaschen-taschen/server
+    make FT_BACKEND=rgb-matrix # or "terminal"
+    cd ./rgb-matrix
     make build-python
-
-    cd ./lib/rpi-rgb-led-matrix
     
-
- Build the required Python bindings:
-    git submodule update --init --recursive
-    cd ./lib/rpi-rgb-led-matrix
-    make build-python
-
 ## Configuration
 
 Modify any LED matrix and other settings by copying and modifying the provided [config.env](./config.env.example) example file:
