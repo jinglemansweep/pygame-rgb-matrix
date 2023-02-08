@@ -15,8 +15,11 @@ from app.config import (
     LED_PARALLEL,
     PYGAME_BITS_PER_PIXEL,
 )
+from app.utils.flaschen import Flaschen
 
 LOG_FORMAT = "%(message)s"
+
+tf = Flaschen("rgbmatrix.home.ptre.es", 1337, 64, 64)
 
 
 def setup_logger(debug=False):
@@ -64,6 +67,28 @@ def render_led_matrix(screen, matrix=None, matrix_surface=None, matrix_buffer=No
     matrix_buffer.SetImage(image_rgb)
     # Flip and return next buffer
     return matrix.SwapOnVSync(matrix_buffer)
+
+
+def render_tf(screen, matrix_surface=None):
+    # Blit first 4 panels to top row
+    matrix_surface.blit(
+        screen,
+        (0, 0),
+        (0, 0, LED_COLS * LED_CHAIN, LED_ROWS * 1),
+    )
+    # Blit next 4 panels to next row
+    matrix_surface.blit(
+        screen,
+        (0, LED_ROWS),
+        (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
+    )
+    # Convert PyGame surface to RGB byte array
+    image_str = pygame.image.tostring(matrix_surface, "RGB", False)
+    print(image_str)
+    # Slice array to sections for offset overlay
+    array_new = image_str[0:63, 0:63]
+    tf.send_array(array_new, (0, 0, 1))
+    print(len(array_new))
 
 
 def random_color():

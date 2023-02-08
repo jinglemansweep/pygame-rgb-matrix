@@ -17,12 +17,12 @@ from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 load_dotenv(find_dotenv())
 
 sys.path.append(
-        os.path.abspath(
-            os.path.dirname(__file__) + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python",
-        ),
+    os.path.abspath(
+        os.path.dirname(__file__)
+        + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python",
+    ),
 )
 
-import rgbmatrix
 
 from app.config import (
     matrix_options,
@@ -58,6 +58,7 @@ from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
     get_rss_items,
     render_led_matrix,
+    render_tf,
     setup_logger,
 )
 
@@ -141,6 +142,10 @@ logger.info(
 matrix = None
 matrix_buffer = None
 matrix_surface = None
+tf_surface = pygame.Surface(
+    (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
+)
+
 if LED_ENABLED:
     from rgbmatrix import RGBMatrix
 
@@ -248,7 +253,7 @@ async def start_main_loop():
         if GUI_ENABLED:
             pygame.display.update(update_rects)
         matrix_buffer = render_led_matrix(screen, matrix, matrix_surface, matrix_buffer)
-
+        # render_tf(screen, tf_surface)
         clock.tick(PYGAME_FPS)
         await asyncio.sleep(0)
 
