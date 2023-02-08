@@ -1,7 +1,7 @@
 [Unit]
 Description=RGB Matrix
-Requires=xvfb.service
-After=xvfb.service
+Requires=xvfb.service ft-server.service
+After=xvfb.service ft-server.service
 
 [Service]
 WorkingDirectory=/opt/rgbmatrix
