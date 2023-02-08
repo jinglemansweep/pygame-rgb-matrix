@@ -14,14 +14,21 @@ from app.config import (
     LED_COLS,
     LED_CHAIN,
     LED_PARALLEL,
+    FT_HOST,
+    FT_PORT,
+    FT_LAYER,
+    FT_TRANSPARENT,
 )
 
 LOG_FORMAT = "%(message)s"
 
 ft = FTClient(
-    "rgbmatrix.home.ptre.es",
+    FT_HOST,
+    FT_PORT,
     width=LED_COLS * LED_CHAIN,
     height=LED_ROWS * LED_PARALLEL,
+    layer=FT_LAYER,
+    transparent=FT_TRANSPARENT,
     tile_width=LED_COLS,
     tile_height=LED_ROWS,
 )

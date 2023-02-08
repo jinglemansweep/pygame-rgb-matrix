@@ -1410,7 +1410,7 @@ pygame = "^2.1.2"
 type = "git"
 url = "https://github.com/jinglemansweep/pygame-ft.git"
 reference = "HEAD"
-resolved_reference = "5952e5fb5c13f26ca645f6b70ec6f3fae5325196"
+resolved_reference = "31b463ed75a6d4e4ab63a7aae28cefccee79cb22"
 
 [[package]]
 name = "pyrsistent"

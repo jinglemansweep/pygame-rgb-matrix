@@ -16,6 +16,11 @@ LED_PARALLEL = int(os.environ.get("LED_PARALLEL", 1))  # 3
 PANEL_ROWS = int(os.environ.get("PANEL_ROWS", 1))
 PANEL_COLS = int(os.environ.get("PANEL_COLS", 1))
 
+FT_HOST = os.environ.get("FT_HOST", "localhost")
+FT_PORT = int(os.environ.get("FT_PORT", 1337))
+FT_LAYER = int(os.environ.get("FT_LAYER", 5))
+FT_TRANSPARENT = os.environ.get("FT_TRANSPARENT", "true").lower() == "true"
+
 RSS_URL = os.environ.get("RSS_URL")
 RSS_UPDATE_INTERVAL = int(os.environ.get("RSS_UPDATE_INTERVAL", 3600))  # 1 hour
 
