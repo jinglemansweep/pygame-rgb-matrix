@@ -1,7 +1,6 @@
 import asyncio
 import cProfile
 import html
-import json
 import logging
 import os
 import pygame
@@ -16,22 +15,12 @@ from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 
 load_dotenv(find_dotenv())
 
-sys.path.append(
-    os.path.abspath(
-        os.path.dirname(__file__)
-        + "/../../lib/flaschen-taschen/server/rgb-matrix/bindings/python",
-    ),
-)
-
-
 from app.config import (
-    matrix_options,
     DEBUG,
     PROFILING,
     GUI_ENABLED,
     PYGAME_FPS,
     PYGAME_BITS_PER_PIXEL,
-    LED_ENABLED,
     LED_CHAIN,
     LED_PARALLEL,
     LED_ROWS,
@@ -57,18 +46,10 @@ from app.sprites.utils.images import glob_files, load_and_resize_image
 from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
     get_rss_items,
-    render_led_matrix,
-    render_tf,
+    render_pygameft,
     setup_logger,
 )
 
-"""
-from app.utils.flaschen import Flaschen
-ft = Flaschen("10.0.2.83", 1337, width=128, height=64, layer=1)
-row = [(255, 255, 255) for i in range(0, 64)]
-block = [row for i in range(0, 32)]
-ft.send_array(block, (10, 10, 1))
-"""
 
 _APP_NAME = "wideboy"
 _APP_DESCRIPTION = "WideBoy RGB Matrix Platform"
@@ -137,23 +118,6 @@ logger.info(
     f"gui:size w={LED_COLS*LED_CHAIN}px h={LED_ROWS*LED_PARALLEL}px",
 )
 
-# joypad = JoyPad(0)
-
-matrix = None
-matrix_buffer = None
-matrix_surface = None
-tf_surface = pygame.Surface(
-    (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
-)
-
-if LED_ENABLED:
-    from rgbmatrix import RGBMatrix
-
-    matrix = RGBMatrix(options=matrix_options)
-    matrix_buffer = matrix.CreateFrameCanvas()
-    matrix_surface = pygame.Surface(
-        (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), depth=PYGAME_BITS_PER_PIXEL
-    )
 
 frame = 0
 
@@ -252,8 +216,8 @@ async def start_main_loop():
 
         if GUI_ENABLED:
             pygame.display.update(update_rects)
-        matrix_buffer = render_led_matrix(screen, matrix, matrix_surface, matrix_buffer)
-        # render_tf(screen, tf_surface)
+
+        render_pygameft(screen)
         clock.tick(PYGAME_FPS)
         await asyncio.sleep(0)
 

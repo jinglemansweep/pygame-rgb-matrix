@@ -7,19 +7,24 @@ import numpy as np
 import pygame
 import random
 from PIL import Image
+from pygameft import FTClient
 
 from app.config import (
     LED_ROWS,
     LED_COLS,
     LED_CHAIN,
     LED_PARALLEL,
-    PYGAME_BITS_PER_PIXEL,
 )
-from app.utils.flaschen import Flaschen
 
 LOG_FORMAT = "%(message)s"
 
-tf = Flaschen("rgbmatrix.home.ptre.es", 1337, 64, 64)
+ft = FTClient(
+    "rgbmatrix.home.ptre.es",
+    width=LED_COLS * LED_CHAIN,
+    height=LED_ROWS * LED_PARALLEL,
+    tile_width=LED_COLS,
+    tile_height=LED_ROWS,
+)
 
 
 def setup_logger(debug=False):
@@ -29,66 +34,28 @@ def setup_logger(debug=False):
     )
 
 
-# PyGame renders wall like this:
-#
-# | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
-#
-# We need to render to the LED panels (if using
-# parallel chains and panels are arranged on a single row):
-#
-# |  0 |  1 |  2 |  3 | <- chain 1
-# |  4 |  5 |  6 |  7 | <- chain 2
-# |  8 |  9 | 10 | 11 | <- chain 3
+def render_pygameft(screen):
+    surface = parallelise_surface(screen)
+    ft.send_surface(surface)
 
 
-def render_led_matrix(screen, matrix=None, matrix_surface=None, matrix_buffer=None):
-    if not matrix:
-        return
+def parallelise_surface(surface):
+    temp_surface = pygame.Surface(
+        (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL),
+    )
     # Blit first 4 panels to top row
-    matrix_surface.blit(
-        screen,
+    temp_surface.blit(
+        surface,
         (0, 0),
         (0, 0, LED_COLS * LED_CHAIN, LED_ROWS * 1),
     )
     # Blit next 4 panels to next row
-    matrix_surface.blit(
-        screen,
+    temp_surface.blit(
+        surface,
         (0, LED_ROWS),
         (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
     )
-    # Convert PyGame surface to RGB byte array
-    image_str = pygame.image.tostring(matrix_surface, "RGB", False)
-    # Create a PIL compatible image from the byte array
-    image_rgb = Image.frombytes(
-        "RGB", (LED_COLS * LED_CHAIN, LED_ROWS * LED_PARALLEL), image_str
-    ).convert()
-
-    # Render PIL image to buffer
-    matrix_buffer.SetImage(image_rgb)
-    # Flip and return next buffer
-    return matrix.SwapOnVSync(matrix_buffer)
-
-
-def render_tf(screen, matrix_surface=None):
-    # Blit first 4 panels to top row
-    matrix_surface.blit(
-        screen,
-        (0, 0),
-        (0, 0, LED_COLS * LED_CHAIN, LED_ROWS * 1),
-    )
-    # Blit next 4 panels to next row
-    matrix_surface.blit(
-        screen,
-        (0, LED_ROWS),
-        (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
-    )
-    # Convert PyGame surface to RGB byte array
-    image_str = pygame.image.tostring(matrix_surface, "RGB", False)
-    print(image_str)
-    # Slice array to sections for offset overlay
-    array_new = image_str[0:63, 0:63]
-    tf.send_array(array_new, (0, 0, 1))
-    print(len(array_new))
+    return temp_surface
 
 
 def random_color():
