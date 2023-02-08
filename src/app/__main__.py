@@ -20,7 +20,6 @@ from app.config import (
     PROFILING,
     GUI_ENABLED,
     PYGAME_FPS,
-    PYGAME_BITS_PER_PIXEL,
     LED_CHAIN,
     LED_PARALLEL,
     LED_ROWS,
@@ -106,8 +105,7 @@ if GUI_ENABLED:
 
 screen = pygame.display.set_mode(
     (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
-    screen_flags,
-    PYGAME_BITS_PER_PIXEL,
+    screen_flags
 )
 
 logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
@@ -159,7 +157,7 @@ async def start_main_loop():
     mqtt.loop_start()
 
     background = pygame.Surface(
-        (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0, PYGAME_BITS_PER_PIXEL
+        (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0
     )
     background.fill((0, 0, 64, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)

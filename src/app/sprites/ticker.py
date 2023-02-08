@@ -4,7 +4,6 @@ import logging
 from pygame.locals import SRCALPHA
 
 from app.sprites.utils.images import load_and_resize_image
-from app.config import PYGAME_BITS_PER_PIXEL
 
 logger = logging.getLogger("sprites.ticker")
 
@@ -73,7 +72,6 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         temp_surface = pygame.Surface(
             (text_surface.get_rect().width + 2, text_surface.get_rect().height + 2),
             SRCALPHA,
-            PYGAME_BITS_PER_PIXEL,
         )
         for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
             outline_surface = self.font_cache.get(font).render(

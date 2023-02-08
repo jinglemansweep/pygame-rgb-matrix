@@ -3,7 +3,6 @@ import pygame
 from datetime import datetime
 from pygame.locals import SRCALPHA
 
-from app.config import PYGAME_BITS_PER_PIXEL
 
 logger = logging.getLogger("sprites.clock")
 
@@ -22,7 +21,7 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
         pygame.sprite.DirtySprite.__init__(self)
         self.rect = pygame.rect.Rect(*rect)
         self.image = pygame.Surface(
-            (self.rect.width, self.rect.height), SRCALPHA, depth=PYGAME_BITS_PER_PIXEL
+            (self.rect.width, self.rect.height), SRCALPHA
         )
         pygame.font.init()
         self.font_date = pygame.font.SysFont(font_date, 20)
