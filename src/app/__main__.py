@@ -104,8 +104,7 @@ if GUI_ENABLED:
     screen_flags |= RESIZABLE | SCALED | DOUBLEBUF
 
 screen = pygame.display.set_mode(
-    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
-    screen_flags
+    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), screen_flags
 )
 
 logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
@@ -156,9 +155,7 @@ async def start_main_loop():
 
     mqtt.loop_start()
 
-    background = pygame.Surface(
-        (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0
-    )
+    background = pygame.Surface((LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0)
     background.fill((0, 0, 64, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)
     sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))

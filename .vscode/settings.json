@@ -1,8 +1,6 @@
 {
-    "python.analysis.extraPaths": [
-        "./lib/rpi-rgb-led-matrix/bindings/python"
-    ],
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "mypy.runUsingActiveInterpreter": true
 }
