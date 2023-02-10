@@ -5,6 +5,7 @@ import logging
 import os
 import pygame
 import pygame.pkgdata
+import random
 import sys
 import traceback
 
@@ -38,9 +39,10 @@ from app.config import (
 )
 
 
+from app.sprites.background import BackgroundSprite
 from app.sprites.clock import ClockWidgetSprite
 from app.sprites.ticker import TickerWidgetSprite
-from app.sprites.utils.images import glob_files, load_and_resize_image
+from app.sprites.utils.images import glob_files, load_resize_image
 
 from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
@@ -94,6 +96,8 @@ def _on_message(client, userdata, msg):
 
 mqtt.on_message = _on_message
 
+
+image_path = os.path.join("..", IMAGE_PATH)
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -155,14 +159,17 @@ async def start_main_loop():
 
     mqtt.loop_start()
 
-    background = pygame.Surface((LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0)
-    background.fill((0, 0, 0, 255))
-    sprites = pygame.sprite.LayeredDirty(background=None)  # (background)
+    background_images = glob_files(os.path.join(image_path, "backgrounds"), "*.png")
+    background = BackgroundSprite(
+        random.choice(background_images),
+        (0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
+    )
+    sprites = pygame.sprite.LayeredDirty(background=background)
     sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
 
     sprite_images = TickerWidgetSprite(
         ((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS)),
-        item_margin=16,
+        item_margin=8,
         scroll_speed=30,
     )
     sprites.add(sprite_images)
@@ -181,10 +188,9 @@ async def start_main_loop():
     )
     sprites.add(sprite_clock)
 
-    image_path = os.path.join("..", IMAGE_PATH)
-    images = glob_files(image_path, "*.jpg")
-    for image_filename in images:
-        sprite_images.add_image_item(image_filename, (LED_COLS * 2, LED_ROWS))
+    photos = glob_files(os.path.join(image_path, "photos"), "*.jpg")
+    for photo_filename in photos:
+        sprite_images.add_image_item(photo_filename, (LED_COLS * 2, LED_ROWS))
     sprite_images.render_surface()
 
     loop = asyncio.get_event_loop()
@@ -207,7 +213,7 @@ async def start_main_loop():
         delta = clock.tick(PYGAME_FPS) / 1000
 
         sprites.update(frame, delta)
-        sprites.clear(screen, background)
+        sprites.clear(screen, background.image)
         update_rects = sprites.draw(screen)
         # logger.debug(f"main:ticker:draw updates={update_rects}")
 

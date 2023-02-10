@@ -3,7 +3,7 @@ import logging
 
 from pygame.locals import SRCALPHA
 
-from app.sprites.utils.images import load_and_resize_image
+from app.sprites.utils.images import load_resize_image
 
 logger = logging.getLogger("sprites.ticker")
 
@@ -82,7 +82,7 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         self.item_surfaces.append(temp_surface)
 
     def add_image_item(self, filename, size):
-        self.item_surfaces.append(load_and_resize_image(filename, size))
+        self.item_surfaces.append(load_resize_image(filename, size))
 
     def reset_position(self):
         self.x = self.rect.width

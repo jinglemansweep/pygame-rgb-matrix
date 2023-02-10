@@ -31,5 +31,5 @@ MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD")
 
 DEVICE_NAME = os.environ.get("DEVICE_NAME", "default")
 
-IMAGE_PATH = "images/photos"
+IMAGE_PATH = "images"
 TICKER_DISPLAY_INTERVAL = int(os.environ.get("TICKER_DISPLAY_INTERVAL", 300))  # 5 mins
