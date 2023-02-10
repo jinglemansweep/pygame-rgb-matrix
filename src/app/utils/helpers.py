@@ -29,7 +29,7 @@ ft = FTClient(
     height=LED_ROWS * LED_PARALLEL,
     layer=FT_LAYER,
     transparent=FT_TRANSPARENT,
-    tile_width=LED_COLS,
+    tile_width=LED_COLS * 2,
     tile_height=LED_ROWS,
 )
 
@@ -53,14 +53,20 @@ def parallelise_surface(surface):
     # Blit first 4 panels to top row
     temp_surface.blit(
         surface,
-        (0, 0),
-        (0, 0, LED_COLS * LED_CHAIN, LED_ROWS * 1),
+        (0, 0), # (0, 0)
+        (0, 0, LED_COLS * 4, LED_ROWS * 1), # (0, 0, 256, 64)
     )
     # Blit next 4 panels to next row
     temp_surface.blit(
         surface,
-        (0, LED_ROWS),
-        (LED_COLS * LED_CHAIN, 0, (LED_COLS * LED_CHAIN), LED_COLS),
+        (0, LED_ROWS * 1), # (0, 64)
+        (LED_COLS * 4, 0, LED_COLS * 4, LED_ROWS * 1), # (256, 0, 256, 64)
+    )
+    # Blit next 4 panels to next row
+    temp_surface.blit(
+        surface,
+        (0, LED_ROWS * 2), # (0, 128)
+        (LED_COLS * 8, 0, LED_COLS * 4, LED_ROWS * 1), # (512, 0, 256, 64)
     )
     return temp_surface
 

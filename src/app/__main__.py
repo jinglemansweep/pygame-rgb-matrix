@@ -155,9 +155,10 @@ async def start_main_loop():
 
     mqtt.loop_start()
 
+    
     background = pygame.Surface((LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0)
-    background.fill((0, 0, 64, 255))
-    sprites = pygame.sprite.LayeredDirty(background=background)
+    background.fill((0, 0, 0, 255))
+    sprites = pygame.sprite.LayeredDirty(background=None) # (background)
     sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
 
     sprite_images = TickerWidgetSprite(
