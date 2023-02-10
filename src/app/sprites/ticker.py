@@ -18,7 +18,7 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         text_antialias=True,
         padding=0,
         item_margin=0,
-        scroll_speed=1.0,
+        scroll_speed=60.0,
         loop_count=0,
         autorun=True,
     ):
@@ -116,10 +116,10 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
                 )
                 self.reset_position()
 
-    def update(self, frame):
-        super().update(frame)
+    def update(self, frame, delta):
+        super().update()
         if self.running:
-            self.x -= self.scroll_speed
+            self.x -= self.scroll_speed * delta
             self.next_loop()
         self.rect.x = int(self.x)
         # logger.debug(f"sprite:ticker x={self.rect.x}")

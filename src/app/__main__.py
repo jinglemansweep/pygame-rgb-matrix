@@ -155,16 +155,15 @@ async def start_main_loop():
 
     mqtt.loop_start()
 
-    
     background = pygame.Surface((LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), 0)
     background.fill((0, 0, 0, 255))
-    sprites = pygame.sprite.LayeredDirty(background=None) # (background)
+    sprites = pygame.sprite.LayeredDirty(background=None)  # (background)
     sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
 
     sprite_images = TickerWidgetSprite(
         ((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS)),
         item_margin=16,
-        scroll_speed=0.5,
+        scroll_speed=30,
     )
     sprites.add(sprite_images)
 
@@ -205,7 +204,9 @@ async def start_main_loop():
                 )
                 hass.process_message(event.topic, event.message)
 
-        sprites.update(frame)
+        delta = clock.tick(PYGAME_FPS) / 1000
+
+        sprites.update(frame, delta)
         sprites.clear(screen, background)
         update_rects = sprites.draw(screen)
         # logger.debug(f"main:ticker:draw updates={update_rects}")
@@ -214,11 +215,11 @@ async def start_main_loop():
             pygame.display.update(update_rects)
 
         render_pygameft(screen)
-        clock.tick(PYGAME_FPS)
+
         await asyncio.sleep(0)
 
         if frame % 200 == 0:
-            logger.info(f"debug:clock fps={clock.get_fps()}")
+            logger.info(f"debug:clock fps={clock.get_fps()} delta={delta}")
 
         frame += 1
 

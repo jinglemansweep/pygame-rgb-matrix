@@ -20,9 +20,7 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
     ):
         pygame.sprite.DirtySprite.__init__(self)
         self.rect = pygame.rect.Rect(*rect)
-        self.image = pygame.Surface(
-            (self.rect.width, self.rect.height), SRCALPHA
-        )
+        self.image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         pygame.font.init()
         self.font_date = pygame.font.SysFont(font_date, 20)
         self.font_time = pygame.font.SysFont(font_time, 42)
@@ -32,7 +30,7 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
         self.time_fmt = time_fmt
         self.sec_prev = None
 
-    def update(self, frame):
+    def update(self, frame, delta):
         super().update(frame)
         # Common updates
         now = datetime.now()
