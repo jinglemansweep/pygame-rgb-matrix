@@ -163,6 +163,7 @@ async def start_main_loop():
     background = BackgroundSprite(
         random.choice(background_images),
         (0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
+        (LED_COLS * 4, LED_ROWS * 4),
     )
     sprites = pygame.sprite.LayeredDirty(background=background)
     sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
@@ -172,7 +173,7 @@ async def start_main_loop():
         item_margin=8,
         scroll_speed=30,
     )
-    sprites.add(sprite_images)
+    # sprites.add(sprite_images)
 
     sprite_ticker = TickerWidgetSprite(
         (0, 38, LED_COLS * PANEL_COLS, 26),
