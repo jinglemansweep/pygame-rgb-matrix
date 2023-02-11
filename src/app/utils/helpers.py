@@ -7,7 +7,6 @@ import numpy as np
 import pygame
 import random
 from PIL import Image
-from pygameft import FTClient
 
 from app.config import (
     LED_ROWS,
@@ -22,28 +21,12 @@ from app.config import (
 
 LOG_FORMAT = "%(message)s"
 
-ft = FTClient(
-    FT_HOST,
-    FT_PORT,
-    width=LED_COLS * LED_CHAIN,
-    height=LED_ROWS * LED_PARALLEL,
-    layer=FT_LAYER,
-    transparent=FT_TRANSPARENT,
-    tile_width=LED_COLS * 2,
-    tile_height=LED_ROWS,
-)
-
 
 def setup_logger(debug=False):
 
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO, format=LOG_FORMAT
     )
-
-
-def render_pygameft(screen):
-    surface = parallelise_surface(screen)
-    ft.send_surface(surface)
 
 
 def parallelise_surface(surface):
@@ -53,20 +36,20 @@ def parallelise_surface(surface):
     # Blit first 4 panels to top row
     temp_surface.blit(
         surface,
-        (0, 0), # (0, 0)
-        (0, 0, LED_COLS * 4, LED_ROWS * 1), # (0, 0, 256, 64)
+        (0, 0),  # (0, 0)
+        (0, 0, LED_COLS * 4, LED_ROWS * 1),  # (0, 0, 256, 64)
     )
     # Blit next 4 panels to next row
     temp_surface.blit(
         surface,
-        (0, LED_ROWS * 1), # (0, 64)
-        (LED_COLS * 4, 0, LED_COLS * 4, LED_ROWS * 1), # (256, 0, 256, 64)
+        (0, LED_ROWS * 1),  # (0, 64)
+        (LED_COLS * 4, 0, LED_COLS * 4, LED_ROWS * 1),  # (256, 0, 256, 64)
     )
     # Blit next 4 panels to next row
     temp_surface.blit(
         surface,
-        (0, LED_ROWS * 2), # (0, 128)
-        (LED_COLS * 8, 0, LED_COLS * 4, LED_ROWS * 1), # (512, 0, 256, 64)
+        (0, LED_ROWS * 2),  # (0, 128)
+        (LED_COLS * 8, 0, LED_COLS * 4, LED_ROWS * 1),  # (512, 0, 256, 64)
     )
     return temp_surface
 

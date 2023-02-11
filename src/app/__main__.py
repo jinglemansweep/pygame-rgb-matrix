@@ -13,6 +13,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
 from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
+from pygameft import FTClient
 
 load_dotenv(find_dotenv())
 
@@ -27,6 +28,10 @@ from app.config import (
     LED_COLS,
     PANEL_ROWS,
     PANEL_COLS,
+    FT_HOST,
+    FT_PORT,
+    FT_LAYER,
+    FT_TRANSPARENT,
     RSS_URL,
     RSS_UPDATE_INTERVAL,
     MQTT_HOST,
@@ -47,7 +52,6 @@ from app.sprites.utils.images import glob_files, load_resize_image
 from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
 from app.utils.helpers import (
     get_rss_items,
-    render_pygameft,
     setup_logger,
 )
 
@@ -96,6 +100,16 @@ def _on_message(client, userdata, msg):
 
 mqtt.on_message = _on_message
 
+ft = FTClient(
+    FT_HOST,
+    FT_PORT,
+    width=LED_COLS * LED_CHAIN,
+    height=LED_ROWS * LED_PARALLEL,
+    layer=FT_LAYER,
+    transparent=FT_TRANSPARENT,
+    tile_width=LED_COLS * 2,
+    tile_height=LED_ROWS,
+)
 
 image_path = os.path.join("..", IMAGE_PATH)
 
@@ -221,8 +235,7 @@ async def start_main_loop():
         if GUI_ENABLED:
             pygame.display.update(update_rects)
 
-        render_pygameft(screen)
-
+        ft.send_surface(screen)
         await asyncio.sleep(0)
 
         if frame % 200 == 0:
