@@ -1,7 +1,5 @@
 import logging
 import pygame
-from datetime import datetime
-from pygame.locals import SRCALPHA
 
 from app.sprites.utils.images import load_resize_image, tile_image
 

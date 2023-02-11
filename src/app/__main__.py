@@ -12,7 +12,7 @@ import traceback
 from argparse import ArgumentParser
 from datetime import datetime
 from dotenv import load_dotenv, find_dotenv
-from pygame.locals import QUIT, DOUBLEBUF, RESIZABLE, SCALED
+from pygame import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 from pygameft import FTClient
 
 load_dotenv(find_dotenv())

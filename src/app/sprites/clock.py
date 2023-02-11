@@ -1,7 +1,7 @@
 import logging
 import pygame
 from datetime import datetime
-from pygame.locals import SRCALPHA
+from pygame import SRCALPHA
 
 
 logger = logging.getLogger("sprites.clock")
