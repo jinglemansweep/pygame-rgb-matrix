@@ -18,7 +18,7 @@ FT_LAYER = int(os.environ.get("FT_LAYER", 5))
 FT_TRANSPARENT = os.environ.get("FT_TRANSPARENT", "true").lower() == "true"
 FT_TILE_WIDTH = int(os.environ.get("FT_TILE_WIDTH", 64))
 FT_TILE_HEIGHT = int(os.environ.get("FT_TILE_HEIGHT", 64))
-FT_TILE_SIZE = (FT_TILE_WIDTH, FT_HEIGHT)
+FT_TILE_SIZE = (FT_TILE_WIDTH, FT_TILE_HEIGHT)
 
 MQTT_HOST = os.environ.get("MQTT_HOST")
 MQTT_PORT = int(os.environ.get("MQTT_PORT", 8883))
