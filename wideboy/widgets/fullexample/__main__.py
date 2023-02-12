@@ -73,6 +73,8 @@ running = True
 
 async def start_main_loop():
 
+    loop = asyncio.get_event_loop()
+
     if not BACKGROUND_IMAGE_FILENAME:
         images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
         image = random.choice(images)
@@ -100,7 +102,6 @@ async def start_main_loop():
     )
     sprites.add(sprite_clock)
 
-    loop = asyncio.get_event_loop()
     asyncio.create_task(
         update_ticker(loop, sprite_ticker, RSS_URL, TICKER_UPDATE_INTERVAL, True)
     )
