@@ -32,6 +32,18 @@ services:
       FT_TRANSPARENT: "true"
     command: "-m wideboy.widgets.ticker"
 
+  wideboy-tray:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    environment:
+      FT_POS_X: 0
+      FT_POS_Y: 168
+      FT_LAYER: 3
+      FT_TRANSPARENT: "true"
+    command: "-m wideboy.widgets.tray"
+
   wideboy-clock:
     build:
       context: .

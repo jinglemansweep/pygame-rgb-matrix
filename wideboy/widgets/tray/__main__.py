@@ -27,8 +27,7 @@ from wideboy.utils.pygame import (
     loop_debug,
     clock_tick,
 )
-from wideboy.widgets.ticker.sprites.ticker import TickerWidgetSprite
-from wideboy.widgets.ticker.utils import update_ticker, show_ticker
+from wideboy.widgets.tray.sprites.tray import TrayWidgetSprite
 
 # Widget Metadata
 
@@ -45,15 +44,9 @@ intro_debug(_WIDGET_NAME)
 
 # Configuration
 
-CANVAS_WIDTH = int(get_config_env_var("CANVAS_WIDTH", 64 * 8, _WIDGET_NAME))
-CANVAS_HEIGHT = int(get_config_env_var("CANVAS_HEIGHT", 24 * 1, _WIDGET_NAME))
+CANVAS_WIDTH = int(get_config_env_var("CANVAS_WIDTH", 64 * 2, _WIDGET_NAME))
+CANVAS_HEIGHT = int(get_config_env_var("CANVAS_HEIGHT", 26 * 1, _WIDGET_NAME))
 CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
-
-RSS_URL = get_config_env_var(
-    "RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml", _WIDGET_NAME
-)
-TICKER_UPDATE_INTERVAL = int(get_config_env_var("UPDATE_INTERVAL", 3600, _WIDGET_NAME))
-TICKER_DISPLAY_INTERVAL = int(get_config_env_var("DISPLAY_INTERVAL", 900, _WIDGET_NAME))
 
 logger.info(f"Canvas Size: {CANVAS_SIZE[0]}x{CANVAS_SIZE[1]}")
 
@@ -74,22 +67,14 @@ async def start_main_loop():
     loop = asyncio.get_event_loop()
 
     background = pygame.surface.Surface(CANVAS_SIZE)
-    background.fill((1, 1, 1, 255))
+    background.fill((64, 0, 64, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)
     sprites.set_clip((0, 0, *CANVAS_SIZE))
 
-    sprite_ticker = TickerWidgetSprite(
-        (0, 0, CANVAS_WIDTH, 26),
-        item_margin=100,
-        loop_count=3,
-        autorun=True,
+    sprite_tray = TrayWidgetSprite(
+        (0, 0, *CANVAS_SIZE),
     )
-    sprites.add(sprite_ticker)
-
-    asyncio.create_task(
-        update_ticker(loop, sprite_ticker, RSS_URL, TICKER_UPDATE_INTERVAL, True)
-    )
-    asyncio.create_task(show_ticker(sprite_ticker, TICKER_DISPLAY_INTERVAL, True))
+    sprites.add(sprite_tray)
 
     while running:
         for event in pygame.event.get():
