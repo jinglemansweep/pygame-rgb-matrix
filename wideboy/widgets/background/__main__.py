@@ -70,14 +70,16 @@ async def start_main_loop():
 
     loop = asyncio.get_event_loop()
 
+    sprites = pygame.sprite.LayeredDirty()
+    sprites.set_clip((0, 0, *CANVAS_SIZE))
+
     if not BACKGROUND_IMAGE_FILENAME:
         images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
         image = random.choice(images)
     else:
         image = BACKGROUND_IMAGE_FILENAME
     background = BackgroundSprite(image, (0, 0, *CANVAS_SIZE), (128, 128), CANVAS_SIZE)
-    sprites = pygame.sprite.LayeredDirty(background=background)
-    sprites.set_clip((0, 0, *CANVAS_SIZE))
+    sprites.add(background)
 
     while running:
         for event in pygame.event.get():
@@ -86,7 +88,7 @@ async def start_main_loop():
         frame, delta = clock_tick(clock)
 
         sprites.update(frame, delta)
-        sprites.clear(screen, background.image)
+        # sprites.clear(screen)
         update_rects = sprites.draw(screen)
 
         pygame.display.update(update_rects)

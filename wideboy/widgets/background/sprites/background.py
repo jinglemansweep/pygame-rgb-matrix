@@ -16,9 +16,18 @@ class BackgroundSprite(pygame.sprite.DirtySprite):
     ) -> None:
         pygame.sprite.DirtySprite.__init__(self)
         self.rect = pygame.rect.Rect(*rect)
+        self.fill_size = fill_size
         image = load_resize_image(filename, tile_size)
-        self.image = tile_surface(image, fill_size)
+        self.image_orig = self.image = tile_surface(image, self.fill_size)
         self.dirty = 2
 
     def update(self, frame: int, delta: float) -> None:
         pass
+        """
+        scale = 1 + ((frame % 10000) / 10000)
+        print(scale)
+        self.image = tile_surface(
+            pygame.transform.rotozoom(self.image_orig, 0, scale),
+            self.fill_size,
+        )
+        """
