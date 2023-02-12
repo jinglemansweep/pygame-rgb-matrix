@@ -13,7 +13,7 @@ from pygame import QUIT
 
 load_dotenv(find_dotenv())
 
-from wideboy.config import DEBUG, LED_ROWS, LED_COLS, PANEL_ROWS, PANEL_COLS, IMAGE_PATH
+from wideboy.config import DEBUG, LED_ROWS, LED_COLS, IMAGE_PATH
 
 from wideboy.utils.display import connect_flaschen_taschen
 from wideboy.utils.images import glob_files
@@ -44,6 +44,8 @@ logger = logging.getLogger(_APP_NAME)
 
 # Configuration
 
+CANVAS_WIDTH = int(os.environ.get("FULLEXAMPLE_CANVAS_WIDTH", LED_COLS * 12))
+CANVAS_HEIGHT = int(os.environ.get("FULLEXAMPLE_CANVAS_HEIGHT", LED_ROWS * 1))
 RSS_URL = os.environ.get(
     "FULLEXAMPLE_RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml"
 )
@@ -54,17 +56,14 @@ TICKER_DISPLAY_INTERVAL = int(
 
 # PyGame & Display
 
-ft = connect_flaschen_taschen((LED_COLS * 12, LED_ROWS * 1))
-clock, screen = setup_pygame(
-    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), _APP_DESCRIPTION
-)
+ft = connect_flaschen_taschen((LED_COLS * 4, LED_ROWS * 3))
+clock, screen = setup_pygame((CANVAS_WIDTH, CANVAS_HEIGHT), _APP_DESCRIPTION)
 
 # Initialisation
 
 logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
 logger.info(f"panel:size w={LED_COLS}px h={LED_ROWS}px")
-logger.info(f"wall:size: w={PANEL_COLS*LED_COLS}px h={PANEL_ROWS*LED_ROWS}px")
-logger.info(f"wall:layout w={PANEL_COLS} h={PANEL_ROWS}")
+logger.info(f"canvas:size: w={CANVAS_WIDTH}px h={CANVAS_HEIGHT}px")
 
 
 running = True
@@ -80,14 +79,14 @@ async def start_main_loop():
     background_images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
     background = BackgroundSprite(
         random.choice(background_images),
-        (0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS),
+        (0, 0, CANVAS_WIDTH, CANVAS_HEIGHT),
         (LED_COLS * 4, LED_ROWS * 4),
     )
     sprites = pygame.sprite.LayeredDirty(background=background)
-    sprites.set_clip((0, 0, LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS))
+    sprites.set_clip((0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
 
     sprite_ticker = TickerWidgetSprite(
-        (0, 38, LED_COLS * PANEL_COLS, 26),
+        (0, 38, CANVAS_WIDTH, 26),
         item_margin=100,
         loop_count=3,
         autorun=True,
@@ -95,7 +94,7 @@ async def start_main_loop():
     sprites.add(sprite_ticker)
 
     sprite_clock = ClockWidgetSprite(
-        (LED_COLS * (PANEL_COLS - 2), 0, LED_COLS * 2, LED_ROWS * PANEL_ROWS),
+        (CANVAS_WIDTH - 128, 0, 128, CANVAS_HEIGHT),
         color_bg=(128, 0, 0, 192),
     )
     sprites.add(sprite_clock)

@@ -8,10 +8,6 @@ from pygame import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 
 from wideboy.config import (
     PYGAME_FPS,
-    LED_ROWS,
-    LED_COLS,
-    PANEL_ROWS,
-    PANEL_COLS,
     PROFILING,
 )
 

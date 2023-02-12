@@ -10,8 +10,7 @@ PYGAME_BITS_PER_PIXEL = int(os.environ.get("PYGAME_BITS_PER_PIXEL", 16))
 
 LED_ROWS = int(os.environ.get("LED_ROWS", 64))  # 64
 LED_COLS = int(os.environ.get("LED_COLS", 64))  # 64
-PANEL_ROWS = int(os.environ.get("PANEL_ROWS", 1))
-PANEL_COLS = int(os.environ.get("PANEL_COLS", 1))
+
 
 FT_HOST = os.environ.get("FT_HOST", "localhost")
 FT_PORT = int(os.environ.get("FT_PORT", 1337))

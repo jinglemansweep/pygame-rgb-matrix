@@ -7,6 +7,8 @@ from wideboy.config import (
     FT_PORT,
     FT_LAYER,
     FT_TRANSPARENT,
+    FT_TILE_WIDTH,
+    FT_TILE_HEIGHT,
 )
 
 
@@ -18,6 +20,6 @@ def connect_flaschen_taschen(display_size):
         height=display_size[1],
         layer=FT_LAYER,
         transparent=FT_TRANSPARENT,
-        tile_width=LED_COLS * 2,
-        tile_height=LED_ROWS,
+        tile_width=FT_TILE_WIDTH,
+        tile_height=FT_TILE_HEIGHT,
     )
