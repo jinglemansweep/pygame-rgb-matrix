@@ -28,14 +28,13 @@ from wideboy.config import (
     TICKER_DISPLAY_INTERVAL,
 )
 
-
-from wideboy.sprites.background import BackgroundSprite
-from wideboy.sprites.clock import ClockWidgetSprite
-from wideboy.sprites.ticker import TickerWidgetSprite
 from wideboy.utils.display import connect_flaschen_taschen
 from wideboy.utils.images import glob_files
 from wideboy.utils.helpers import setup_logger
 from wideboy.utils.pygame import setup_pygame, handle_event, main_entrypoint, run_loop
+from wideboy.widgets.fullexample.sprites.background import BackgroundSprite
+from wideboy.widgets.fullexample.sprites.clock import ClockWidgetSprite
+from wideboy.widgets.fullexample.sprites.ticker import TickerWidgetSprite
 from wideboy.widgets.fullexample.utils import update_ticker, show_ticker
 
 _APP_NAME = "wideboy"
