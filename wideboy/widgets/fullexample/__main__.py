@@ -121,8 +121,6 @@ async def start_main_loop():
         ft.send_surface(screen)
 
         loop_debug(frame, clock, delta)
-
-        frame += 1
         await asyncio.sleep(0)
 
 
