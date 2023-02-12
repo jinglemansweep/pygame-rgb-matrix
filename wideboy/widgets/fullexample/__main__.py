@@ -9,7 +9,7 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-from wideboy.config import DEBUG, IMAGE_PATH, FT_WIDTH, FT_HEIGHT
+from wideboy.config import DEBUG, IMAGE_PATH, FT_SIZE
 
 from wideboy.utils.display import connect_flaschen_taschen
 from wideboy.utils.images import glob_files
@@ -42,6 +42,7 @@ logger = logging.getLogger(_APP_NAME)
 
 CANVAS_WIDTH = int(os.environ.get("FULLEXAMPLE_CANVAS_WIDTH", 64 * 12))
 CANVAS_HEIGHT = int(os.environ.get("FULLEXAMPLE_CANVAS_HEIGHT", 64 * 1))
+CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
 RSS_URL = os.environ.get(
     "FULLEXAMPLE_RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml"
 )
@@ -53,13 +54,13 @@ TICKER_DISPLAY_INTERVAL = int(
 # PyGame & Display
 
 ft = connect_flaschen_taschen()
-clock, screen = setup_pygame((CANVAS_WIDTH, CANVAS_HEIGHT), _APP_DESCRIPTION)
+clock, screen = setup_pygame(CANVAS_SIZE, _APP_DESCRIPTION)
 
 # Initialisation
 
 logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
-logger.info(f"ftpanel:size w={FT_WIDTH}px h={FT_HEIGHT}px")
-logger.info(f"canvas:size: w={CANVAS_WIDTH}px h={CANVAS_HEIGHT}px")
+logger.info(f"ftpanel:size w={FT_SIZE[0]}px h={FT_SIZE[1]}px")
+logger.info(f"canvas:size: w={CANVAS_SIZE[0]}px h={CANVAS_SIZE[1]}px")
 
 
 running = True
@@ -72,11 +73,11 @@ async def start_main_loop():
     background_images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
     background = BackgroundSprite(
         random.choice(background_images),
-        (0, 0, CANVAS_WIDTH, CANVAS_HEIGHT),
+        (0, 0, *CANVAS_SIZE),
         (128, 128),
     )
     sprites = pygame.sprite.LayeredDirty(background=background)
-    sprites.set_clip((0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
+    sprites.set_clip((0, 0, *CANVAS_SIZE))
 
     sprite_ticker = TickerWidgetSprite(
         (0, 38, CANVAS_WIDTH, 26),
@@ -87,7 +88,7 @@ async def start_main_loop():
     sprites.add(sprite_ticker)
 
     sprite_clock = ClockWidgetSprite(
-        (CANVAS_WIDTH - 128, 0, 128, CANVAS_HEIGHT),
+        (CANVAS_SIZE[0] - 128, 0, 128, CANVAS_SIZE[1]),
         color_bg=(128, 0, 0, 192),
     )
     sprites.add(sprite_clock)
