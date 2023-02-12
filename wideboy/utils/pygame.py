@@ -33,9 +33,6 @@ def handle_event(event: pygame.event.Event) -> None:
         sys.exit()
 
 
-function
-
-
 def main_entrypoint(main_func: Callable) -> None:
     if PROFILING in ["ncalls", "tottime"]:
         cProfile.run("main_func()", None, sort=PROFILING)
