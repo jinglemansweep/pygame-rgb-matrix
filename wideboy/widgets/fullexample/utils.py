@@ -29,7 +29,7 @@ async def update_ticker(
     for idx, item in enumerate(entries):
         content = html.unescape(item["title"])
         if DEBUG:
-            content = f"{idx}:{content[:15]}..."
+            content = f"({idx}) {content}"
         ticker.add_text_item(content)
     ticker.render_surface()
     logger.info(

@@ -16,7 +16,7 @@ FT_POS_Y = int(os.environ.get("FT_POS_Y", 0))
 FT_POS = (FT_POS_X, FT_POS_Y)
 FT_LAYER = int(os.environ.get("FT_LAYER", 5))
 FT_TRANSPARENT = os.environ.get("FT_TRANSPARENT", "true").lower() == "true"
-FT_TILE_WIDTH = int(os.environ.get("FT_TILE_WIDTH", 64))
+FT_TILE_WIDTH = int(os.environ.get("FT_TILE_WIDTH", 128))
 FT_TILE_HEIGHT = int(os.environ.get("FT_TILE_HEIGHT", 64))
 FT_TILE_SIZE = (FT_TILE_WIDTH, FT_TILE_HEIGHT)
 
