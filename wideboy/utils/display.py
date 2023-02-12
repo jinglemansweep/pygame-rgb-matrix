@@ -1,6 +1,7 @@
 from pygameft import FTClient
 
 from wideboy.config import (
+    DEBUG,
     FT_HOST,
     FT_PORT,
     FT_POS,
@@ -20,4 +21,5 @@ def connect_flaschen_taschen():
         layer=FT_LAYER,
         transparent=FT_TRANSPARENT,
         tile_size=FT_TILE_SIZE,
+        debug=DEBUG,
     )

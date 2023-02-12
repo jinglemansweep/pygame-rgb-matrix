@@ -12,8 +12,9 @@ load_dotenv(find_dotenv())
 from wideboy.config import DEBUG, IMAGE_PATH, FT_SIZE
 
 from wideboy.utils.display import connect_flaschen_taschen
+from wideboy.utils.helpers import intro_debug
 from wideboy.utils.images import glob_files
-from wideboy.utils.helpers import setup_logger
+from wideboy.utils.logger import setup_logger
 from wideboy.utils.pygame import (
     setup_pygame,
     handle_event,
@@ -51,17 +52,17 @@ TICKER_DISPLAY_INTERVAL = int(
     os.environ.get("FULLEXAMPLE_TICKER_DISPLAY_INTERVAL", 900)
 )
 
+# Startup
+
+intro_debug(_APP_DESCRIPTION, _APP_VERSION)
+logger.info(f"Canvas Size: {CANVAS_SIZE[0]}x{CANVAS_SIZE[1]}")
+
 # PyGame & Display
 
 ft = connect_flaschen_taschen()
 clock, screen = setup_pygame(CANVAS_SIZE, _APP_DESCRIPTION)
 
-# Initialisation
-
-logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
-logger.info(f"ftpanel:size w={FT_SIZE[0]}px h={FT_SIZE[1]}px")
-logger.info(f"canvas:size: w={CANVAS_SIZE[0]}px h={CANVAS_SIZE[1]}px")
-
+# Loop Setup
 
 running = True
 

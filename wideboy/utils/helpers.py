@@ -5,15 +5,15 @@ import logging
 import pygame
 import random
 
+from wideboy.config import DEBUG, FT_SIZE
 
-LOG_FORMAT = "%(message)s"
+logger = logging.getLogger(__name__)
 
 
-def setup_logger(debug=False):
-
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO, format=LOG_FORMAT
-    )
+def intro_debug(description, version):
+    logger.info(f"{description} v{version}")
+    logger.info(f"Debug: {DEBUG}")
+    logger.info(f"FT Panel Size: {FT_SIZE[0]}x{FT_SIZE[1]}")
 
 
 def random_color():
