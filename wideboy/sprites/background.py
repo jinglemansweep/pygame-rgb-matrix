@@ -1,7 +1,7 @@
 import logging
 import pygame
 
-from wideboy.sprites.utils.images import load_resize_image, tile_image
+from wideboy.utils.images import load_resize_image, tile_image
 
 logger = logging.getLogger("sprites.background")
 

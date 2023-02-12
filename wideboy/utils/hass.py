@@ -174,3 +174,18 @@ def _message_to_hass(message, entity):
         return dict(text=message)
     else:
         return json.loads(str(message))
+
+
+def hass_to_color(rgb_dict, brightness=255):
+    color = [
+        rgb_dict.get("r") * (brightness / 255),
+        rgb_dict.get("g") * (brightness / 255),
+        rgb_dict.get("b") * (brightness / 255),
+    ]
+    return tuple(color)
+
+
+def hass_to_visible(control, master):
+    if not master:
+        return 0
+    return 1 if control else 0

@@ -1,11 +1,11 @@
 services:
-  wideboy-ticker:
+  wideboy-fullexample:
     build:
       context: .
     env_file:
       - ./.env
     environment:
       SDL_VIDEODRIVER: dummy
-    command: "-m wideboy.widgets.ticker"
+    command: "-m wideboy.widgets.fullexample"
 
     

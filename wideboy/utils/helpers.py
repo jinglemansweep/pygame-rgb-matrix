@@ -3,20 +3,15 @@ import asyncio
 import async_timeout
 import feedparser
 import logging
-import numpy as np
 import pygame
 import random
-from PIL import Image
+
 
 from wideboy.config import (
     LED_ROWS,
     LED_COLS,
     LED_CHAIN,
     LED_PARALLEL,
-    FT_HOST,
-    FT_PORT,
-    FT_LAYER,
-    FT_TRANSPARENT,
 )
 
 LOG_FORMAT = "%(message)s"
@@ -70,21 +65,6 @@ async def get_rss_items(loop, url):
         html = await async_fetch(session, url)
         feed = feedparser.parse(html)
     return feed
-
-
-def hass_to_color(rgb_dict, brightness=255):
-    color = [
-        rgb_dict.get("r") * (brightness / 255),
-        rgb_dict.get("g") * (brightness / 255),
-        rgb_dict.get("b") * (brightness / 255),
-    ]
-    return tuple(color)
-
-
-def hass_to_visible(control, master):
-    if not master:
-        return 0
-    return 1 if control else 0
 
 
 class JoyPad:
