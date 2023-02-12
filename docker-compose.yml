@@ -1,7 +1,8 @@
 services:
-  test:
+  wideboy-ticker:
     build:
       context: .
     env_file:
       - ./.env
-      
+
+    

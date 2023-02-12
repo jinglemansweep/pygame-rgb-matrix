@@ -3,7 +3,12 @@ FROM ubuntu:latest
 ARG user="user"
 ARG uid="1001"
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
+ENV DEBUG="false"
+ENV PROFILING=""
+ENV SDL_VIDEODRIVER="dummy"
+ENV PYGAME_FPS=60
+ENV PYGAME_BITS_PER_PIXEL=16
 
 RUN apt-get -y update && \
     apt-get -y install \
