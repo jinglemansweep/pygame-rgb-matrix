@@ -50,7 +50,7 @@ CANVAS_WIDTH = int(get_config_env_var("CANVAS_WIDTH", 64 * 12, _WIDGET_NAME))
 CANVAS_HEIGHT = int(get_config_env_var("CANVAS_HEIGHT", 64 * 1, _WIDGET_NAME))
 CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
 
-BACKGROUND_IMAGE_FILENAME = get_config_env_var("BACKGROUND_IMAGE", None, _WIDGET_NAME)
+BACKGROUND_IMAGE_FILENAME = get_config_env_var("IMAGE", None, _WIDGET_NAME)
 
 logger.info(f"Canvas Size: {CANVAS_SIZE[0]}x{CANVAS_SIZE[1]}")
 

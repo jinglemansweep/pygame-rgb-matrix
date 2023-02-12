@@ -52,12 +52,8 @@ CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
 RSS_URL = get_config_env_var(
     "RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml", _WIDGET_NAME
 )
-TICKER_UPDATE_INTERVAL = int(
-    get_config_env_var("TICKER_UPDATE_INTERVAL", 3600, _WIDGET_NAME)
-)
-TICKER_DISPLAY_INTERVAL = int(
-    get_config_env_var("TICKER_DISPLAY_INTERVAL", 900, _WIDGET_NAME)
-)
+TICKER_UPDATE_INTERVAL = int(get_config_env_var("UPDATE_INTERVAL", 3600, _WIDGET_NAME))
+TICKER_DISPLAY_INTERVAL = int(get_config_env_var("DISPLAY_INTERVAL", 900, _WIDGET_NAME))
 
 logger.info(f"Canvas Size: {CANVAS_SIZE[0]}x{CANVAS_SIZE[1]}")
 
