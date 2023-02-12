@@ -1,8 +1,6 @@
 from pygameft import FTClient
 
 from wideboy.config import (
-    LED_CHAIN,
-    LED_PARALLEL,
     LED_ROWS,
     LED_COLS,
     FT_HOST,
@@ -12,12 +10,12 @@ from wideboy.config import (
 )
 
 
-def connect_flaschen_taschen():
+def connect_flaschen_taschen(display_size):
     return FTClient(
         FT_HOST,
         FT_PORT,
-        width=LED_COLS * LED_CHAIN,
-        height=LED_ROWS * LED_PARALLEL,
+        width=display_size[0],
+        height=display_size[1],
         layer=FT_LAYER,
         transparent=FT_TRANSPARENT,
         tile_width=LED_COLS * 2,

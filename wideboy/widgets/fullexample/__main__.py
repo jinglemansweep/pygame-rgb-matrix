@@ -13,51 +13,64 @@ from pygame import QUIT
 
 load_dotenv(find_dotenv())
 
-from wideboy.config import (
-    DEBUG,
-    PYGAME_FPS,
-    LED_CHAIN,
-    LED_PARALLEL,
-    LED_ROWS,
-    LED_COLS,
-    PANEL_ROWS,
-    PANEL_COLS,
-    RSS_URL,
-    RSS_UPDATE_INTERVAL,
-    IMAGE_PATH,
-    TICKER_DISPLAY_INTERVAL,
-)
+from wideboy.config import DEBUG, LED_ROWS, LED_COLS, PANEL_ROWS, PANEL_COLS, IMAGE_PATH
 
 from wideboy.utils.display import connect_flaschen_taschen
 from wideboy.utils.images import glob_files
 from wideboy.utils.helpers import setup_logger
-from wideboy.utils.pygame import setup_pygame, handle_event, main_entrypoint, run_loop
+from wideboy.utils.pygame import (
+    setup_pygame,
+    handle_event,
+    main_entrypoint,
+    run_loop,
+    loop_debug,
+    clock_tick,
+)
 from wideboy.widgets.fullexample.sprites.background import BackgroundSprite
 from wideboy.widgets.fullexample.sprites.clock import ClockWidgetSprite
 from wideboy.widgets.fullexample.sprites.ticker import TickerWidgetSprite
 from wideboy.widgets.fullexample.utils import update_ticker, show_ticker
 
+# Widget Metadata
+
 _APP_NAME = "wideboy"
 _APP_DESCRIPTION = "WideBoy RGB Matrix Platform"
 _APP_VERSION = "0.0.1"
 
+# Logging
+
 setup_logger(debug=DEBUG)
 logger = logging.getLogger(_APP_NAME)
 
-ft = connect_flaschen_taschen()
-clock, screen = setup_pygame(_APP_DESCRIPTION)
+# Configuration
+
+RSS_URL = os.environ.get(
+    "FULLEXAMPLE_RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml"
+)
+TICKER_UPDATE_INTERVAL = int(os.environ.get("FULLEXAMPLE_TICKER_UPDATE_INTERVAL", 3600))
+TICKER_DISPLAY_INTERVAL = int(
+    os.environ.get("FULLEXAMPLE_TICKER_DISPLAY_INTERVAL", 900)
+)
+
+# PyGame & Display
+
+ft = connect_flaschen_taschen((LED_COLS * 12, LED_ROWS * 1))
+clock, screen = setup_pygame(
+    (LED_COLS * PANEL_COLS, LED_ROWS * PANEL_ROWS), _APP_DESCRIPTION
+)
+
+# Initialisation
 
 logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
 logger.info(f"panel:size w={LED_COLS}px h={LED_ROWS}px")
 logger.info(f"wall:size: w={PANEL_COLS*LED_COLS}px h={PANEL_ROWS*LED_ROWS}px")
 logger.info(f"wall:layout w={PANEL_COLS} h={PANEL_ROWS}")
-logger.info(
-    f"gui:size w={LED_COLS*LED_CHAIN}px h={LED_ROWS*LED_PARALLEL}px",
-)
 
 
 running = True
 frame = 0
+
+# Main Loop
 
 
 async def start_main_loop():
@@ -89,7 +102,7 @@ async def start_main_loop():
 
     loop = asyncio.get_event_loop()
     asyncio.create_task(
-        update_ticker(loop, sprite_ticker, RSS_URL, RSS_UPDATE_INTERVAL, True)
+        update_ticker(loop, sprite_ticker, RSS_URL, TICKER_UPDATE_INTERVAL, True)
     )
     asyncio.create_task(show_ticker(sprite_ticker, TICKER_DISPLAY_INTERVAL, True))
 
@@ -97,7 +110,7 @@ async def start_main_loop():
         for event in pygame.event.get():
             handle_event(event)
 
-        delta = clock.tick(PYGAME_FPS) / 1000
+        delta = clock_tick(clock)
 
         sprites.update(frame, delta)
         sprites.clear(screen, background.image)
@@ -106,12 +119,13 @@ async def start_main_loop():
         pygame.display.update(update_rects)
         ft.send_surface(screen)
 
-        if frame % 200 == 0:
-            logger.info(f"debug:clock fps={clock.get_fps()} delta={delta}")
+        loop_debug(frame, clock, delta)
 
         frame += 1
         await asyncio.sleep(0)
 
+
+# Entrypoint
 
 if __name__ == "__main__":
     main_entrypoint(run_loop(start_main_loop))
