@@ -1,14 +1,10 @@
 import asyncio
-import cProfile
 import logging
 import os
 import pygame
 import pygame.pkgdata
 import random
-import sys
-import traceback
 from dotenv import load_dotenv, find_dotenv
-from pygame import QUIT
 
 
 load_dotenv(find_dotenv())
@@ -67,14 +63,11 @@ logger.info(f"canvas:size: w={CANVAS_WIDTH}px h={CANVAS_HEIGHT}px")
 
 
 running = True
-frame = 0
 
 # Main Loop
 
 
 async def start_main_loop():
-
-    global frame
 
     background_images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
     background = BackgroundSprite(
@@ -109,7 +102,7 @@ async def start_main_loop():
         for event in pygame.event.get():
             handle_event(event)
 
-        delta = clock_tick(clock)
+        frame, delta = clock_tick(clock)
 
         sprites.update(frame, delta)
         sprites.clear(screen, background.image)

@@ -13,6 +13,8 @@ from wideboy.config import (
 
 logger = logging.getLogger(__name__)
 
+frame = 0
+
 
 def setup_pygame(display_size, caption):
 
@@ -45,8 +47,11 @@ def run_loop(loop_func):
 
 def loop_debug(frame, clock, delta, every=200):
     if frame % every == 0:
-        logger.info(f"debug:clock fps={clock.get_fps()} delta={delta}")
+        logger.info(f"debug:loop frame={frame} fps={clock.get_fps()} delta={delta}")
 
 
 def clock_tick(clock):
-    return clock.tick(PYGAME_FPS) / 1000
+    global frame
+    delta = clock.tick(PYGAME_FPS) / 1000
+    frame += 1
+    return frame, delta
