@@ -4,5 +4,7 @@ services:
       context: .
     env_file:
       - ./.env
+    environment:
+      SDL_VIDEODRIVER: dummy
 
     

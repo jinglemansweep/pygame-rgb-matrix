@@ -35,4 +35,4 @@ RUN python -m venv ./venv && \
 USER ${user}
 COPY . .
 
-ENTRYPOINT ["/bin/bash", "/opt/workspace/docker-entrypoint.sh"]
+ENTRYPOINT ["/opt/workspace/venv/bin/python", "-m", "wideboy"]
