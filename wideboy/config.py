@@ -4,9 +4,7 @@ import os
 
 DEBUG = os.environ.get("DEBUG", "false") == "true"
 PROFILING = os.environ.get("PROFILING", "")
-
 PYGAME_FPS = int(os.environ.get("PYGAME_FPS", 60))
-PYGAME_BITS_PER_PIXEL = int(os.environ.get("PYGAME_BITS_PER_PIXEL", 16))
 
 FT_HOST = os.environ.get("FT_HOST", "localhost")
 FT_PORT = int(os.environ.get("FT_PORT", 1337))

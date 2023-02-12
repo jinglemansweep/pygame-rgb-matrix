@@ -13,7 +13,7 @@ from pygame import QUIT
 
 load_dotenv(find_dotenv())
 
-from wideboy.config import DEBUG, LED_ROWS, LED_COLS, IMAGE_PATH
+from wideboy.config import DEBUG, IMAGE_PATH, FT_WIDTH, FT_HEIGHT
 
 from wideboy.utils.display import connect_flaschen_taschen
 from wideboy.utils.images import glob_files
@@ -62,7 +62,7 @@ clock, screen = setup_pygame((CANVAS_WIDTH, CANVAS_HEIGHT), _APP_DESCRIPTION)
 # Initialisation
 
 logger.info(f"{_APP_DESCRIPTION} v{_APP_VERSION}")
-logger.info(f"panel:size w={LED_COLS}px h={LED_ROWS}px")
+logger.info(f"ftpanel:size w={FT_WIDTH}px h={FT_HEIGHT}px")
 logger.info(f"canvas:size: w={CANVAS_WIDTH}px h={CANVAS_HEIGHT}px")
 
 
@@ -80,7 +80,7 @@ async def start_main_loop():
     background = BackgroundSprite(
         random.choice(background_images),
         (0, 0, CANVAS_WIDTH, CANVAS_HEIGHT),
-        (LED_COLS * 4, LED_ROWS * 4),
+        (128, 128),
     )
     sprites = pygame.sprite.LayeredDirty(background=background)
     sprites.set_clip((0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
