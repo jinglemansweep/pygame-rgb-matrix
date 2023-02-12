@@ -6,13 +6,15 @@ from pygame import SRCALPHA
 
 logger = logging.getLogger("sprites.clock")
 
+# ['bitstreamverasansmono', 'bitstreamverasans', 'anonymousprominus', 'anonymouspro', 'bitstreamveraserif']
+
 
 class ClockWidgetSprite(pygame.sprite.DirtySprite):
     def __init__(
         self,
         rect,
-        font_date="arial",
-        font_time="impact",
+        font_date="bitstreamverasans",
+        font_time="bitstreamverasans",
         color_bg=(0, 0, 0),
         color_fg=(255, 255, 255),
         antialias=True,
@@ -23,7 +25,7 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
         self.image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         pygame.font.init()
         self.font_date = pygame.font.SysFont(font_date, 20)
-        self.font_time = pygame.font.SysFont(font_time, 42)
+        self.font_time = pygame.font.SysFont(font_time, 36, True)
         self.color_bg = color_bg
         self.color_fg = color_fg
         self.antialias = antialias

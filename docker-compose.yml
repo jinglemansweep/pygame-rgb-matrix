@@ -1,0 +1,7 @@
+services:
+  test:
+    build:
+      context: .
+    env_file:
+      - ./.env
+      
