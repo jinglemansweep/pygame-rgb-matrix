@@ -4,8 +4,43 @@ services:
       context: .
     env_file:
       - ./.env
-    environment:
-      SDL_VIDEODRIVER: dummy
-    command: "-m wideboy.widgets.fullexample"
+    # DISABLED: command: "-m wideboy.widgets.fullexample"
+    command: /bin/true
 
-    
+  wideboy-background:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    environment:
+      PYGAME_FPS: 1
+      FT_POS_X: 0
+      FT_POS_Y: 0
+      FT_LAYER: 1
+      FT_TRANSPARENT: "false"
+    command: "-m wideboy.widgets.background"
+
+  wideboy-ticker:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    environment:
+      FT_POS_X: 0
+      FT_POS_Y: 0
+      FT_LAYER: 2
+      FT_TRANSPARENT: "true"
+    command: "-m wideboy.widgets.ticker"
+
+  wideboy-clock:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    environment:
+      PYGAME_FPS: 1
+      FT_POS_X: 128
+      FT_POS_Y: 128
+      FT_LAYER: 5
+      FT_TRANSPARENT: "false"
+    command: "-m wideboy.widgets.clock"
