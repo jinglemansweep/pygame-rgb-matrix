@@ -35,4 +35,4 @@ RUN python -m venv ./venv && \
 USER ${user}
 COPY . .
 
-ENTRYPOINT ["/opt/workspace/venv/bin/python", "-m", "wideboy"]
+ENTRYPOINT ["/opt/workspace/venv/bin/python"]

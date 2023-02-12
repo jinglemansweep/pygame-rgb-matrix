@@ -6,5 +6,6 @@ services:
       - ./.env
     environment:
       SDL_VIDEODRIVER: dummy
+    command: "-m wideboy.widgets.ticker"
 
     
