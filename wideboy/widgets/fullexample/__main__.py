@@ -44,6 +44,8 @@ logger = logging.getLogger(_APP_NAME)
 CANVAS_WIDTH = int(os.environ.get("FULLEXAMPLE_CANVAS_WIDTH", 64 * 12))
 CANVAS_HEIGHT = int(os.environ.get("FULLEXAMPLE_CANVAS_HEIGHT", 64 * 1))
 CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
+
+BACKGROUND_IMAGE_FILENAME = os.environ.get("FULLEXAMPLE_BACKGROUND_IMAGE")
 RSS_URL = os.environ.get(
     "FULLEXAMPLE_RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml"
 )
@@ -71,9 +73,13 @@ running = True
 
 async def start_main_loop():
 
-    background_images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
+    if not BACKGROUND_IMAGE_FILENAME:
+        images = glob_files(os.path.join(IMAGE_PATH, "backgrounds"), "*.png")
+        image = random.choice(images)
+    else:
+        image = BACKGROUND_IMAGE_FILENAME
     background = BackgroundSprite(
-        random.choice(background_images),
+        image,
         (0, 0, *CANVAS_SIZE),
         (128, 128),
     )
