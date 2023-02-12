@@ -3,7 +3,7 @@ import logging
 
 from pygame.locals import SRCALPHA
 
-from app.sprites.utils.images import load_resize_image
+from wideboy.sprites.utils.images import load_resize_image
 
 logger = logging.getLogger("sprites.ticker")
 

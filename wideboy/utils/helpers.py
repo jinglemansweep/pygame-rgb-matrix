@@ -8,7 +8,7 @@ import pygame
 import random
 from PIL import Image
 
-from app.config import (
+from wideboy.config import (
     LED_ROWS,
     LED_COLS,
     LED_CHAIN,

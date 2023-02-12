@@ -17,7 +17,7 @@ from pygameft import FTClient
 
 load_dotenv(find_dotenv())
 
-from app.config import (
+from wideboy.config import (
     DEBUG,
     PROFILING,
     GUI_ENABLED,
@@ -44,13 +44,13 @@ from app.config import (
 )
 
 
-from app.sprites.background import BackgroundSprite
-from app.sprites.clock import ClockWidgetSprite
-from app.sprites.ticker import TickerWidgetSprite
-from app.sprites.utils.images import glob_files, load_resize_image
+from wideboy.sprites.background import BackgroundSprite
+from wideboy.sprites.clock import ClockWidgetSprite
+from wideboy.sprites.ticker import TickerWidgetSprite
+from wideboy.sprites.utils.images import glob_files, load_resize_image
 
-from app.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
-from app.utils.helpers import (
+from wideboy.utils.hass import HASSManager, setup_mqtt_client, OPTS_LIGHT_RGB
+from wideboy.utils.helpers import (
     get_rss_items,
     setup_logger,
 )
@@ -111,7 +111,7 @@ ft = FTClient(
     tile_height=LED_ROWS,
 )
 
-image_path = os.path.join("..", IMAGE_PATH)
+image_path = IMAGE_PATH
 
 pygame.init()
 clock = pygame.time.Clock()
