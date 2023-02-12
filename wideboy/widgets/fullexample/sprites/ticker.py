@@ -44,7 +44,7 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         if self.autorun:
             self.run()
 
-    def run(self, reset_position=True, reset_loop=True):
+    def run(self, reset_position: bool = True, reset_loop: bool = True) -> None:
         if reset_position:
             self.reset_position()
         if reset_loop:
@@ -52,16 +52,23 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         self.next_loop(True)
         self.running = True
 
-    def stop(self, now=False):
+    def stop(self, now: bool = False) -> None:
         self.repeat = False
         self.running = not now
 
-    def clear_items(self):
+    def clear_items(self) -> None:
         logger.debug(f"sprite:ticker:clear_items")
         self.items = list()
         self.item_surfaces = list()
 
-    def add_text_item(self, text, font=None, size=None, color=None, antialias=None):
+    def add_text_item(
+        self,
+        text: str,
+        font: pygame.font.SysFont = None,
+        size: int = None,
+        color: pygame.Color = None,
+        antialias: bool = None,
+    ) -> None:
         font = font or self.text_font
         size = size or self.text_size
         color = color or self.text_color
@@ -81,13 +88,13 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         temp_surface.blit(text_surface, (1, 1))
         self.item_surfaces.append(temp_surface)
 
-    def add_image_item(self, filename, size):
+    def add_image_item(self, filename: str, size: tuple[int, int]) -> None:
         self.item_surfaces.append(load_resize_image(filename, size))
 
-    def reset_position(self):
+    def reset_position(self) -> None:
         self.x = self.rect.width
 
-    def render_surface(self):
+    def render_surface(self) -> None:
         surface_width = 0
         for item_surface in self.item_surfaces:
             surface_width += self._get_surface_width(item_surface)
@@ -104,10 +111,10 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         self.image = sprite_surface
         self.reset_position()
 
-    def _get_surface_width(self, surface):
+    def _get_surface_width(self, surface: pygame.Surface) -> int:
         return surface.get_rect().width + self.item_margin
 
-    def next_loop(self, run_now=False):
+    def next_loop(self, run_now: bool = False):
         if run_now or self.x < 0 - self.image.get_rect().width:
             if self.loop_count == 0 or self.loop_idx < self.loop_count:
                 self.loop_idx += 1
@@ -116,7 +123,7 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
                 )
                 self.reset_position()
 
-    def update(self, frame, delta):
+    def update(self, frame: int, delta: float):
         super().update()
         if self.running:
             self.x -= self.scroll_speed * delta

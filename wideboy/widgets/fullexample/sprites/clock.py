@@ -32,7 +32,7 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
         self.time_fmt = time_fmt
         self.sec_prev = None
 
-    def update(self, frame, delta):
+    def update(self, frame: str, delta: float):
         super().update(frame)
         # Common updates
         now = datetime.now()

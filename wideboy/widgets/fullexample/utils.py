@@ -4,12 +4,19 @@ import logging
 from datetime import datetime
 
 from wideboy.utils.helpers import get_rss_items
+from wideboy.widgets.fullexample.sprites.ticker import TickerWidgetSprite
 from wideboy.config import DEBUG
 
 logger = logging.getLogger(__name__)
 
 
-async def update_ticker(loop, ticker, url, interval, update_now=False):
+async def update_ticker(
+    loop: asyncio.AbstractEventLoop,
+    ticker: TickerWidgetSprite,
+    url: str,
+    interval: int,
+    update_now: bool = False,
+) -> None:
     if not update_now:
         await asyncio.sleep(interval)
     feed = await get_rss_items(loop, url)
@@ -31,7 +38,9 @@ async def update_ticker(loop, ticker, url, interval, update_now=False):
     asyncio.create_task(update_ticker(loop, ticker, url, interval, False))
 
 
-async def show_ticker(ticker, interval, show_now=False):
+async def show_ticker(
+    ticker: TickerWidgetSprite, interval: int, show_now: bool = False
+):
     if not show_now:
         await asyncio.sleep(interval)
     logger.info(f"ticker:show interval={interval}")

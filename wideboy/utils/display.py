@@ -1,4 +1,4 @@
-from pygameft import FTClient
+from pygameft import FTClient  # type: ignore
 
 from wideboy.config import (
     DEBUG,
@@ -12,7 +12,7 @@ from wideboy.config import (
 )
 
 
-def connect_flaschen_taschen():
+def connect_flaschen_taschen() -> FTClient:
     return FTClient(
         FT_HOST,
         FT_PORT,
