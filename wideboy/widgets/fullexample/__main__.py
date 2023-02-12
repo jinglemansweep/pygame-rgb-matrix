@@ -44,8 +44,8 @@ logger = logging.getLogger(_APP_NAME)
 
 # Configuration
 
-CANVAS_WIDTH = int(os.environ.get("FULLEXAMPLE_CANVAS_WIDTH", LED_COLS * 12))
-CANVAS_HEIGHT = int(os.environ.get("FULLEXAMPLE_CANVAS_HEIGHT", LED_ROWS * 1))
+CANVAS_WIDTH = int(os.environ.get("FULLEXAMPLE_CANVAS_WIDTH", 64 * 12))
+CANVAS_HEIGHT = int(os.environ.get("FULLEXAMPLE_CANVAS_HEIGHT", 64 * 1))
 RSS_URL = os.environ.get(
     "FULLEXAMPLE_RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml"
 )
@@ -56,7 +56,7 @@ TICKER_DISPLAY_INTERVAL = int(
 
 # PyGame & Display
 
-ft = connect_flaschen_taschen((LED_COLS * 4, LED_ROWS * 3))
+ft = connect_flaschen_taschen()
 clock, screen = setup_pygame((CANVAS_WIDTH, CANVAS_HEIGHT), _APP_DESCRIPTION)
 
 # Initialisation

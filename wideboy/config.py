@@ -8,12 +8,10 @@ PROFILING = os.environ.get("PROFILING", "")
 PYGAME_FPS = int(os.environ.get("PYGAME_FPS", 60))
 PYGAME_BITS_PER_PIXEL = int(os.environ.get("PYGAME_BITS_PER_PIXEL", 16))
 
-LED_ROWS = int(os.environ.get("LED_ROWS", 64))  # 64
-LED_COLS = int(os.environ.get("LED_COLS", 64))  # 64
-
-
 FT_HOST = os.environ.get("FT_HOST", "localhost")
 FT_PORT = int(os.environ.get("FT_PORT", 1337))
+FT_WIDTH = int(os.environ.get("FT_WIDTH", 256))
+FT_HEIGHT = int(os.environ.get("FT_HEIGHT", 192))
 FT_POS_X = int(os.environ.get("FT_POS_X", 0))
 FT_POS_Y = int(os.environ.get("FT_POS_Y", 0))
 FT_LAYER = int(os.environ.get("FT_LAYER", 5))
