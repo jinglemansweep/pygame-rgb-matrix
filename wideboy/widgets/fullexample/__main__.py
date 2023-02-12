@@ -9,10 +9,14 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
+from wideboy import _APP_NAME
 from wideboy.config import DEBUG, IMAGE_PATH, FT_SIZE
-
 from wideboy.utils.display import connect_flaschen_taschen
-from wideboy.utils.helpers import intro_debug
+from wideboy.utils.helpers import (
+    intro_debug,
+    get_widget_name_from_path,
+    get_config_env_var,
+)
 from wideboy.utils.images import glob_files
 from wideboy.utils.logger import setup_logger
 from wideboy.utils.pygame import (
@@ -30,39 +34,40 @@ from wideboy.widgets.fullexample.utils import update_ticker, show_ticker
 
 # Widget Metadata
 
-_APP_NAME = "wideboy"
-_APP_DESCRIPTION = "WideBoy RGB Matrix Platform"
-_APP_VERSION = "0.0.1"
+_WIDGET_NAME = get_widget_name_from_path(__file__)
 
 # Logging
 
 setup_logger(debug=DEBUG)
 logger = logging.getLogger(_APP_NAME)
 
-# Configuration
-
-CANVAS_WIDTH = int(os.environ.get("FULLEXAMPLE_CANVAS_WIDTH", 64 * 12))
-CANVAS_HEIGHT = int(os.environ.get("FULLEXAMPLE_CANVAS_HEIGHT", 64 * 1))
-CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
-
-BACKGROUND_IMAGE_FILENAME = os.environ.get("FULLEXAMPLE_BACKGROUND_IMAGE")
-RSS_URL = os.environ.get(
-    "FULLEXAMPLE_RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml"
-)
-TICKER_UPDATE_INTERVAL = int(os.environ.get("FULLEXAMPLE_TICKER_UPDATE_INTERVAL", 3600))
-TICKER_DISPLAY_INTERVAL = int(
-    os.environ.get("FULLEXAMPLE_TICKER_DISPLAY_INTERVAL", 900)
-)
-
 # Startup
 
-intro_debug(_APP_DESCRIPTION, _APP_VERSION)
+intro_debug(_WIDGET_NAME)
+
+# Configuration
+
+CANVAS_WIDTH = int(get_config_env_var("CANVAS_WIDTH", 64 * 12, _WIDGET_NAME))
+CANVAS_HEIGHT = int(get_config_env_var("CANVAS_HEIGHT", 64 * 1, _WIDGET_NAME))
+CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
+
+BACKGROUND_IMAGE_FILENAME = get_config_env_var("BACKGROUND_IMAGE", None, _WIDGET_NAME)
+RSS_URL = get_config_env_var(
+    "RSS_URL", "https://feeds.skynews.com/feeds/rss/home.xml", _WIDGET_NAME
+)
+TICKER_UPDATE_INTERVAL = int(
+    get_config_env_var("TICKER_UPDATE_INTERVAL", 3600, _WIDGET_NAME)
+)
+TICKER_DISPLAY_INTERVAL = int(
+    get_config_env_var("TICKER_DISPLAY_INTERVAL", 900, _WIDGET_NAME)
+)
+
 logger.info(f"Canvas Size: {CANVAS_SIZE[0]}x{CANVAS_SIZE[1]}")
 
 # PyGame & Display
 
 ft = connect_flaschen_taschen()
-clock, screen = setup_pygame(CANVAS_SIZE, _APP_DESCRIPTION)
+clock, screen = setup_pygame(CANVAS_SIZE)
 
 # Loop Setup
 

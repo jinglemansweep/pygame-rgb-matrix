@@ -7,6 +7,7 @@ import traceback
 from pygame import QUIT, DOUBLEBUF, RESIZABLE, SCALED
 from typing import Callable
 
+from wideboy import _APP_DESCRIPTION
 from wideboy.config import (
     PYGAME_FPS,
     PROFILING,
@@ -18,12 +19,12 @@ frame = 0
 
 
 def setup_pygame(
-    display_size: tuple[int, int], caption: str
+    display_size: tuple[int, int]
 ) -> tuple[pygame.time.Clock, pygame.surface.Surface]:
 
     pygame.init()
     clock = pygame.time.Clock()
-    pygame.display.set_caption(caption)
+    pygame.display.set_caption(_APP_DESCRIPTION)
     screen = pygame.display.set_mode(display_size, RESIZABLE | SCALED | DOUBLEBUF)
     return clock, screen
 
