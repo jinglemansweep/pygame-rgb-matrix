@@ -13,7 +13,7 @@ services:
     env_file:
       - ./.env
     environment:
-      PYGAME_FPS: 1
+      PYGAME_FPS: 10
       FT_POS_X: 0
       FT_POS_Y: 0
       FT_LAYER: 1
@@ -27,7 +27,7 @@ services:
       - ./.env
     environment:
       FT_POS_X: 0
-      FT_POS_Y: 0
+      FT_POS_Y: 40
       FT_LAYER: 2
       FT_TRANSPARENT: "true"
     command: "-m wideboy.widgets.ticker"
@@ -38,7 +38,7 @@ services:
     env_file:
       - ./.env
     environment:
-      PYGAME_FPS: 1
+      PYGAME_FPS: 10
       FT_POS_X: 128
       FT_POS_Y: 128
       FT_LAYER: 5

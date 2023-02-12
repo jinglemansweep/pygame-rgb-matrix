@@ -46,7 +46,7 @@ intro_debug(_WIDGET_NAME)
 # Configuration
 
 CANVAS_WIDTH = int(get_config_env_var("CANVAS_WIDTH", 64 * 12, _WIDGET_NAME))
-CANVAS_HEIGHT = int(get_config_env_var("CANVAS_HEIGHT", 64 * 1, _WIDGET_NAME))
+CANVAS_HEIGHT = int(get_config_env_var("CANVAS_HEIGHT", 24 * 1, _WIDGET_NAME))
 CANVAS_SIZE = (CANVAS_WIDTH, CANVAS_HEIGHT)
 
 RSS_URL = get_config_env_var(
@@ -74,12 +74,12 @@ async def start_main_loop():
     loop = asyncio.get_event_loop()
 
     background = pygame.surface.Surface(CANVAS_SIZE)
-    background.fill((0, 0, 0, 255))
+    background.fill((1, 1, 1, 255))
     sprites = pygame.sprite.LayeredDirty(background=background)
     sprites.set_clip((0, 0, *CANVAS_SIZE))
 
     sprite_ticker = TickerWidgetSprite(
-        (0, 38, CANVAS_WIDTH, 26),
+        (0, 0, CANVAS_WIDTH, 26),
         item_margin=100,
         loop_count=3,
         autorun=True,

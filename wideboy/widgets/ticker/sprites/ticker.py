@@ -76,17 +76,7 @@ class TickerWidgetSprite(pygame.sprite.DirtySprite):
         if not self.font_cache.get(font):
             self.font_cache[font] = pygame.font.SysFont(font, size)
         text_surface = self.font_cache.get(font).render(text, antialias, color)
-        temp_surface = pygame.Surface(
-            (text_surface.get_rect().width + 2, text_surface.get_rect().height + 2),
-            SRCALPHA,
-        )
-        for offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-            outline_surface = self.font_cache.get(font).render(
-                text, antialias, (1, 1, 1, 255)
-            )
-            temp_surface.blit(outline_surface, (offset[0] + 1, offset[1] + 1))
-        temp_surface.blit(text_surface, (1, 1))
-        self.item_surfaces.append(temp_surface)
+        self.item_surfaces.append(text_surface)
 
     def add_image_item(self, filename: str, size: tuple[int, int]) -> None:
         self.item_surfaces.append(load_resize_image(filename, size))

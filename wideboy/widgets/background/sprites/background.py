@@ -18,6 +18,7 @@ class BackgroundSprite(pygame.sprite.DirtySprite):
         self.rect = pygame.rect.Rect(*rect)
         image = load_resize_image(filename, tile_size)
         self.image = tile_surface(image, fill_size)
+        self.dirty = 2
 
     def update(self, frame: int, delta: float) -> None:
         pass
