@@ -26,6 +26,7 @@ services:
     env_file:
       - ./.env
     environment:
+      PYGAME_FPS: 30
       FT_POS_X: 0
       FT_POS_Y: 40
       FT_LAYER: 2
@@ -38,6 +39,7 @@ services:
     env_file:
       - ./.env
     environment:
+      PYGAME_FPS: 10
       FT_POS_X: 0
       FT_POS_Y: 168
       FT_LAYER: 3
