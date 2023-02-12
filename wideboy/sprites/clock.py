@@ -24,8 +24,8 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
         self.rect = pygame.rect.Rect(*rect)
         self.image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         pygame.font.init()
-        self.font_date = pygame.font.SysFont(font_date, 20)
-        self.font_time = pygame.font.SysFont(font_time, 36, True)
+        self.font_date = pygame.font.SysFont(font_date, 20, bold=True)
+        self.font_time = pygame.font.SysFont(font_time, 38, bold=True)
         self.color_bg = color_bg
         self.color_fg = color_fg
         self.antialias = antialias
@@ -51,7 +51,7 @@ class ClockWidgetSprite(pygame.sprite.DirtySprite):
         date_pos = ((self.rect[2] - date_sprite.get_rect()[2]) // 2, 40)
         time_sprite = self.font_time.render(time_str, self.antialias, self.color_fg)
         time_sprite_shadow = self.font_time.render(time_str, self.antialias, (0, 0, 0))
-        time_pos = ((self.rect[2] - time_sprite.get_rect()[2]) // 2, -6)
+        time_pos = ((self.rect[2] - time_sprite.get_rect()[2]) // 2, -2)
         self.image.blit(
             date_sprite_shadow, (date_pos[0] + shadow_depth, date_pos[1] + shadow_depth)
         )
